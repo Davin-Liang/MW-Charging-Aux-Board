@@ -9,15 +9,63 @@
 #include <string.h>
 #include <stdlib.h>
 #include "power_supply_task.h"
+#include "queue.h"
 
 static void command_task(void * param);
 
 /* command_task任务句柄 */
 static TaskHandle_t g_commandTaskHandle = NULL;
 /* 项目命令 */
-static enum MWCommandDef command;
+static struct CommandInfo command;
 /* 所有任务的链表 */
 static struct TaskHandleNode *g_taskNode = NULL;
+QueueHandle_t g_commandQueueHandle;
+
+/**
+  * @brief  command_task任务主体
+  * @param  param 任务参数   
+  * @return 无
+  **/
+static void command_task(void * param)
+{	
+  /* 注册command，使其可以在command_task.c中使用该command */
+  register_command_for_power_supply(&command);
+	insert_task_handle(g_commandTaskHandle, "command");
+  g_commandQueueHandle = xQueueCreate(COMMAND_QUEUE_LENGTH, sizeof(struct CommandInfo));
+	
+	while (1)
+  {
+		if (pdPASS == xQueueReceive(g_commandQueueHandle, &command, 10))
+    {
+      switch ((int)(command.commandType))
+      {
+        case demandOne:
+        case demandTwo:
+          vTaskResume(find_task_node_by_name("power_supply")->taskHandle);
+          break;
+        case demandFault:
+          
+          break;
+        case noDemand:
+          
+          break;
+		  }      
+    }
+		
+		vTaskDelay(10);
+  }
+}
+
+BaseType_t create_task_for_command(uint16_t size, UBaseType_t priority)
+{
+	
+	return xTaskCreate((TaskFunction_t )command_task,  /* 任务入口函数 */
+										(const char*    )"command_task",/* 任务名字 */
+										(uint16_t       )size,  /* 任务栈大小 */
+										(void*          )NULL,/* 任务入口函数参数 */
+										(UBaseType_t    )priority, /* 任务的优先级 */
+										(TaskHandle_t*  )&g_commandTaskHandle); /* 任务控制块指针 */ 
+}
 
 /**
 	* @brief  将TaskHandle插入链表头部
@@ -50,7 +98,7 @@ int insert_task_handle(TaskHandle_t handle, char * taskName)
     }
     newNode->next = NULL;
     
-    /* 3. 插入链表（这里实现的是头插法） */ 
+    /* 插入链表（这里实现的是头插法） */ 
     if (g_taskNode == NULL) {
         /* 链表为空时，新节点成为头节点 */ 
         g_taskNode = newNode;
@@ -89,43 +137,3 @@ struct TaskHandleNode * find_task_node_by_name(const char* targetName)
     return NULL;
 }
 
-/**
-  * @brief  command_task任务主体
-  * @param  param 任务参数   
-  * @return 无
-  **/
-static void command_task(void * param)
-{	
-  register_command_for_power_supply(&command);
-	insert_task_handle(g_commandTaskHandle, "command");
-	
-	while (1)
-  {
-		switch ((int)command)
-		{
-			case demandOne:
-			case demandTwo:
-				vTaskResume(find_task_node_by_name("power_supply")->taskHandle);
-				break;
-			case demandFault:
-				
-				break;
-			case noDemand:
-				
-				break;
-		}
-		
-		vTaskDelay(10);
-  }
-}
-
-BaseType_t create_task_for_command(uint16_t size, UBaseType_t priority)
-{
-	
-	return xTaskCreate((TaskFunction_t )command_task,  /* 任务入口函数 */
-										(const char*    )"command_task",/* 任务名字 */
-										(uint16_t       )size,  /* 任务栈大小 */
-										(void*          )NULL,/* 任务入口函数参数 */
-										(UBaseType_t    )priority, /* 任务的优先级 */
-										(TaskHandle_t*  )&g_commandTaskHandle); /* 任务控制块指针 */ 
-}
