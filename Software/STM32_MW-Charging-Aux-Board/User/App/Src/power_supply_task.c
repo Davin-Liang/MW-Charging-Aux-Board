@@ -83,7 +83,6 @@ static void power_supply_task(void * param)
 			
 				break;
 			case demandTwo:
-				// TODO: 完善需求实现
 				if (enableUsart == ENABLE)
 				{
 					pm_usart_it_config(enableUsart);
