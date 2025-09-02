@@ -24,7 +24,7 @@ static float historyPowers[140] = {0.0f};
 
 
 /**
-  * @brief  为电源创建任务
+  * @brief  为电源注册命令
   * @param  MWCommand 系统命令
   * @return void
   **/
@@ -33,6 +33,11 @@ void register_command_for_power_supply(struct CommandInfo * MWCommand)
 	command = MWCommand;
 }
 
+/**
+  * @brief  电源任务
+  * @param  param 任务参数
+  * @return void
+  **/
 static void power_supply_task(void * param)
 {
 	float currentVoltage = 0.0f;
@@ -66,7 +71,7 @@ static void power_supply_task(void * param)
 					/* 长时间没收到串口数据 */
 					command->commandType = demandFault; // 设置命令状态异常
 					enableUsart = ENABLE;
-					printf("未收到串口数据，请检查串口与功率计的连接!\r\n");
+					mutual_printf("未收到串口数据，请检查串口与功率计的连接!\r\n");
 				}
 					
 				/* 电压、功率值记录 */
@@ -76,14 +81,13 @@ static void power_supply_task(void * param)
 				currentVoltage += VOL_STEP;
 				if (currentVoltage >= MAX_VAL)
 				{
-					printf("Best(P,V)=(%.3f, %.2f)\r\n", s_bestPower, s_bestVoltage);
+					mutual_printf("Best(P,V)=(%.3f, %.2f)\r\n", s_bestPower, s_bestVoltage);
 					enableUsart = ENABLE;
 					command->commandType = noDemand; // 命令完成
 				}
 			
 				break;
 			case demandTwo:
-				// TODO: 完善需求实现
 				if (enableUsart == ENABLE)
 				{
 					pm_usart_it_config(enableUsart);
@@ -101,7 +105,7 @@ static void power_supply_task(void * param)
 						/* 长时间没收到串口数据 */
 						command->commandType = demandFault; // 设置命令状态异常
 						enableUsart = ENABLE;
-						printf("未收到串口数据，请检查串口与功率计的连接!\r\n");
+						mutual_printf("未收到串口数据，请检查串口与功率计的连接!\r\n");
 					}
 						
 					/* 电压、功率值记录 */
@@ -112,7 +116,7 @@ static void power_supply_task(void * param)
 				currentVoltage += VOL_STEP;
 				if (currentVoltage >= MAX_VAL)
 				{
-					printf("Best(P,V)=(%.3f, %.2f)\r\n", s_bestPower, s_bestVoltage);
+					mutual_printf("Best(P,V)=(%.3f, %.2f)\r\n", s_bestPower, s_bestVoltage);
 					enableUsart = ENABLE;
 					command->commandType = noDemand; // 命令完成
 				}
@@ -145,7 +149,7 @@ static void detect_optimal_voltage(float currentVoltage, float currentPower, int
 			s_bestVoltage = currentVoltage;
 			s_bestPower = currentPower;
 		}
-		printf("P=%.3fW, V=%.2fV, Best(P,V)=(%.3f, %.2f)\r\n",
+		mutual_printf("P=%.3fW, V=%.2fV, Best(P,V)=(%.3f, %.2f)\r\n",
 								currentPower, currentVoltage, s_bestPower, s_bestVoltage);
 	}
 	else if (mode == MULTI_CHANNELS_SCANNING)
@@ -155,8 +159,8 @@ static void detect_optimal_voltage(float currentVoltage, float currentPower, int
 			s_bestVoltages[channel] = currentVoltage;
 			s_bestPowers[channel] = currentPower;
 		}
-		printf("channel=%d, P=%.3fW, V=%.2fV, Best(P,V)=(%.3f, %.2f)\r\n",
-								channel, currentPower, currentVoltage, s_bestPower, s_bestVoltage);		
+		mutual_printf("channel=%d, P=%.3fW, V=%.2fV, Best(P,V)=(%.3f, %.2f)\r\n",
+								channel, currentPower, currentVoltage, s_bestPower, s_bestVoltage);	
 	}
 	
 	// TODO: 未记录当前电压和当前功率值
