@@ -17,7 +17,12 @@
 
 #include <stm32f4xx_conf.h>
 #include "bsp_debug_usart.h"
+#include "FreeRTOS.h"
+#include "semphr.h"
+#include <stdarg.h>  // 用于处理可变参数
 
+
+static SemaphoreHandle_t g_debugUsartMutex;
 
  /**
   * @brief  配置嵌套向量中断控制器NVIC
@@ -43,6 +48,25 @@ static void NVIC_Configuration(void)
   NVIC_Init(&NVIC_InitStructure);
 }
 
+/**
+  * @brief  互斥打印
+  * @param  format 字符串
+  * @return void
+  **/
+void mutual_printf(const char *format, ...)
+{
+    // 获取互斥锁，确保打印操作的原子性
+    xSemaphoreTake(g_debugUsartMutex, portMAX_DELAY);
+    
+    // 处理可变参数并打印
+    va_list args;
+    va_start(args, format);
+    vprintf(format, args);  // 使用vprintf处理可变参数
+    va_end(args);
+    
+    // 释放互斥锁
+    xSemaphoreGive(g_debugUsartMutex);
+}
 
  /**
   * @brief  DEBUG_USART GPIO 配置,工作模式配置。115200 8-N-1 ，中断接收模式
@@ -104,6 +128,9 @@ void Debug_USART_Config(void)
 	
   /* 使能串口 */
   USART_Cmd(DEBUG_USART, ENABLE);
+
+  /* 为DEBUG串口创建互斥量 */
+  g_debugUsartMutex = xSemaphoreCreateMutex();
 }
 
 /*****************  发送一个字符 **********************/

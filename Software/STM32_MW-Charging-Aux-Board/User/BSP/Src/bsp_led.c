@@ -27,10 +27,19 @@ void LED_GPIO_Config(void)
 		/*定义一个GPIO_InitTypeDef类型的结构体*/
 		GPIO_InitTypeDef GPIO_InitStructure;
 
+    #ifdef USE_ZHENGDIAN
+
+		/*开启LED相关的GPIO外设时钟*/
+		RCC_AHB1PeriphClockCmd (LED1_GPIO_CLK| LED2_GPIO_CLK, ENABLE); 
+
+    #else
+
 		/*开启LED相关的GPIO外设时钟*/
 		RCC_AHB1PeriphClockCmd ( LED1_GPIO_CLK|
 	                           LED2_GPIO_CLK|
 	                           LED3_GPIO_CLK, ENABLE); 
+
+    #endif
 
 		/*选择要控制的GPIO引脚*/															   
 		GPIO_InitStructure.GPIO_Pin = LED1_PIN;	
@@ -53,12 +62,19 @@ void LED_GPIO_Config(void)
     /*选择要控制的GPIO引脚*/															   
 		GPIO_InitStructure.GPIO_Pin = LED2_PIN;	
     GPIO_Init(LED2_GPIO_PORT, &GPIO_InitStructure);	
-    
+
+    LED1_OFF;
+    LED2_OFF;
+
+    #ifndef USE_ZHENGDIAN    
+
     /*选择要控制的GPIO引脚*/															   
 		GPIO_InitStructure.GPIO_Pin = LED3_PIN;	
     GPIO_Init(LED3_GPIO_PORT, &GPIO_InitStructure);	
 		
 		/*关闭RGB灯*/
 		LED_RGBOFF;		
+
+    #endif 
 }
 /*********************************************END OF FILE**********************/

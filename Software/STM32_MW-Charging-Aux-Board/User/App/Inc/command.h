@@ -3,6 +3,8 @@
 
 #include "FreeRTOS.h"
 #include "task.h"
+#include "bsp_attenuator.h"
+#include "stm32f4xx.h"
 
 #define COMMAND_QUEUE_LENGTH 10
 
@@ -18,6 +20,7 @@ enum MWCommandDef{
 	 *        得到最优电压后，设置电源为该电压，
 	 */
 	demandTwo,
+	demandThree,
 	demandFault,
 	noDemand
 };
@@ -26,6 +29,9 @@ struct CommandInfo{
 	enum MWCommandDef commandType;
 	/* demandOne */
 	int psChannel;
+	/* demandThree */
+	enum AttenuatorIndex_t attenuatorIndex;
+	FunctionalState attNewState;
 };
 
 struct TaskHandleNode{

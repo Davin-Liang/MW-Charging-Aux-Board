@@ -4,22 +4,43 @@
 #include "stm32f4xx.h"
 #include <stm32f4xx_conf.h>
 
-//引脚定义
+#define USE_ZHENGDIAN 1
+
+/* 引脚定义 */
 /*******************************************************/
-//R 红色灯
+#ifdef USE_ZHENGDIAN
+// R 红色灯
+// 正点原子板子上的红色LED为PF9
+#define LED1_PIN                  GPIO_Pin_9                 
+#define LED1_GPIO_PORT            GPIOF                      
+#define LED1_GPIO_CLK             RCC_AHB1Periph_GPIOF
+
+// G 绿色灯
+// 正点原子板子上的绿色LED为PF10
+#define LED2_PIN                  GPIO_Pin_10                 
+#define LED2_GPIO_PORT            GPIOF                      
+#define LED2_GPIO_CLK             RCC_AHB1Periph_GPIOF
+
+#else
+
+// R 红色灯
+// 野火板子上的红色LED为PF6
 #define LED1_PIN                  GPIO_Pin_6                 
 #define LED1_GPIO_PORT            GPIOF                      
 #define LED1_GPIO_CLK             RCC_AHB1Periph_GPIOF
 
-//G 绿色灯
+// G 绿色灯
+// 野火板子上的绿色LED为PF7
 #define LED2_PIN                  GPIO_Pin_7                 
 #define LED2_GPIO_PORT            GPIOF                      
 #define LED2_GPIO_CLK             RCC_AHB1Periph_GPIOF
-
-//B 蓝色灯
+// B 蓝色灯
+// 野火板子上的蓝色LED为PF8
 #define LED3_PIN                  GPIO_Pin_8                 
 #define LED3_GPIO_PORT            GPIOF                       
 #define LED3_GPIO_CLK             RCC_AHB1Periph_GPIOF
+
+#endif
 /************************************************************/
 
 
@@ -41,11 +62,15 @@
 					else		\
 					GPIO_ResetBits(LED2_GPIO_PORT,LED2_PIN)
 
+#ifndef USE_ZHENGDIAN
+
 #define LED3(a)	if (a)	\
 					GPIO_SetBits(LED3_GPIO_PORT,LED3_PIN);\
 					else		\
 					GPIO_ResetBits(LED3_GPIO_PORT,LED3_PIN)
 
+
+#endif
 
 /* 直接操作寄存器的方法控制IO */
 #define	digitalHi(p,i)			 {p->BSRRL=i;}		//设置为高电平
@@ -79,12 +104,13 @@
 					LED2_ON;\
 					LED3_OFF
 
+#ifndef USE_ZHENGDIAN
+
 //蓝
 #define LED_BLUE	\
 					LED1_OFF;\
 					LED2_OFF;\
 					LED3_ON
-
 					
 //黄(红+绿)					
 #define LED_YELLOW	\
@@ -115,7 +141,7 @@
 					LED2_OFF;\
 					LED3_OFF		
 
-
+#endif
 
 
 void LED_GPIO_Config(void);
