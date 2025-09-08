@@ -17,7 +17,7 @@ static void test_Task(void * param)
   while (1)
   {
     LED1_ON;
-    mutual_printf("Test_Task Running,LED1_ON\r\n");
+		mutual_printf("Test_Task Running,LED1_ON\r\n");
     vTaskDelay(500);   /* ÑÓÊ±500¸ötick */
     
     LED1_OFF;     

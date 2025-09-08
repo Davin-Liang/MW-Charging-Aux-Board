@@ -68,12 +68,13 @@ static void command_task(void * param)
           
           break;
         case noDemand:
-          
           break;
 		  }      
     }
 		
-		vTaskDelay(10);
+		xQueueSend(g_commandQueueHandle, &fuckCommand, 10);
+		
+		vTaskDelay(1000);
   }
 }
 
