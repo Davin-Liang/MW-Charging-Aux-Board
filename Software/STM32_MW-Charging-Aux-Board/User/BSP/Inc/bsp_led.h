@@ -3,12 +3,13 @@
 
 #include "stm32f4xx.h"
 #include <stm32f4xx_conf.h>
+#include "main.h"
 
 //#define USE_ZHENGDIAN 0
 
 /* 引脚定义 */
 /*******************************************************/
-#ifdef USE_ZHENGDIAN
+#if USE_ZHENGDIAN
 // R 红色灯
 // 正点原子板子上的红色LED为PF9
 #define LED1_PIN                  GPIO_Pin_9                 
@@ -62,7 +63,7 @@
 					else		\
 					GPIO_ResetBits(LED2_GPIO_PORT,LED2_PIN)
 
-#ifndef USE_ZHENGDIAN
+#if !USE_ZHENGDIAN
 
 #define LED3(a)	if (a)	\
 					GPIO_SetBits(LED3_GPIO_PORT,LED3_PIN);\
@@ -104,7 +105,7 @@
 					LED2_ON;\
 					LED3_OFF
 
-#ifndef USE_ZHENGDIAN
+#if !USE_ZHENGDIAN
 
 //蓝
 #define LED_BLUE	\

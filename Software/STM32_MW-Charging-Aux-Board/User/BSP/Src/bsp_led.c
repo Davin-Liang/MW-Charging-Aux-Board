@@ -15,7 +15,8 @@
   ******************************************************************************
   */
   
-#include "bsp_led.h"   
+#include "bsp_led.h"
+#include "main.h"   
 
  /**
   * @brief  初始化控制LED的IO
@@ -27,7 +28,7 @@ void LED_GPIO_Config(void)
 		/*定义一个GPIO_InitTypeDef类型的结构体*/
 		GPIO_InitTypeDef GPIO_InitStructure;
 
-    #ifdef USE_ZHENGDIAN
+    #if USE_ZHENGDIAN
 
 		/*开启LED相关的GPIO外设时钟*/
 		RCC_AHB1PeriphClockCmd (LED1_GPIO_CLK| LED2_GPIO_CLK, ENABLE); 
@@ -66,7 +67,7 @@ void LED_GPIO_Config(void)
     LED1_OFF;
     LED2_OFF;
 
-    #ifndef USE_ZHENGDIAN    
+    #if !USE_ZHENGDIAN    
 
     /*选择要控制的GPIO引脚*/															   
 		GPIO_InitStructure.GPIO_Pin = LED3_PIN;	
