@@ -40,4 +40,6 @@ void Usart_SendString( USART_TypeDef * pUSARTx, char *str);
 
 void Usart_SendHalfWord( USART_TypeDef * pUSARTx, uint16_t ch);
 
+void mutual_printf(const char *format, ...);
+
 #endif /* __USART1_H */

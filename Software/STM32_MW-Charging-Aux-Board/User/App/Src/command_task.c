@@ -9,7 +9,10 @@
 #include <string.h>
 #include <stdlib.h>
 #include "power_supply_task.h"
+#include "attenuator_task.h"
 #include "queue.h"
+
+#define DEBUG 1
 
 static void command_task(void * param);
 
@@ -30,12 +33,27 @@ static void command_task(void * param)
 {	
   /* 注册command，使其可以在command_task.c中使用该command */
   register_command_for_power_supply(&command);
+  register_command_for_attenuator(&command);
 	insert_task_handle(g_commandTaskHandle, "command");
   g_commandQueueHandle = xQueueCreate(COMMAND_QUEUE_LENGTH, sizeof(struct CommandInfo));
+
+  #ifdef DEBUG
+
+  /* 用假消息测试功能 */
+  struct CommandInfo fuckCommand = {
+    .commandType = demandOne,
+    .psChannel = 1,
+    .attenuatorIndex = attenuator1,
+    .attNewState = ENABLE
+  };
+
+  xQueueSend(g_commandQueueHandle, &fuckCommand, 10);
+
+  #endif
 	
 	while (1)
   {
-		if (pdPASS == xQueueReceive(g_commandQueueHandle, &command, 10))
+		if (pdPASS == xQueueReceive(g_commandQueueHandle, &command, COMMAND_QUEUE_LEN))
     {
       switch ((int)(command.commandType))
       {
@@ -43,16 +61,20 @@ static void command_task(void * param)
         case demandTwo:
           vTaskResume(find_task_node_by_name("power_supply")->taskHandle);
           break;
+        case demandThree:
+        
+          break;
         case demandFault:
           
           break;
         case noDemand:
-          
           break;
 		  }      
     }
 		
-		vTaskDelay(10);
+		xQueueSend(g_commandQueueHandle, &fuckCommand, 10);
+		
+		vTaskDelay(1000);
   }
 }
 
