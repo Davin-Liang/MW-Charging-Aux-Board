@@ -7,6 +7,9 @@
 #include "bsp_power_meter.h"
 #include "command_task.h"
 #include <string.h>
+#include "ff.h"
+#include "file_common.h"
+#include "main.h"
 
 static void power_supply_task(void * param);
 static void detect_optimal_voltage(float currentVoltage, float currentPower, int mode, int channel);
@@ -22,17 +25,6 @@ static float s_bestPowers[4] = {0.0f};
 static float historyVoltages[140] = {0.0f};
 static float historyPowers[140] = {0.0f};
 
-
-/**
-  * @brief  为电源注册命令
-  * @param  MWCommand 系统命令
-  * @return void
-  **/
-void register_command_for_power_supply(struct CommandInfo * MWCommand)
-{
-	command = MWCommand;
-}
-
 /**
   * @brief  电源任务
   * @param  param 任务参数
@@ -43,6 +35,7 @@ static void power_supply_task(void * param)
 	float currentVoltage = 0.0f;
 	float currentPower = 0.0f;
 	FunctionalState enableUsart = ENABLE;
+	FRESULT res;
 	
 	/* 将 g_PowerSupplyTaskHandle 插入链表 */
 	insert_task_handle(g_PowerSupplyTaskHandle, "power_supply");
@@ -56,6 +49,8 @@ static void power_supply_task(void * param)
 		switch ((int)command->commandType)
 		{
 			case demandOne:
+//				mutual_printf("ps_demandone\r\n");
+//				command->commandType = noDemand;
 				if (enableUsart == ENABLE)
 				{
 					pm_usart_it_config(enableUsart);
@@ -66,13 +61,17 @@ static void power_supply_task(void * param)
 				set_power_supply_voltage(PS_SLAVE_ADDR, PS_REG_ADDR(command->psChannel), currentVoltage);
 				vTaskDelay(TIME_OF_FINISHING_SETTING_VOL);
 				/* 得到发送的电压对应的功率值 */
+				#if !SD_NOTE
 				if (!parse_power_from_buf(&currentPower))
 				{
 					/* 长时间没收到串口数据 */
 					command->commandType = demandFault; // 设置命令状态异常
 					enableUsart = ENABLE;
-					mutual_printf("未收到串口数据，请检查串口与功率计的连接!\r\n");
+					mutual_printf("No serial port data received. Please check the connection between the serial port and the power meter!\r\n");
+					
+					break;
 				}
+				#endif
 					
 				/* 电压、功率值记录 */
 				detect_optimal_voltage(currentVoltage, currentPower, SINGLE_CHANNEL_SCANNING, 0);
@@ -83,8 +82,24 @@ static void power_supply_task(void * param)
 				{
 					mutual_printf("Best(P,V)=(%.3f, %.2f)\r\n", s_bestPower, s_bestVoltage);
 					enableUsart = ENABLE;
+					
+					#if SD_NOTE
+					
+					mutual_printf("Start writing!\r\n");
+					res = writeArraysToCSV("0:test.csv", historyVoltages, historyPowers);
+					if (res == FR_OK)
+						mutual_printf("FR_OK");
+					else if (res == FR_DISK_ERR)
+						mutual_printf("FR_DISK_ERR");
+					mutual_printf("error type: %d", (int)res);
+					mutual_printf("Successfully written to SD card!\r\n");
+
+					#endif
+
 					command->commandType = noDemand; // 命令完成
 				}
+				
+				vTaskDelay(VOL_SENDING_TIME_INTERVAL);
 			
 				break;
 			case demandTwo:
@@ -105,7 +120,7 @@ static void power_supply_task(void * param)
 						/* 长时间没收到串口数据 */
 						command->commandType = demandFault; // 设置命令状态异常
 						enableUsart = ENABLE;
-						mutual_printf("未收到串口数据，请检查串口与功率计的连接!\r\n");
+						mutual_printf("No serial port data received. Please check the connection between the serial port and the power meter!\r\n");
 					}
 						
 					/* 电压、功率值记录 */
@@ -125,12 +140,23 @@ static void power_supply_task(void * param)
 			default:
 				reset_ps_data();
 				pm_usart_it_config(DISABLE);
+				mutual_printf("Power supply closed!");
 				vTaskSuspend(NULL); // 完成任务将自身挂起，节约系统资源
 				break;
 		}
 		
 		vTaskDelay(5);
 	}
+}
+
+/**
+  * @brief  为电源注册命令
+  * @param  MWCommand 系统命令
+  * @return void
+  **/
+void register_command_for_power_supply(struct CommandInfo * MWCommand)
+{
+	command = MWCommand;
 }
 
 /**

@@ -4,7 +4,7 @@
 #include "stm32f4xx.h"
 #include <stm32f4xx_conf.h>
 
-#define USE_ZHENGDIAN 1
+//#define USE_ZHENGDIAN 0
 
 /* Òý½Å¶¨Òå */
 /*******************************************************/

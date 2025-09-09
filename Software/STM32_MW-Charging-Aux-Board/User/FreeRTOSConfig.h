@@ -144,7 +144,7 @@
 #define configMAX_PRIORITIES					  (32)
 
 //空闲任务使用的堆栈大小
-#define configMINIMAL_STACK_SIZE				((unsigned short)128)
+#define configMINIMAL_STACK_SIZE				((unsigned short)1024)
   
 //任务名字字符串长度
 #define configMAX_TASK_NAME_LEN					(16)
@@ -290,7 +290,7 @@
 #define configLIBRARY_LOWEST_INTERRUPT_PRIORITY			15     
 
 //系统可管理的最高中断优先级
-#define configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY	4 
+#define configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY	5
 
 #define configKERNEL_INTERRUPT_PRIORITY 		( configLIBRARY_LOWEST_INTERRUPT_PRIORITY << (8 - configPRIO_BITS) )	/* 240 */
 

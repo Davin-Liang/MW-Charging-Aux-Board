@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "FreeRTOS.h"
+#include "bsp_debug_usart.h"
 #include "task.h"
 
 static void NVIC_Configuration(void);
@@ -170,7 +171,10 @@ int parse_power_from_buf(float * outPower)
 		
 		if (timeCount == 10)
 			return 0;
-
+		
+		mutual_printf("Get Data!\r\n");
+		
+		
 		char temp[PM_USART_REC_LEN + 1] = {0};
     uint16_t len = (g_pmUsartRxSta & 0x3FFF);
     if (len == 0 || len >= PM_USART_REC_LEN) 
