@@ -5,7 +5,7 @@
 #include "command.h"
 
 #define VOL_STEP 0.1f
-#define MAX_VAL 1.f
+#define MAX_VAL 13.f
 #define SINGLE_CHANNEL_SCANNING 1
 #define MULTI_CHANNELS_SCANNING 2
 

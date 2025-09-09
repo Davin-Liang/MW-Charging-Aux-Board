@@ -9,8 +9,7 @@
 #include <string.h>
 #include "ff.h"
 #include "file_common.h"
-
-#define SD_NOTE 1
+#include "main.h"
 
 static void power_supply_task(void * param);
 static void detect_optimal_voltage(float currentVoltage, float currentPower, int mode, int channel);
@@ -25,17 +24,6 @@ static float s_bestVoltages[4] = {0.0f};
 static float s_bestPowers[4] = {0.0f};
 static float historyVoltages[140] = {0.0f};
 static float historyPowers[140] = {0.0f};
-
-
-/**
-  * @brief  为电源注册命令
-  * @param  MWCommand 系统命令
-  * @return void
-  **/
-void register_command_for_power_supply(struct CommandInfo * MWCommand)
-{
-	command = MWCommand;
-}
 
 /**
   * @brief  电源任务
@@ -73,15 +61,17 @@ static void power_supply_task(void * param)
 				set_power_supply_voltage(PS_SLAVE_ADDR, PS_REG_ADDR(command->psChannel), currentVoltage);
 				vTaskDelay(TIME_OF_FINISHING_SETTING_VOL);
 				/* 得到发送的电压对应的功率值 */
-				// if (!parse_power_from_buf(&currentPower))
-				// {
-				// 	/* 长时间没收到串口数据 */
-				// 	command->commandType = demandFault; // 设置命令状态异常
-				// 	enableUsart = ENABLE;
-				// 	mutual_printf("No serial port data received. Please check the connection between the serial port and the power meter!\r\n");
+				#if !SD_NOTE
+				if (!parse_power_from_buf(&currentPower))
+				{
+					/* 长时间没收到串口数据 */
+					command->commandType = demandFault; // 设置命令状态异常
+					enableUsart = ENABLE;
+					mutual_printf("No serial port data received. Please check the connection between the serial port and the power meter!\r\n");
 					
-				// 	break;
-				// }
+					break;
+				}
+				#endif
 					
 				/* 电压、功率值记录 */
 				detect_optimal_voltage(currentVoltage, currentPower, SINGLE_CHANNEL_SCANNING, 0);
@@ -157,6 +147,16 @@ static void power_supply_task(void * param)
 		
 		vTaskDelay(5);
 	}
+}
+
+/**
+  * @brief  为电源注册命令
+  * @param  MWCommand 系统命令
+  * @return void
+  **/
+void register_command_for_power_supply(struct CommandInfo * MWCommand)
+{
+	command = MWCommand;
 }
 
 /**
