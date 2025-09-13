@@ -3,7 +3,7 @@
 
 #include "ff.h"
 
-FRESULT writeArraysToCSV(const TCHAR * path, float * historyVoltages, float * historyPowers);
+FRESULT write_arrays_to_CSV(const TCHAR * path, float * historyVoltages, float * historyPowers);
 
 #endif
 
