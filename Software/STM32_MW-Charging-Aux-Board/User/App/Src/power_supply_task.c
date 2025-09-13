@@ -24,6 +24,7 @@ static float s_bestVoltages[4] = {0.0f};
 static float s_bestPowers[4] = {0.0f};
 static float historyVoltages[140] = {0.0f};
 static float historyPowers[140] = {0.0f};
+static uint16_t psRegAddr[] = {0x006E, 0x00D2, 0x0136, 0x019A};
 
 /**
   * @brief  电源任务
@@ -58,7 +59,7 @@ static void power_supply_task(void * param)
 				}
 				
 				/* 发送电压 */
-				set_power_supply_voltage(PS_SLAVE_ADDR, PS_REG_ADDR(command->psChannel), currentVoltage);
+				set_power_supply_voltage(PS_SLAVE_ADDR, psRegAddr[(int)(command->psChannel)], currentVoltage);
 				vTaskDelay(TIME_OF_FINISHING_SETTING_VOL);
 				/* 得到发送的电压对应的功率值 */
 				#if !SD_NOTE
@@ -86,7 +87,7 @@ static void power_supply_task(void * param)
 					#if SD_NOTE
 					
 					mutual_printf("Start writing!\r\n");
-					res = writeArraysToCSV("0:test.csv", historyVoltages, historyPowers);
+					res = write_arrays_to_CSV("0:test.csv", historyVoltages, historyPowers);
 					if (res == FR_OK)
 						mutual_printf("FR_OK");
 					else if (res == FR_DISK_ERR)
