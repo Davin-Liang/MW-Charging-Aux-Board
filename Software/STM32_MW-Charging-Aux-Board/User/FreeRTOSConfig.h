@@ -144,7 +144,7 @@
 #define configMAX_PRIORITIES					  (32)
 
 //空闲任务使用的堆栈大小
-#define configMINIMAL_STACK_SIZE				((unsigned short)1024)
+#define configMINIMAL_STACK_SIZE				((unsigned short)512)
   
 //任务名字字符串长度
 #define configMAX_TASK_NAME_LEN					(16)
@@ -274,7 +274,7 @@
 #define INCLUDE_eTaskGetState			           1
 #define INCLUDE_xTimerPendFunctionCall	     0
 //#define INCLUDE_xTaskGetCurrentTaskHandle       1
-//#define INCLUDE_uxTaskGetStackHighWaterMark     0
+#define INCLUDE_uxTaskGetStackHighWaterMark     1
 //#define INCLUDE_xTaskGetIdleTaskHandle          0
 
 
