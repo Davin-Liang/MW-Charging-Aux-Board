@@ -81,6 +81,7 @@ static void power_supply_task(void * param)
 				currentVoltage += VOL_STEP;
 				if (currentVoltage >= MAX_VAL)
 				{
+					currentVoltage = 0.f;
 					mutual_printf("Best(P,V)=(%.3f, %.2f)\r\n", s_bestPower, s_bestVoltage);
 					enableUsart = ENABLE;
 					

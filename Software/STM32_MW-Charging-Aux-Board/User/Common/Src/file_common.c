@@ -25,17 +25,17 @@ FRESULT write_arrays_to_CSV(const TCHAR * path, float * historyVoltages, float *
 	  
     /* 创建/打开文件（如果存在则覆盖） */
     res = f_open(&fil, path, FA_WRITE | FA_CREATE_ALWAYS);
-    if (res != FR_OK) 
-    {
-        f_mount(NULL, "0:", 1); // 卸载文件系统
-        return res;
-    }
+//    if (res != FR_OK) 
+//    {
+//        f_mount(NULL, "0:", 1); // 卸载文件系统
+//        return res;
+//    }
     
     /* 写入CSV表头 */
     f_puts("Index,Voltage,Power\n", &fil);
     
     /* 写入数据行 */
-    for (int i = 0; i < 130; i ++) 
+    for (int i = 0; i < 50; i ++) 
     {
         /* 格式化数据行：索引,电压,功率 */
         sprintf(buffer, "%d,%.3f,%.3f\n", i, historyVoltages[i], historyPowers[i]);		
