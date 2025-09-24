@@ -516,6 +516,37 @@ int generate_circle_trajectory(Point2D *points, int num_points, int radius)
     return 0; // ³É¹¦
 }
 
+void set_motor_speed(enum Dm542Def whichDm542, float motorAngularVel)
+{
+    float motorRpm;
+    uint32_t neededFpulse;
+    uint32_t neededArr, neededCcr;
+
+    motorRpm = motorAngularVel / (2 * 3.14);
+    neededFpulse = MOTOR_PRR * motorRpm;
+    neededArr = (int)(NEEDED_CK_CNT / neededFpulse);
+    neededCcr = (int)(neededArr / 2);
+
+    if (whichDm542 == horDm542)
+    {
+        dm542_pul_config(whichDm542, DISABLE);
+        
+        TIM_SetAutoreload(HOR_DM542_TIM, neededArr);
+        TIM_PrescalerConfig(HOR_DM542_TIM, NEEDED_PSC, TIM_PSCReloadMode_Immediate);
+        TIM_SetCompare1(HOR_DM542_TIM, neededCcr);
+    }
+    if (whichDm542 == verDm542)
+    {
+        dm542_pul_config(whichDm542, DISABLE);
+        
+        TIM_SetAutoreload(VER_DM542_TIM, neededArr);
+        TIM_PrescalerConfig(VER_DM542_TIM, NEEDED_PSC, TIM_PSCReloadMode_Immediate);
+        TIM_SetCompare1(VER_DM542_TIM, neededCcr);
+    } 
+}
+
+
+
 void motor_status_add(void)
 {
     horSM.currentPosition += 2;
