@@ -85,9 +85,9 @@ static void power_supply_task(void * param)
 					enableUsart = ENABLE;
 					
 					#if SD_NOTE
-					
+					currentVoltage = 0.f;
 					mutual_printf("Start writing!\r\n");
-					res = write_arrays_to_CSV("0:test.csv", historyVoltages, historyPowers);
+					res = write_arrays_to_CSV("0:test1.csv", historyVoltages, historyPowers);
 					if (res == FR_OK)
 						mutual_printf("FR_OK");
 					else if (res == FR_DISK_ERR)

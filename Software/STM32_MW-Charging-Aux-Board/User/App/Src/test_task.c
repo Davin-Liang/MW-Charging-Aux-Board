@@ -18,11 +18,11 @@ static void test_Task(void * param)
   {
     LED1_ON;
 		mutual_printf("Test_Task Running,LED1_ON\r\n");
-    vTaskDelay(300);   /* 延时500个tick */
+    vTaskDelay(1000);   /* 延时500个tick */
     
     LED1_OFF;     
     mutual_printf("Test_Task Running,LED1_OFF\r\n");
-    vTaskDelay(300);   /* 延时500个tick */
+    vTaskDelay(1000);   /* 延时500个tick */
   }
 }
 

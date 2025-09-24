@@ -2,6 +2,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "dm542_test.h"
+#include "bsp_dm542.h"
 
 static void only_test_Task(void * param); /* only_test_Task任务实现 */
 
@@ -18,7 +19,10 @@ static void only_test_Task(void * param)
   {
 //        test1();
 //				vTaskDelay(5000);
-        dm542_test2();
+//       dm542_test2();
+//    dm542_test3();
+    // dm542_test4();
+    dm542_test5();
   }
 }
 
