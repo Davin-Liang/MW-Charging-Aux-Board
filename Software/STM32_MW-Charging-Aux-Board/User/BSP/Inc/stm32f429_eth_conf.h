@@ -97,9 +97,9 @@
    so the user have to update this value depending on the used external PHY */   
 
 /* The LAN8742A PHY status register  */
- #define PHY_SR                 ((uint16_t)0x001F) /* PHY status register Offset */
- #define PHY_SPEED_STATUS       ((uint16_t)0x0004) /* PHY Speed mask  1:10Mb/s       0:100Mb/s*/
- #define PHY_DUPLEX_STATUS      ((uint16_t)0x0010) /* PHY Duplex mask 1:Full duplex  0:Half duplex*/
+//  #define PHY_SR                 ((uint16_t)0x001F) /* PHY status register Offset */
+//  #define PHY_SPEED_STATUS       ((uint16_t)0x0004) /* PHY Speed mask  1:10Mb/s       0:100Mb/s*/
+//  #define PHY_DUPLEX_STATUS      ((uint16_t)0x0010) /* PHY Duplex mask 1:Full duplex  0:Half duplex*/
 
 
 /* Exported macro ------------------------------------------------------------*/

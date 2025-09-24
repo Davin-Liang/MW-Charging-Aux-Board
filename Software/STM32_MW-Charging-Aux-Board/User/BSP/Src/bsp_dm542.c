@@ -516,6 +516,74 @@ int generate_circle_trajectory(Point2D *points, int num_points, int radius)
     return 0; // 成功
 }
 
+/**
+ * @brief  生成正方形轨迹
+ * @param  points      存放轨迹点的数组（需要在外部分配好空间）
+ * @param  num_points  轨迹点个数
+ * @param  side_length 正方形边长（单位 mm，必须小于 800）
+ * @retval 0 表示成功，-1 表示失败（边长超出范围）
+ */
+int generate_square_trajectory(Point2D *points, int num_points, int side_length)
+{
+    if (side_length <= 0 || side_length >= 800)
+        return -1;  // 边长不合法
+
+    if (num_points < 4)
+        return -1;  // 至少要 4 个点才能形成正方形
+
+
+    int half = side_length / 2;  // 正方形半边长
+    int points_per_side = num_points / 4;  // 每条边分配的点数（不算余数）
+
+    int idx = 0;
+
+    // 1. 下边 (从左下到右下)
+    for (int i = 0; i < points_per_side; i++) 
+    {
+        double t = (double)i / (points_per_side - 1);
+        points[idx].x = (int)lround(-half + t * side_length);
+        points[idx].y = -half;
+        idx++;
+    }
+
+    // 2. 右边 (从右下到右上)
+    for (int i = 0; i < points_per_side; i++) 
+    {
+        double t = (double)i / (points_per_side - 1);
+        points[idx].x = half;
+        points[idx].y = (int)lround(-half + t * side_length);
+        idx++;
+    }
+
+    // 3. 上边 (从右上到左上)
+    for (int i = 0; i < points_per_side; i++) 
+    {
+        double t = (double)i / (points_per_side - 1);
+        points[idx].x = (int)lround(half - t * side_length);
+        points[idx].y = half;
+        idx++;
+    }
+
+    // 4. 左边 (从左上到左下)
+    for (int i = 0; i < points_per_side; i++) 
+    {
+        double t = (double)i / (points_per_side - 1);
+        points[idx].x = -half;
+        points[idx].y = (int)lround(half - t * side_length);
+        idx++;
+    }
+
+    // 如果点数不是 4 的倍数，还可能剩余一些点，把它们分布在起点附近
+    while (idx < num_points) 
+    {
+        points[idx].x = -half;
+        points[idx].y = -half;
+        idx++;
+    }
+
+    return 0; // 成功
+}
+
 void set_motor_speed(enum Dm542Def whichDm542, float motorAngularVel)
 {
     float motorRpm;

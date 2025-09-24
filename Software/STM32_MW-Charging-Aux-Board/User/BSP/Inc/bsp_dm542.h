@@ -96,6 +96,7 @@ int motor_status_write_to_flash(void);
 int motor_status_write_from_flash(void);
 int generate_circle_trajectory(Point2D *points, int num_points, int radius);
 void set_motor_speed(enum Dm542Def whichDm542, float motorAngularVel);
+int generate_square_trajectory(Point2D *points, int num_points, int side_length);
 void motor_status_add(void);
 
 #endif

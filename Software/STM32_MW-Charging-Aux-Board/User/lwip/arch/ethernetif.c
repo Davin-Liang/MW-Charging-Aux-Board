@@ -123,10 +123,12 @@ static void low_level_init(struct netif *netif)
     netif->flags = NETIF_FLAG_BROADCAST|NETIF_FLAG_ETHARP|NETIF_FLAG_LINK_UP;   /*广播 ARP协议 链接检测*/
 		
     ETH_MACAddressConfig(ETH_MAC_Address0, netif->hwaddr); // 向STM32F4的MAC地址寄存器中写入MAC地址
+    /* 使DMA描绘符变成链式结构 */
     ETH_DMATxDescChainInit(DMATxDscrTab, Tx_Buff, ETH_TXBUFNB);
     ETH_DMARxDescChainInit(DMARxDscrTab, Rx_Buff, ETH_RXBUFNB);
 		
-		ETH_Start();
+    /* 开启以太网接口 */
+    ETH_Start();
     
 //    HAL_ETH_DMATxDescListInit(&g_eth_handler,g_eth_dma_tx_dscr_tab,g_eth_tx_buf,ETH_TXBUFNB); /*初始化发送描述符*/
 //    HAL_ETH_DMARxDescListInit(&g_eth_handler,g_eth_dma_rx_dscr_tab,g_eth_rx_buf,ETH_RXBUFNB); /*初始化接收描述符*/
@@ -159,11 +161,11 @@ static err_t low_level_output(struct netif *netif, struct pbuf *p)
     for (q = p; q != NULL; q = q->next) 
     {
         memcpy((u8_t*)&buffer[l], q->payload, q->len);
-        l = l+q->len;
+        l = l+q -> len;
     } 
     res = ETH_Tx_Packet(l); 
     if (res == ETH_ERROR)
-				return ERR_MEM;//返回错误状态
+        return ERR_MEM;//返回错误状态
 		
     return ERR_OK;
 
