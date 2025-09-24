@@ -8,6 +8,10 @@
 #include <stdio.h>
 #include "FreeRTOS.h"
 #include "task.h"
+#include "bsp_spi_flash.h"
+#include "bsp_debug_usart.h"
+#include <math.h>
+#include <stdint.h>
 
 struct ScrewMotorStatus horSM = {
     .movingCompletionStatus = finished,
@@ -154,7 +158,7 @@ void ver_dm542_init(uint32_t period, uint16_t prescaler, uint32_t pulse)
     GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;  
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5;  
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8;  
     GPIO_Init(GPIOB, &GPIO_InitStructure);
 
 	TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
@@ -281,7 +285,7 @@ void TIM5_IRQHandler(void)
         TIM_Cmd(VER_DM542_SLAVE_TIM, DISABLE);
         TIM_Cmd(VER_DM542_TIM, DISABLE);
         verSM.movingCompletionStatus = finished;
-        GPIO_ToggleBits(GPIOB, GPIO_Pin_5);
+       GPIO_ToggleBits(GPIOB, GPIO_Pin_8);
     }
 }
 
@@ -307,13 +311,6 @@ int motor_position_ctrl(float horPosition, float verPosition)
         horSM.movingCompletionStatus = unfinished;
     if (verDistance != 0)
         verSM.movingCompletionStatus = unfinished;
-
-    /* 距离记录 */
-    // TODO:待改进
-    horSM.currentPosition = horPosition; 
-    verSM.currentPosition = verPosition; 
-    // TODO:写入到 flash
-
 
     /* 横向步进电机方向控制 */
     if (horDistance >= 0)
@@ -354,6 +351,13 @@ int motor_position_ctrl(float horPosition, float verPosition)
         vTaskDelay(5);
     while (verSM.movingCompletionStatus == unfinished)
         vTaskDelay(5);
+		
+    /* 距离记录 */
+    // TODO:待改进
+    horSM.currentPosition = horPosition; 
+    verSM.currentPosition = verPosition; 
+    // 写入到 flash
+    motor_status_write_to_flash();
 
     return 1;
 }
@@ -365,8 +369,155 @@ int motor_position_ctrl(float horPosition, float verPosition)
   **/
 void screw_motor_status_init(void)
 {
-	/* 从 flash 中获取横向步进电机实际距离值 */
-    // TODO:
-    /* 从 flash 中获取纵向步进电机实际距离值 */
-    // TODO:
+    motor_status_write_from_flash();
 }	
+
+/**
+  * @brief  步进电机状态复位
+  * @param  void
+  * @return void
+  **/
+void screw_motor_status_reset(void)
+{
+    horSM.currentPosition = 0;
+    verSM.currentPosition = 0;
+    motor_status_write_to_flash();
+}	
+
+/**
+  * @brief  将步进电机状态的数据写进 flash
+  * @param  void
+  * @return -1 没有和Flash建立通讯 / 1 写入数据成功
+  **/
+int motor_status_write_to_flash(void)
+{
+    __IO uint32_t flashID = 0;
+    uint8_t dataFlag = DATA_FLAG;
+    uint8_t motorStatusData[MOTOR_DATA_LEN] = {0};
+    // uint8_t i = 0;
+
+	/* 获取 SPI Flash ID */
+	flashID = SPI_FLASH_ReadID();
+
+    if (flashID != sFLASH_ID)
+    {
+        mutual_printf("[error]: No get flash ID!!!\r\n");
+        return -1;
+    }
+        
+
+    /* 整合数据 */
+    motorStatusData[0] = dataFlag;
+    uint32_t horPostionData = *(uint32_t*)&(horSM.currentPosition);
+    motorStatusData[1] = horPostionData >> 24;
+    motorStatusData[2] = horPostionData >> 16;
+    motorStatusData[3] = horPostionData >>  8;
+    motorStatusData[4] = horPostionData >>  0;
+
+    uint32_t verPostionData = *(uint32_t*)&(verSM.currentPosition);
+    motorStatusData[5] = verPostionData >> 24;
+    motorStatusData[6] = verPostionData >> 16;
+    motorStatusData[7] = verPostionData >>  8;
+    motorStatusData[8] = verPostionData >>  0;
+    
+    /* 擦除扇区 */
+    SPI_FLASH_SectorErase(0);
+
+    /* 写入电机状态数据到第0页 */
+    SPI_FLASH_BufferWrite((void*)motorStatusData, (SPI_FLASH_PageSize * 0), MOTOR_DATA_LEN);   
+    mutual_printf("[write]: The data to be written --> horSM.currentposition = %f, verSM.currentposition = %f\r\n", horSM.currentPosition, verSM.currentPosition);
+
+    return 1;
+}
+
+/**
+  * @brief  从 flash 读取步进电机状态的数据
+  * @param  void
+  * @return -1 没有和Flash建立通讯 / 0 flash 中没有电机数据 / 1 读取数据成功
+  **/
+int motor_status_write_from_flash(void)
+{
+    __IO uint32_t flashID = 0;
+    uint8_t dataFlag = 0;
+    uint8_t motorStatusData[MOTOR_DATA_LEN] = {0};
+    uint32_t horPostionData = 0;
+    uint32_t verPostionData = 0;
+
+	/* 获取 SPI Flash ID */
+	flashID = SPI_FLASH_ReadID();
+
+    if (flashID != sFLASH_ID)
+    {
+        mutual_printf("[error]: No get flash ID!!!\r\n");
+        return -1;
+    }
+    /* 读取数据标志位 */
+    SPI_FLASH_BufferRead((void*)&dataFlag, (SPI_FLASH_PageSize * 0), 1);
+
+    if (dataFlag != DATA_FLAG)
+        return 0;
+
+    /* 读取数据 */
+    SPI_FLASH_BufferRead((void*)motorStatusData, (SPI_FLASH_PageSize * 0), MOTOR_DATA_LEN);
+
+    /* 数据提取 */
+    horPostionData = motorStatusData[1] << 24 |
+                    motorStatusData[2] << 16 |
+                    motorStatusData[3] << 8 |
+                    motorStatusData[4] << 0;
+    verPostionData = motorStatusData[5] << 24 |
+                    motorStatusData[6] << 16 |
+                    motorStatusData[7] << 8 |
+                    motorStatusData[8] << 0;
+		mutual_printf("[read]: motorStatusData[1] = %d\r\n", motorStatusData[1]);
+		mutual_printf("[read]: motorStatusData[2] = %d\r\n", motorStatusData[2]);
+		mutual_printf("[read]: motorStatusData[3] = %d\r\n", motorStatusData[3]);
+		mutual_printf("[read]: motorStatusData[4] = %d\r\n", motorStatusData[4]);
+		mutual_printf("[read]: motorStatusData[5] = %d\r\n", motorStatusData[5]);
+		mutual_printf("[read]: motorStatusData[6] = %d\r\n", motorStatusData[6]);
+		mutual_printf("[read]: motorStatusData[7] = %d\r\n", motorStatusData[7]);
+		mutual_printf("[read]: motorStatusData[8] = %d\r\n", motorStatusData[8]);
+
+    horSM.currentPosition = *(float*)&horPostionData;
+    verSM.currentPosition = *(float*)&verPostionData;
+
+    mutual_printf("[read]: The data readed --> horSM.currentposition = %f, verSM.currentposition = %f\r\n", horSM.currentPosition, verSM.currentPosition);
+
+    return 1;
+}
+
+/**
+  * @brief  生成圆形轨迹
+  * @param  points    存放轨迹点的数组（需要在外部分配好空间）
+  * @param  num_points 轨迹点个数
+  * @param  radius     圆的半径（单位 mm，必须小于 400）
+  * @retval 0 表示成功，-1 表示失败（半径超出范围）
+  **/
+int generate_circle_trajectory(Point2D *points, int num_points, int radius)
+{
+    if (radius <= 0 || radius >= (int)(MAX_DISTANCE_VAL * 1000))
+        return -1;  // 半径不合法
+
+
+    for (int i = 0; i < num_points; i++) 
+    {
+        double theta = 2.0 * 3.14 * i / num_points;  // 当前角度
+
+        /* 计算圆上点的坐标 */
+        double x = radius * cos(theta);
+        double y = radius * sin(theta);
+
+        /* 转换为 int 型 */
+        points[i].x = (int)lround(x);
+        points[i].y = (int)lround(y);
+			mutual_printf("points[%d].x = %d,points[%d].y = %d \r\n", i, points[i].x,i, points[i].y);
+    }
+
+    return 0; // 成功
+}
+
+void motor_status_add(void)
+{
+    horSM.currentPosition += 2;
+    verSM.currentPosition += 2;
+}

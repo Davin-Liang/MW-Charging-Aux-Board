@@ -8,7 +8,7 @@
 #define MOTOR_STEP_ANGLE    1.8f // 步距角
 #define MOTOR_PRR           ((360.f / MOTOR_STEP_ANGLE) * DM542_SUBDIVISION) // 电机每转所需的脉冲数
 #define PULSE_EQUIVALENT    (SCREW_LEAD / MOTOR_PRR) // 脉冲当量
-#define MOTOR_ANGULAR_VEL   10.f // 电机角速度
+#define MOTOR_ANGULAR_VEL   70.f // 电机角速度
 #define MOTOR_RPM           (MOTOR_ANGULAR_VEL / (2 * 3.14)) // 电机转速
 #define NEEDED_FPULSE       (MOTOR_PRR * MOTOR_RPM) // 脉冲频率
 #define NEEDED_PSC          128
@@ -16,7 +16,10 @@
 #define NEEDED_ARR          (int)(NEEDED_CK_CNT / NEEDED_FPULSE)
 #define NEEDED_CCR          (int)(NEEDED_ARR / 2)
 
-#define MAX_DISTANCE_VAL    0.5f
+#define MAX_DISTANCE_VAL    0.4f // 单位[m]
+
+#define DATA_FLAG           0XCD
+#define MOTOR_DATA_LEN         9
 
 /*
  * 横方向步进电机
@@ -76,11 +79,22 @@ struct ScrewMotorStatus{
     enum MovingCompletionStatus movingCompletionStatus;
 };
 
+/* 轨迹点结构体 */
+typedef struct {
+    int x;
+    int y;
+} Point2D;
+
 void hor_dm542_init(uint32_t period, uint16_t prescaler, uint32_t pulse);
 void ver_dm542_init(uint32_t period, uint16_t prescaler, uint32_t pulse);
 void dm542_dir_config(enum Dm542Def whichDm542, BitAction bitVal);
 void dm542_pul_config(enum Dm542Def whichDm542, FunctionalState newState);
 int motor_position_ctrl(float horPosition, float verPosition);
 void screw_motor_status_init(void);
+void screw_motor_status_reset(void);
+int motor_status_write_to_flash(void);
+int motor_status_write_from_flash(void);
+int generate_circle_trajectory(Point2D *points, int num_points, int radius);
+void motor_status_add(void);
 
 #endif
