@@ -143,7 +143,7 @@ void start_task(void *pvParameters)
     while (lwip_comm_init() != 0)
     {
 //        lcd_show_string(30, 110, 200, 16, 16, "lwIP Init failed!!", RED);
-				printf("lwIP Init failed!!\r\n");
+        printf("lwIP Init failed!!\r\n");
         delay_ms(500);
 //        lcd_fill(30, 50, 200 + 30, 50 + 16, WHITE);
 //        lcd_show_string(30, 110, 200, 16, 16, "Retrying...       ", RED);
@@ -154,10 +154,12 @@ void start_task(void *pvParameters)
     while (!ethernet_read_phy(PHY_SR))  /* 检查MCU与PHY芯片是否通信成功 */
     {
         printf("MCU与PHY芯片通信失败，请检查电路或者源码！！！！\r\n");
+        vTaskDelay(5);
     }
     
     while ((g_lwipdev.dhcpstatus != 2)&&(g_lwipdev.dhcpstatus != 0XFF))  /* 等待DHCP获取成功/超时溢出 */
     {
+        printf("等待DHCP获取成功/超时溢出");
         vTaskDelay(5);
     }
     

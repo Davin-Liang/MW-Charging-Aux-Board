@@ -487,11 +487,11 @@ int motor_status_write_from_flash(void)
 }
 
 /**
-  * @brief  生成圆形轨迹
-  * @param  points    存放轨迹点的数组（需要在外部分配好空间）
-  * @param  num_points 轨迹点个数
-  * @param  radius     圆的半径（单位 mm，必须小于 400）
-  * @retval 0 表示成功，-1 表示失败（半径超出范围）
+  * @brief              生成圆形轨迹
+  * @param  points      存放轨迹点的数组（需要在外部分配好空间）
+  * @param  num_points  轨迹点个数
+  * @param  radius      圆的半径（单位 mm，必须小于 400）
+  * @retval             0 表示成功，-1 表示失败（半径超出范围）
   **/
 int generate_circle_trajectory(Point2D *points, int num_points, int radius)
 {
@@ -517,12 +517,12 @@ int generate_circle_trajectory(Point2D *points, int num_points, int radius)
 }
 
 /**
- * @brief  生成正方形轨迹
- * @param  points      存放轨迹点的数组（需要在外部分配好空间）
- * @param  num_points  轨迹点个数
- * @param  side_length 正方形边长（单位 mm，必须小于 800）
- * @retval 0 表示成功，-1 表示失败（边长超出范围）
- */
+  * @brief               生成正方形轨迹
+  * @param  points       存放轨迹点的数组（需要在外部分配好空间）
+  * @param  num_points   轨迹点个数
+  * @param  side_length  正方形边长（单位 mm，必须小于 800）
+  * @retval              0 表示成功，-1 表示失败（边长超出范围）
+  **/
 int generate_square_trajectory(Point2D *points, int num_points, int side_length)
 {
     if (side_length <= 0 || side_length >= 800)
