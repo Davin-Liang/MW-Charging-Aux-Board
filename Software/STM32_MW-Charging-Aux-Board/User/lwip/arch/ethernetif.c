@@ -127,6 +127,24 @@ static void low_level_init(struct netif *netif)
     ETH_DMATxDescChainInit(DMATxDscrTab, Tx_Buff, ETH_TXBUFNB);
     ETH_DMARxDescChainInit(DMARxDscrTab, Rx_Buff, ETH_RXBUFNB);
 		
+		/* Enable Ethernet Rx interrrupt */
+		{ 
+			for(int i=0; i<ETH_RXBUFNB; i++)
+			{
+				ETH_DMARxDescReceiveITConfig(&DMARxDscrTab[i], ENABLE);
+			}
+		}
+
+	#ifdef CHECKSUM_BY_HARDWARE
+		/* Enable the checksum insertion for the Tx frames */
+		{
+			for(int i=0; i<ETH_TXBUFNB; i++)
+			{
+				ETH_DMATxDescChecksumInsertionConfig(&DMATxDscrTab[i], ETH_DMATxDesc_ChecksumTCPUDPICMPFull);
+			}
+		} 
+	#endif		
+		
     /* 开启以太网接口 */
     ETH_Start();
     
@@ -265,6 +283,12 @@ static struct pbuf * low_level_input(struct netif *netif)
     u8 * buffer;
     p = NULL;
     frame = ETH_Rx_Packet();
+	
+		if(frame.length == ETH_ERROR) //????,DMA???
+		{
+		return p;
+		}	
+	
     len = frame.length;// 得到包大小
     buffer = (u8 *)frame.buffer; // 得到包数据地址 
     p = pbuf_alloc(PBUF_RAW, len, PBUF_POOL); // pbufs内存池分配pbuf

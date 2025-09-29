@@ -59,6 +59,12 @@ uint8_t ethernet_init(void)
 {
     ETH_MspInit();
 	
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_ETH_MAC | RCC_AHB1Periph_ETH_MAC_Tx |RCC_AHB1Periph_ETH_MAC_Rx, ENABLE);
+	
+    ETH_DeInit();                                  
+    ETH_SoftwareReset();                          
+    while (ETH_GetSoftwareResetStatus() == SET){;}
+	
     ETH_StructInit(&ETH_InitStructure);
 
     /* Fill ETH_InitStructure parametrs */
@@ -123,7 +129,19 @@ uint8_t ethernet_init(void)
     /* Configure Ethernet */
 	/* 配置ETH */
 		uint32_t EthStatus = ETH_ERROR;
+		ETH_DMAITConfig(ETH_DMA_IT_NIS|ETH_DMA_IT_R, ENABLE);
     EthStatus = ETH_Init(&ETH_InitStructure, ETHERNET_PHY_ADDRESS);
+		ETH_DMAITConfig(ETH_DMA_IT_NIS|ETH_DMA_IT_R, ENABLE);
+		
+		
+		
+//    NVIC_InitTypeDef NVIC_InitStructure;
+//    NVIC_InitStructure.NVIC_IRQChannel = ETH_IRQn;           // 以太网中断
+//    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1; // 抢占优先级
+//    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;        // 子优先级
+//    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;           // 使能中断
+//    NVIC_Init(&NVIC_InitStructure);		
+		
     if (EthStatus == ETH_SUCCESS)
     {
         return 0;   /* 成功 */
@@ -132,6 +150,8 @@ uint8_t ethernet_init(void)
     {
         return 1;  /* 失败 */
     }
+		
+
 
     // uint8_t macaddress[6];
 
@@ -353,8 +373,8 @@ void ETH_MspInit(void)
     // 设置中断优先级
     NVIC_InitTypeDef NVIC_InitStructure;
     NVIC_InitStructure.NVIC_IRQChannel = ETH_IRQn;           // 以太网中断
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 3; // 抢占优先级
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;        // 子优先级
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0; // 抢占优先级
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;        // 子优先级
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;           // 使能中断
     NVIC_Init(&NVIC_InitStructure);
 }
@@ -410,18 +430,8 @@ uint8_t ethernet_chip_get_speed(void)
     return speed;
 }
 
-//extern void lwip_pkt_handle(void); /* 在lwip_comm.c里面定义 */
+extern void lwip_pkt_handle(void); /* 在lwip_comm.c里面定义 */
 
-//void ETH_IRQHandler(void)
-//{
-//    if (ethernet_get_eth_rx_size(g_eth_handler.RxDesc))
-//    {
-////        lwip_pkt_handle();      /* 处理以太网数据，即将数据提交给LWIP */
-//    }
-
-//    __HAL_ETH_DMA_CLEAR_IT(&g_eth_handler, ETH_DMA_IT_NIS);   /* 清除DMA中断标志位 */
-//    __HAL_ETH_DMA_CLEAR_IT(&g_eth_handler, ETH_DMA_IT_R);     /* 清除DMA接收中断标志位 */
-//}
 /**
  * @breif       中断服务函数
  * @param       无
@@ -430,14 +440,14 @@ uint8_t ethernet_chip_get_speed(void)
 void ETH_IRQHandler(void)
 {
     /* 检查并清除所有中断标志 */
-    if (ETH_GetDMAFlagStatus(ETH_DMA_FLAG_NIS) != RESET)
+    if (ETH_GetDMAITStatus(ETH_DMA_IT_NIS) != RESET)
     {
         /* 检查接收中断 */
-        if (ETH_GetDMAFlagStatus(ETH_DMA_FLAG_R) != RESET)
+        if (ETH_GetDMAITStatus(ETH_DMA_IT_R) != RESET)
         {
             if (ethernet_get_eth_rx_size(DMARxDescToGet))
             {
-//                lwip_pkt_handle();      /* 处理以太网数据，即将数据提交给LWIP */
+                lwip_pkt_handle();      /* 处理以太网数据，即将数据提交给LWIP */
             }
             ETH_DMAClearITPendingBit(ETH_DMA_IT_R);
         }

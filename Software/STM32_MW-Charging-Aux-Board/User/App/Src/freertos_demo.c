@@ -159,7 +159,7 @@ void start_task(void *pvParameters)
     
     while ((g_lwipdev.dhcpstatus != 2)&&(g_lwipdev.dhcpstatus != 0XFF))  /* 等待DHCP获取成功/超时溢出 */
     {
-        printf("等待DHCP获取成功/超时溢出");
+        printf("Acquire DHCP successfully/Timeout");
         vTaskDelay(5);
     }
     
