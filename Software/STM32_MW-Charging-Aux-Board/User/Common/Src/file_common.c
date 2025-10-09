@@ -2,7 +2,9 @@
 #include "ff.h"      // FatFS头文件
 #include "stdio.h"   // 用于sprintf函数
 #include "FreeRTOS.h"
+#include "file_common.h"
 #include "task.h"
+#include <string.h>
 
 //UBaseType_t tackGet0;
 UBaseType_t tackGet;
@@ -47,6 +49,96 @@ FRESULT write_arrays_to_CSV(const TCHAR * path, float * historyVoltages, float *
     /* 关闭文件 */
     res = f_close(&fil);
     
+    return res;
+}
+
+/**
+  * @brief  对于每一个通道，将电压和当前功率数据写入CSV文件，电压
+  * @param  path 文件名
+  * @param  historyVoltages
+  * @param  historyPowers
+  * @return 写入结果
+  **/
+FRESULT write_v_p_to_csv(const TCHAR * path, float voltage, float power, int index,int channel)
+{
+    FRESULT res;
+    FIL fil;
+    char buffer[64];
+    
+    // 尝试以追加方式打开现有文件
+    res = f_open(&fil, path, FA_WRITE | FA_OPEN_EXISTING);
+    
+    if (res == FR_OK) 
+    {
+        // 文件存在，移动到末尾
+        f_lseek(&fil, f_size(&fil));
+    } 
+    else if (res == FR_NO_FILE) 
+    {
+        // 文件不存在，创建新文件
+        res = f_open(&fil, path, FA_WRITE | FA_CREATE_NEW);
+        if (res == FR_OK) 
+        {
+            // 写入表头
+            f_puts("Index,Voltage,Power,Channel\n", &fil);
+        }
+    }
+    
+    if (res != FR_OK) 
+    {
+        return res;
+    }
+    
+    // 写入数据
+    sprintf(buffer, "%d,%.3f,%.3f,%d\n", index, voltage, power, channel);
+    f_puts(buffer, &fil);
+    
+    res = f_close(&fil);
+    return res;
+}
+
+/**
+  * @brief  对于每一个通道，将电压和当前功率数据写入CSV文件，电压
+  * @param  path 文件名
+  * @param  historyVoltages
+  * @param  historyPowers
+  * @return 写入结果
+  **/
+FRESULT write_x_y_p_to_csv(const TCHAR * path, float x, float y, float optimalP)
+{
+    FRESULT res;
+    FIL fil;
+    char buffer[64];
+    
+    // 尝试以追加方式打开现有文件
+    res = f_open(&fil, path, FA_WRITE | FA_OPEN_EXISTING);
+    
+    if (res == FR_OK) 
+    {
+        // 文件存在，移动到末尾
+        f_lseek(&fil, f_size(&fil));
+    } 
+    else if (res == FR_NO_FILE) 
+    {
+        // 文件不存在，创建新文件
+        res = f_open(&fil, path, FA_WRITE | FA_CREATE_NEW);
+        if (res == FR_OK) 
+        {
+            // 写入表头
+            f_puts("X,Y,P\n", &fil);
+        }
+    }
+    
+    if (res != FR_OK) 
+    {
+        return res;
+    }
+    
+    // 写入数据
+    sprintf(buffer, "%.3f,%.3f,%.3f\n", x, y, optimalP);
+    f_puts(buffer, &fil);
+    
+    res = f_close(&fil);
     return res;
 }
 

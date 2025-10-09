@@ -373,7 +373,7 @@ void ETH_MspInit(void)
     // 设置中断优先级
     NVIC_InitTypeDef NVIC_InitStructure;
     NVIC_InitStructure.NVIC_IRQChannel = ETH_IRQn;           // 以太网中断
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0; // 抢占优先级
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1; // 抢占优先级
     NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;        // 子优先级
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;           // 使能中断
     NVIC_Init(&NVIC_InitStructure);
