@@ -2,38 +2,101 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
+#include "file_common.h"
 
-static void data_sum_Task(void * param); /* Test_Taskä»»åŠ¡å®ç° */
+static void data_sum_Task(void * param);
 QueueHandle_t g_motorDataQueue = NULL;
 QueueHandle_t g_optimalVPDataQueue = NULL;
+QueueHandle_t g_currentVPChQueue = NULL;
 
-static TaskHandle_t g_dataSumTaskHandle = NULL;/* LEDä»»åŠ¡å¥æŸ„ */
+static TaskHandle_t g_dataSumTaskHandle = NULL;
 
 /**
-  * @brief  test_Taskä»»åŠ¡ä¸»ä½“
-  * @param  parameter ä»»åŠ¡å‚æ•°   
-  * @return æ— 
+  * @brief  data_sum_Task ÈÎÎñÖ÷Ìå
+  * @param  param ÈÎÎñ²ÎÊı  
+  * @return void
   **/
 static void data_sum_Task(void * param)
 {	
+    struct MotorData_t currentMotorData;
+    struct Optimal_v_p_t currentOptimalVP;
+    struct CurrentV_P_Ch_t currentVPCh;
+  
     g_motorDataQueue = xQueueCreate(MOTOR_DATA_QUEUE_LEN, sizeof(struct MotorData_t));
     g_optimalVPDataQueue = xQueueCreate(OPTIMAL_V_P_DATA_QUEUE_LEN, sizeof(struct Optimal_v_p_t));
+    g_currentVPChQueue = xQueueCreate(CURRENT_V_P_CH_QUEUE_LEN, sizeof(struct CurrentV_P_Ch_t));
   
     while (1)
     {
+      if (pdPASS == xQueueReceive(g_motorDataQueue, &currentMotorData, 10))
+      {
+        /* ´òÓ¡µç»úÊı¾İ */
 
+        /* Í¨¹ıÒÔÌ«ÍøÉÏ´«µç»úÊı¾İ */
+
+      }
+
+        
+      if (pdPASS == xQueueReceive(g_optimalVPDataQueue, &currentOptimalVP, 10))
+      {
+        /* ´òÓ¡µç»úÊı¾İ¡¢×îÓÅ¹¦ÂÊºÍËÄ¸öÍ¨µÀµÄ×îÓÅµçÑ¹ */
+
+
+        /* Íù SD ¿¨ÖĞĞ´Èëµç»úÊı¾İ¡¢×îÓÅ¹¦ÂÊºÍËÄ¸öÍ¨µÀµÄ×îÓÅµçÑ¹ */
+        // TODO: È±ÉÙÂ·¾¶¶¨Òå
+        // write_x_y_v_p_to_csv(,
+        //                       currentMotorData.x,
+        //                       currentMotorData.y,
+        //                       currentOptimalVP.optimalVs,
+        //                       currentOptimalVP.optimalP);
+
+        /* Í¨¹ıÒÔÌ«ÍøÉÏ´«×îÓÅ½á¹û */
+
+      }
+
+      if (pdPASS == xQueueReceive(g_currentVPChQueue, &currentVPCh, 10))
+      {
+        /* ´òÓ¡µ±Ç°Í¨µÀµÄµçÑ¹¡¢¹¦ÂÊ */
+
+
+        /* Íù SD ¿¨ÖĞĞ´Èëµ±Ç°Í¨µÀµÄµçÑ¹¡¢¹¦ÂÊ¡¢Í¨µÀ */
+        // TODO: È±ÉÙÂ·¾¶¶¨Òå
+        // write_v_p_to_csv( ,currentVPCh.currentV, currentVPCh.currentP, currentVPCh.channel);
+
+        /* Í¨¹ıÒÔÌ«ÍøÉÏ´«µ±Ç°Í¨µÀµÄµçÑ¹¡¢¹¦ÂÊ¡¢Í¨µÀ */
+
+      }
+
+      vTaskDelay(10);
     }
 }
+
+/* To power_supply_task.c */
+// #include "data_sum_task.h"
+// struct MotorData_t currentOptimalVP;
+// currentOptimalVP.optimalV1 = ;
+// currentOptimalVP.optimalV2 = ;
+// currentOptimalVP.optimalV3 = ;
+// currentOptimalVP.optimalV4 = ;
+// currentOptimalVP.optimalP = ;
+// xQueueSend(g_optimalVPDataQueue, &currentOptimalVP, 10);
+
+/* To dm542_task.c */
+// #include "data_sum_task.h"
+// struct Optimal_v_p_t currentMotorData;
+// currentMotorData.x = ;
+// currentMotorData.y = ;
+// xQueueSend(g_motorDataQueue, &currentMotorData, 10);
 
 BaseType_t create_task_for_data_sum(uint16_t size, UBaseType_t priority)
 {
 	
-	return xTaskCreate((TaskFunction_t )data_sum_Task,  /* ä»»åŠ¡å…¥å£å‡½æ•° */
-						(const char*    )"data_sum_Task",/* ä»»åŠ¡åå­— */
-						(uint16_t       )size,  /* ä»»åŠ¡æ ˆå¤§å° */
-                        (void*          )NULL,/* ä»»åŠ¡å…¥å£å‡½æ•°å‚æ•° */
-                        (UBaseType_t    )priority, /* ä»»åŠ¡çš„ä¼˜å…ˆçº§ */
-                        (TaskHandle_t*  )&g_dataSumTaskHandle); /* ä»»åŠ¡æ§åˆ¶å—æŒ‡é’ˆ */ 
+	return xTaskCreate((TaskFunction_t )data_sum_Task,
+						          (const char*    )"data_sum_Task",
+						          (uint16_t       )size, 
+                      (void*          )NULL,
+                      (UBaseType_t    )priority, 
+                      (TaskHandle_t*  )&g_dataSumTaskHandle);
 }
 
 

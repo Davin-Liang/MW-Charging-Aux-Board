@@ -14,18 +14,24 @@ struct MotorData_t
 
 struct Optimal_v_p_t
 {
-    float optimalV1;
-    float optimalV2;
-    float optimalV3;
-    float optimalV4;
+    float optimalVs[4];
 
     float optimalP;
 };
 
+struct CurrentV_P_Ch_t
+{
+    uint8_t channel;
+    float currentV;
+    float currentP;
+};
+
 #define MOTOR_DATA_QUEUE_LEN 10
 #define OPTIMAL_V_P_DATA_QUEUE_LEN 10
+#define CURRENT_V_P_CH_QUEUE_LEN 10
 
 extern QueueHandle_t g_motorDataQueue;
 extern QueueHandle_t g_optimalVPDataQueue;
+extern QueueHandle_t g_currentVPChQueue;
 
 #endif
