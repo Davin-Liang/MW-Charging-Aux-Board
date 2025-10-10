@@ -78,7 +78,7 @@ SYS_LIGHTWEIGHT_PROT==1:如果您确实需要任务间保护
 
 /* ---------- DHCP 选项 ---------- */
 /* 如果您希望DHCP配置为，请将LWIP_DHCP定义为1 */
-#define LWIP_DHCP                       1
+#define LWIP_DHCP                       0
 
 
 /* ---------- UDP 选项 ---------- */

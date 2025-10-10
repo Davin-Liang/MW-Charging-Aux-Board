@@ -72,9 +72,9 @@ void dm542_test4(void)
 
 void dm542_test5(void)
 {
-		vTaskDelay(5000);
-	
-		static Point2D trajectory[25];
+    vTaskDelay(5000);
+
+    static Point2D trajectory[25];
     static int test = 1;
 
     if (test)
@@ -84,8 +84,8 @@ void dm542_test5(void)
         for (int i = 0; i < 25; i ++)
         {
             motor_position_ctrl((float)trajectory[i].x, (float)trajectory[i].y);
-						mutual_printf("trajectory[%d].x = %d,trajectory[%d].y = %d", i, trajectory[i].x, i, trajectory[i].y);
-						mutual_printf("circle trajectory[%d] arrived!!!", i);
+            mutual_printf("trajectory[%d].x = %d,trajectory[%d].y = %d", i, trajectory[i].x, i, trajectory[i].y);
+            mutual_printf("circle trajectory[%d] arrived!!!", i);
 					 
             vTaskDelay(500);
         }
@@ -94,4 +94,17 @@ void dm542_test5(void)
     }
 
     vTaskDelay(10);
+
+// static Point2D trajectory[POINT_NUM];
+// generate_circle_trajectory(trajectory, POINT_NUM, 200); // 圆形轨迹
+// // generate_square_trajectory(trajectory, POINT_NUM, 400); // 正方形轨迹
+// for (int i = 0; i < POINT_NUM; i ++)
+// {
+//     motor_position_ctrl((float)trajectory[i].x, (float)trajectory[i].y);       
+//     vTaskDelay(POINT_INTERVAL_TIME);
+// }
+
 }
+
+/*  */
+

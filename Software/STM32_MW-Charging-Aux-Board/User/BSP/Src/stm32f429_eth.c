@@ -30,6 +30,7 @@
 #include "stm32f429_eth.h"
 #include "stm32f4xx_rcc.h"
 //#include "LAN8742A.h"
+#include "ethernet.h"
 #include <string.h>
 
 

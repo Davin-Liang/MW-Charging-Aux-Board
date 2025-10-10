@@ -23,10 +23,10 @@
  */
 
 #include "ethernet.h"
-//#include "lwip_comm.h"
+#include "lwip_comm.h"
 #include "stm32f429_eth_conf.h"
 #include "stm32f429_eth.h"
-//#include "delay.h"
+#include "delay.h"
 #include "malloc.h"
 
 
@@ -52,18 +52,24 @@ ETH_InitTypeDef ETH_InitStructure;
 /**
  * @brief       以太网芯片初始化
  * @param       无
- * @retval      0,成功
- *              1,失败
+ * @retval      0,成功 / 1,失败
+ * @note        该函数在 lwip_comm_init() 中被调用
  */
 uint8_t ethernet_init(void)
 {
     ETH_MspInit();
 	
-		ETH_StructInit(&ETH_InitStructure);
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_ETH_MAC | RCC_AHB1Periph_ETH_MAC_Tx |RCC_AHB1Periph_ETH_MAC_Rx, ENABLE);
+	
+    ETH_DeInit();                                  
+    ETH_SoftwareReset();                          
+    while (ETH_GetSoftwareResetStatus() == SET){;}
+	
+    ETH_StructInit(&ETH_InitStructure);
 
     /* Fill ETH_InitStructure parametrs */
     /*------------------------   MAC   -----------------------------------*/
-        /* 开启网络自适应功能 */
+    /* 开启网络自适应功能 */
     ETH_InitStructure.ETH_AutoNegotiation = ETH_AutoNegotiation_Enable;
     //  ETH_InitStructure.ETH_AutoNegotiation = ETH_AutoNegotiation_Disable; 
     //  ETH_InitStructure.ETH_Speed = ETH_Speed_10M;
@@ -123,7 +129,19 @@ uint8_t ethernet_init(void)
     /* Configure Ethernet */
 	/* 配置ETH */
 		uint32_t EthStatus = ETH_ERROR;
+		ETH_DMAITConfig(ETH_DMA_IT_NIS|ETH_DMA_IT_R, ENABLE);
     EthStatus = ETH_Init(&ETH_InitStructure, ETHERNET_PHY_ADDRESS);
+		ETH_DMAITConfig(ETH_DMA_IT_NIS|ETH_DMA_IT_R, ENABLE);
+		
+		
+		
+//    NVIC_InitTypeDef NVIC_InitStructure;
+//    NVIC_InitStructure.NVIC_IRQChannel = ETH_IRQn;           // 以太网中断
+//    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1; // 抢占优先级
+//    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;        // 子优先级
+//    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;           // 使能中断
+//    NVIC_Init(&NVIC_InitStructure);		
+		
     if (EthStatus == ETH_SUCCESS)
     {
         return 0;   /* 成功 */
@@ -132,6 +150,9 @@ uint8_t ethernet_init(void)
     {
         return 1;  /* 失败 */
     }
+		
+
+
     // uint8_t macaddress[6];
 
     // macaddress[0] = g_lwipdev.mac[0];
@@ -153,10 +174,10 @@ uint8_t ethernet_init(void)
 }
 
 /**
- * @brief       ETH底层驱动，时钟使能，引脚配置
- *    @note     此函数会被HAL_ETH_Init()调用
- * @param       heth:以太网句柄
- * @retval      无
+ * @brief ETH底层驱动，时钟使能，引脚配置
+ * @note  此函数会被ethernet_init()调用
+ * @param void
+ * @retval void
  */
 void ETH_MspInit(void)
 {
@@ -256,8 +277,7 @@ void ETH_MspInit(void)
     /* Enable SYSCFG clock */
     // 使用重映射引脚功能，需要使能这部分时钟，其实使不使能都无所谓
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
-
-		SYSCFG_ETH_MediaInterfaceConfig(SYSCFG_ETH_MediaInterface_RMII); // //MAC和PHY之间使用RMII接口
+	SYSCFG_ETH_MediaInterfaceConfig(SYSCFG_ETH_MediaInterface_RMII); // //MAC和PHY之间使用RMII接口
 
 //    /* MII/RMII Media interface selection --------------------------------------*/
 //    #ifdef MII_MODE /* Mode MII with STM324xG-EVAL  */
@@ -273,8 +293,6 @@ void ETH_MspInit(void)
 //    SYSCFG_ETH_MediaInterfaceConfig(SYSCFG_ETH_MediaInterface_RMII); // //MAC和PHY之间使用RMII接口
 //    #endif
 
-
-
     /* Ethernet pins configuration ************************************************/
     /*
             ETH_MDIO -------------------------> PA2
@@ -288,52 +306,51 @@ void ETH_MspInit(void)
             ETH_MII_TXD1/ETH_RMII_TXD1 -------> PG14
                     ETH_NRST -------------------------> PI1
                                                     */
-
     /* Configure ETH_MDIO */
     GPIO_InitStructure.GPIO_Pin = ETH_MDIO_PIN;
-        GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
     GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
     GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
     GPIO_Init(ETH_MDIO_PORT, &GPIO_InitStructure);
     GPIO_PinAFConfig(ETH_MDIO_PORT, ETH_MDIO_SOURCE, ETH_MDIO_AF);
         
-        /* Configure ETH_MDC */
+    /* Configure ETH_MDC */
     GPIO_InitStructure.GPIO_Pin = ETH_MDC_PIN;
     GPIO_Init(ETH_MDC_PORT, &GPIO_InitStructure);
     GPIO_PinAFConfig(ETH_MDC_PORT, ETH_MDC_SOURCE, ETH_MDC_AF);
         
-        /* Configure ETH_RMII_REF_CLK */
+    /* Configure ETH_RMII_REF_CLK */
     GPIO_InitStructure.GPIO_Pin = ETH_RMII_REF_CLK_PIN;
     GPIO_Init(ETH_RMII_REF_CLK_PORT, &GPIO_InitStructure);
     GPIO_PinAFConfig(ETH_RMII_REF_CLK_PORT, ETH_RMII_REF_CLK_SOURCE, ETH_RMII_REF_CLK_AF);
         
-        /* Configure ETH_RMII_CRS_DV */
+    /* Configure ETH_RMII_CRS_DV */
     GPIO_InitStructure.GPIO_Pin = ETH_RMII_CRS_DV_PIN;
     GPIO_Init(ETH_RMII_CRS_DV_PORT, &GPIO_InitStructure);
     GPIO_PinAFConfig(ETH_RMII_CRS_DV_PORT, ETH_RMII_CRS_DV_SOURCE, ETH_RMII_CRS_DV_AF);
         
-        /* Configure ETH_RMII_RXD0 */
+    /* Configure ETH_RMII_RXD0 */
     GPIO_InitStructure.GPIO_Pin = ETH_RMII_RXD0_PIN;
     GPIO_Init(ETH_RMII_RXD0_PORT, &GPIO_InitStructure);
     GPIO_PinAFConfig(ETH_RMII_RXD0_PORT, ETH_RMII_RXD0_SOURCE, ETH_RMII_RXD0_AF);
         
-        /* Configure ETH_RMII_RXD1 */
+    /* Configure ETH_RMII_RXD1 */
     GPIO_InitStructure.GPIO_Pin = ETH_RMII_RXD1_PIN;
     GPIO_Init(ETH_RMII_RXD1_PORT, &GPIO_InitStructure);
     GPIO_PinAFConfig(ETH_RMII_RXD1_PORT, ETH_RMII_RXD1_SOURCE, ETH_RMII_RXD1_AF);
         
-        /* Configure ETH_RMII_TX_EN */
+    /* Configure ETH_RMII_TX_EN */
     GPIO_InitStructure.GPIO_Pin = ETH_RMII_TX_EN_PIN;
     GPIO_Init(ETH_RMII_TX_EN_PORT, &GPIO_InitStructure);
     GPIO_PinAFConfig(ETH_RMII_TX_EN_PORT, ETH_RMII_TX_EN_SOURCE, ETH_RMII_TX_EN_AF);
         
-        /* Configure ETH_RMII_TXD0 */
+    /* Configure ETH_RMII_TXD0 */
     GPIO_InitStructure.GPIO_Pin = ETH_RMII_TXD0_PIN;
     GPIO_Init(ETH_RMII_TXD0_PORT, &GPIO_InitStructure);
     GPIO_PinAFConfig(ETH_RMII_TXD0_PORT, ETH_RMII_TXD0_SOURCE, ETH_RMII_TXD0_AF);
         
-        /* Configure ETH_RMII_TXD1 */
+    /* Configure ETH_RMII_TXD1 */
     GPIO_InitStructure.GPIO_Pin = ETH_RMII_TXD1_PIN;
     GPIO_Init(ETH_RMII_TXD1_PORT, &GPIO_InitStructure);
     GPIO_PinAFConfig(ETH_RMII_TXD1_PORT, ETH_RMII_TXD1_SOURCE, ETH_RMII_TXD1_AF);		
@@ -347,20 +364,19 @@ void ETH_MspInit(void)
     GPIO_Init(ETH_RESET_GPIO_PORT, &GPIO_InitStructure);
 
     ETHERNET_RST(0);     /* 硬件复位 */
-    // delay_ms(50); TODO:替换延时函数
+    delay_ms(50); 
     ETHERNET_RST(1);     /* 复位结束 */
 
 //    HAL_NVIC_SetPriority(ETH_IRQn, 6, 0); /* 网络中断优先级应该高一点 */
 //    HAL_NVIC_EnableIRQ(ETH_IRQn);
 
-		// 设置中断优先级
-		NVIC_InitTypeDef NVIC_InitStructure;
-		NVIC_InitStructure.NVIC_IRQChannel = ETH_IRQn;           // 以太网中断
-		NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 3; // 抢占优先级
-		NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;        // 子优先级
-		NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;           // 使能中断
-		NVIC_Init(&NVIC_InitStructure);
-
+    // 设置中断优先级
+    NVIC_InitTypeDef NVIC_InitStructure;
+    NVIC_InitStructure.NVIC_IRQChannel = ETH_IRQn;           // 以太网中断
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1; // 抢占优先级
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;        // 子优先级
+    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;           // 使能中断
+    NVIC_Init(&NVIC_InitStructure);
 }
 
 /**
@@ -386,7 +402,7 @@ uint32_t ethernet_read_phy(uint16_t reg)
  */
 void ethernet_write_phy(uint16_t reg, uint16_t value)
 {
-    uint32_t temp = value;
+    // uint32_t temp = value;
     
     ETH_WritePHYRegister(ETHERNET_PHY_ADDRESS, reg, value);
     // HAL_ETH_WritePHYRegister(&g_eth_handler, reg, temp);
@@ -414,35 +430,24 @@ uint8_t ethernet_chip_get_speed(void)
     return speed;
 }
 
-//extern void lwip_pkt_handle(void); /* 在lwip_comm.c里面定义 */
+extern void lwip_pkt_handle(void); /* 在lwip_comm.c里面定义 */
 
 /**
  * @breif       中断服务函数
  * @param       无
  * @retval      无
  */
-//void ETH_IRQHandler(void)
-//{
-//    if (ethernet_get_eth_rx_size(g_eth_handler.RxDesc))
-//    {
-////        lwip_pkt_handle();      /* 处理以太网数据，即将数据提交给LWIP */
-//    }
-
-//    __HAL_ETH_DMA_CLEAR_IT(&g_eth_handler, ETH_DMA_IT_NIS);   /* 清除DMA中断标志位 */
-//    __HAL_ETH_DMA_CLEAR_IT(&g_eth_handler, ETH_DMA_IT_R);     /* 清除DMA接收中断标志位 */
-//}
-
 void ETH_IRQHandler(void)
 {
     /* 检查并清除所有中断标志 */
-    if (ETH_GetDMAFlagStatus(ETH_DMA_FLAG_NIS) != RESET)
+    if (ETH_GetDMAITStatus(ETH_DMA_IT_NIS) != RESET)
     {
         /* 检查接收中断 */
-        if (ETH_GetDMAFlagStatus(ETH_DMA_FLAG_R) != RESET)
+        if (ETH_GetDMAITStatus(ETH_DMA_IT_R) != RESET)
         {
             if (ethernet_get_eth_rx_size(DMARxDescToGet))
             {
-//                lwip_pkt_handle();      /* 处理以太网数据，即将数据提交给LWIP */
+                lwip_pkt_handle();      /* 处理以太网数据，即将数据提交给LWIP */
             }
             ETH_DMAClearITPendingBit(ETH_DMA_IT_R);
         }
@@ -454,10 +459,11 @@ void ETH_IRQHandler(void)
 
 
 /**
- * @breif       获取接收到的帧长度
- * @param       dma_rx_desc : 接收DMA描述符
- * @retval      frameLength : 接收到的帧长度
- */
+  * @brief 获取接收到的帧长度
+  * @param dma_rx_desc : 接收DMA描述符
+  * @retval frameLength : 接收到的帧长度
+  * @note 该函数在 ETH_IRQHandler 被调用
+  **/
 uint32_t  ethernet_get_eth_rx_size(ETH_DMADESCTypeDef *dma_rx_desc)
 {
 //    uint32_t frameLength = 0;
@@ -472,8 +478,12 @@ uint32_t  ethernet_get_eth_rx_size(ETH_DMADESCTypeDef *dma_rx_desc)
     return ETH_GetRxPktSize(dma_rx_desc);
 }
 
-//接收一个网卡数据包
-//返回值:网络数据包帧结构体
+/**
+  * @brief 接收一个网卡数据包
+  * @param void
+  * @retval frame 网络数据包帧结构体
+  * @note 该函数在 low_level_input() 被调用
+  **/
 FrameTypeDef ETH_Rx_Packet(void)
 { 
     uint32_t framelength = 0;
@@ -484,7 +494,7 @@ FrameTypeDef ETH_Rx_Packet(void)
     {    
         frame.length = ETH_ERROR; 
 			
-				/* 检查接收缓冲区不可用状态 */
+        /* 检查接收缓冲区不可用状态 */
         if ((ETH->DMASR & ETH_DMASR_RBUS) != (uint32_t)RESET)  
         { 
             ETH->DMASR = ETH_DMASR_RBUS;//清除ETH DMA的RBUS位 
@@ -500,8 +510,9 @@ FrameTypeDef ETH_Rx_Packet(void)
         framelength = ((DMARxDescToGet->Status & ETH_DMARxDesc_FL) >> ETH_DMARxDesc_FrameLengthShift) - 4; // 得到接收包帧长度(不包含4字节CRC)
         frame.buffer = DMARxDescToGet->Buffer1Addr; // 得到包数据所在的位置
     }
-		else 
-				framelength = ETH_ERROR; // 错误  
+	else 
+        framelength = ETH_ERROR; // 错误  
+
     frame.length = framelength; 
     frame.descriptor = DMARxDescToGet; 
 		
@@ -511,10 +522,12 @@ FrameTypeDef ETH_Rx_Packet(void)
     return frame;  
 }
 
-// 发送一个网卡数据包
-// FrameLength:数据包长度
-// 返回值:ETH_ERROR,发送失败(0)
-//        ETH_SUCCESS,发送成功(1)
+/**
+  * @brief 发送一个网卡数据包
+  * @param FrameLength 数据包长度
+  * @retval ETH_SUCCESS,发送成功(1) / ETH_ERROR,发送失败(0)
+  * @note 该函数在 low_level_output() 被调用
+  **/
 uint8_t ETH_Tx_Packet(uint16_t FrameLength)
 {   
     // 检查当前描述符是否属于CPU（OWN位为0表示属于CPU）
@@ -546,8 +559,14 @@ uint8_t ETH_Tx_Packet(uint16_t FrameLength)
     return ETH_SUCCESS;   
 }
 
-// 得到当前描述符的Tx buffer地址
-// 返回值:Tx buffer地址
+// 
+// 返回值:
+/**
+  * @brief 得到当前描述符的 Tx buffer 地址
+  * @param void
+  * @retval Tx buffer地址
+  * @note 该函数在 low_level_output() 被调用
+  **/
 uint32_t ETH_GetCurrentTxBuffer(void)
 {  
   return DMATxDescToSet->Buffer1Addr;//返回Tx buffer地址  
