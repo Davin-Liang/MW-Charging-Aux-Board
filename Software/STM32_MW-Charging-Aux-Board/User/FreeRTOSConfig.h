@@ -144,7 +144,7 @@
 #define configMAX_PRIORITIES					  (32)
 
 //空闲任务使用的堆栈大小
-#define configMINIMAL_STACK_SIZE				((unsigned short)128)
+#define configMINIMAL_STACK_SIZE				((unsigned short)512)
   
 //任务名字字符串长度
 #define configMAX_TASK_NAME_LEN					(16)
@@ -162,10 +162,10 @@
 #define configUSE_TASK_NOTIFICATIONS    1   
 
 //使用互斥信号量
-#define configUSE_MUTEXES						    0    
+#define configUSE_MUTEXES						    1    
 
 //使用递归互斥信号量                                            
-#define configUSE_RECURSIVE_MUTEXES			0   
+#define configUSE_RECURSIVE_MUTEXES			1   
 
 //为1时使用计数信号量
 #define configUSE_COUNTING_SEMAPHORES		0
@@ -274,7 +274,7 @@
 #define INCLUDE_eTaskGetState			           1
 #define INCLUDE_xTimerPendFunctionCall	     0
 //#define INCLUDE_xTaskGetCurrentTaskHandle       1
-//#define INCLUDE_uxTaskGetStackHighWaterMark     0
+#define INCLUDE_uxTaskGetStackHighWaterMark     1
 //#define INCLUDE_xTaskGetIdleTaskHandle          0
 
 
@@ -290,7 +290,7 @@
 #define configLIBRARY_LOWEST_INTERRUPT_PRIORITY			15     
 
 //系统可管理的最高中断优先级
-#define configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY	5 
+#define configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY	5
 
 #define configKERNEL_INTERRUPT_PRIORITY 		( configLIBRARY_LOWEST_INTERRUPT_PRIORITY << (8 - configPRIO_BITS) )	/* 240 */
 
@@ -305,6 +305,7 @@
 
 
 /* 以下为使用Percepio Tracealyzer需要的东西，不需要时将 configUSE_TRACE_FACILITY 定义为 0 */
+//#define configUSE_TRACE_FACILITY 1
 #if ( configUSE_TRACE_FACILITY == 1 )
 #include "trcRecorder.h"
 #define INCLUDE_xTaskGetCurrentTaskHandle               1   // 启用一个可选函数（该函数被 Trace源码使用，默认该值为0 表示不用）
