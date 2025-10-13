@@ -31,7 +31,7 @@ static void data_sum_Task(void * param)
       if (pdPASS == xQueueReceive(g_motorDataQueue, &currentMotorData, 10))
       {
         /* 打印电机数据 */
-
+        mutual_printf("Position:(%.2f,%.2f)\r\n", currentMotorData.x, currentMotorData.y);
         /* 通过以太网上传电机数据 */
 
       }
@@ -40,15 +40,23 @@ static void data_sum_Task(void * param)
       if (pdPASS == xQueueReceive(g_optimalVPDataQueue, &currentOptimalVP, 10))
       {
         /* 打印电机数据、最优功率和四个通道的最优电压 */
+        mutual_printf("(%.2f,%.2f): V1 = %.2fV, V2 = %.2fV, V3 = %.2fV, V4 = %.2fV, P = %.3fdBm\r\n",
+              currentMotorData.x,
+              currentMotorData.y,
+							currentOptimalVP.optimalVs[0],
+              currentOptimalVP.optimalVs[1], 
+              currentOptimalVP.optimalVs[2],
+              currentOptimalVP.optimalVs[3], 
+              currentOptimalVP.optimalP);
 
 
         /* 往 SD 卡中写入电机数据、最优功率和四个通道的最优电压 */
         // TODO: 缺少路径定义
-        // write_x_y_v_p_to_csv(,
-        //                       currentMotorData.x,
-        //                       currentMotorData.y,
-        //                       currentOptimalVP.optimalVs,
-        //                       currentOptimalVP.optimalP);
+        write_x_y_v_p_to_csv("0:test_optimal_result.csv",
+                              currentMotorData.x,
+                              currentMotorData.y,
+                              currentOptimalVP.optimalVs,
+                              currentOptimalVP.optimalP);
 
         /* 通过以太网上传最优结果 */
 
@@ -57,11 +65,17 @@ static void data_sum_Task(void * param)
       if (pdPASS == xQueueReceive(g_currentVPChQueue, &currentVPCh, 10))
       {
         /* 打印当前通道的电压、功率 */
-
+        mutual_printf("channel: %d current V: %.2f current P: %.3f\r\n",
+        currentVPCh.channel,
+        currentVPCh.currentV,
+        currentVPCh.currentP);
 
         /* 往 SD 卡中写入当前通道的电压、功率、通道 */
         // TODO: 缺少路径定义
-        // write_v_p_to_csv( ,currentVPCh.currentV, currentVPCh.currentP, currentVPCh.channel);
+        write_v_p_to_csv("0:test_current_result.csv", 
+                          currentVPCh.currentV, 
+                          currentVPCh.currentP, 
+                          currentVPCh.channel);
 
         /* 通过以太网上传当前通道的电压、功率、通道 */
 
@@ -70,23 +84,6 @@ static void data_sum_Task(void * param)
       vTaskDelay(10);
     }
 }
-
-/* To power_supply_task.c */
-// #include "data_sum_task.h"
-// struct MotorData_t currentOptimalVP;
-// currentOptimalVP.optimalV1 = ;
-// currentOptimalVP.optimalV2 = ;
-// currentOptimalVP.optimalV3 = ;
-// currentOptimalVP.optimalV4 = ;
-// currentOptimalVP.optimalP = ;
-// xQueueSend(g_optimalVPDataQueue, &currentOptimalVP, 10);
-
-/* To dm542_task.c */
-// #include "data_sum_task.h"
-// struct Optimal_v_p_t currentMotorData;
-// currentMotorData.x = ;
-// currentMotorData.y = ;
-// xQueueSend(g_motorDataQueue, &currentMotorData, 10);
 
 BaseType_t create_task_for_data_sum(uint16_t size, UBaseType_t priority)
 {

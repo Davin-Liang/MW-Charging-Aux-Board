@@ -34,20 +34,23 @@ static void command_task(void * param)
   /* 注册command，使其可以在command_task.c中使用该command */
   register_command_for_power_supply(&command);
   register_command_for_attenuator(&command);
+  register_command_for_dm542(&command);
 	insert_task_handle(g_commandTaskHandle, "command");
   g_commandQueueHandle = xQueueCreate(COMMAND_QUEUE_LENGTH, sizeof(struct CommandInfo));
 
-  #ifdef DEBUG
+  #if DEBUG
 
   /* 用假消息测试功能 */
   struct CommandInfo fuckCommand = {
-    .commandType = demandOne,
+    .commandType = demandTwo,
     .psChannel = 1,
     .attenuatorIndex = attenuator1,
     .attNewState = ENABLE
   };
 
+//	vTaskDelay(3000);
   xQueueSend(g_commandQueueHandle, &fuckCommand, 10);
+	
 
   #endif
 	
@@ -59,6 +62,8 @@ static void command_task(void * param)
       {
         case demandOne:
         case demandTwo:
+          vTaskResume(find_task_node_by_name("dm542")->taskHandle);  
+//					vTaskDelay(1000);
           vTaskResume(find_task_node_by_name("power_supply")->taskHandle);
           break;
         case demandThree:

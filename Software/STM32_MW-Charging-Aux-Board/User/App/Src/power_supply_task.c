@@ -1,5 +1,6 @@
 #include "power_supply_task.h"
 #include "FreeRTOS.h"
+#include "semphr.h"
 #include "task.h"
 #include "queue.h"
 #include "command.h"
@@ -10,6 +11,10 @@
 #include "ff.h"
 #include "file_common.h"
 #include "main.h"
+#include "bsp_led.h"
+#include "dm542_task.h"
+#include "bsp_dm542.h"
+#include "data_sum_task.h"
 
 static void power_supply_task(void * param);
 static void detect_optimal_voltage(float currentVoltage, float currentPower, int mode, int channel);
@@ -20,11 +25,14 @@ static struct CommandInfo * command;
 // static float s_lastPower = -1e30f;
 static float s_bestVoltage = 0.0f;
 static float s_bestPower = -1e30f;
-static float s_bestVoltages[4] = {0.0f};
-static float s_bestPowers[4] = {0.0f};
+static float s_bestVoltages[4] = {0.1f, 0.1f, 0.1f, 0.1f};
+static float s_bestPowers[4] = {-1e30f, -1e30f, -1e30f, -1e30f};
 static float historyVoltages[140] = {0.0f};
 static float historyPowers[140] = {0.0f};
-static uint16_t psRegAddr[] = {0x006E, 0x00D2, 0x0136, 0x019A};
+static uint16_t psRegAddr[] = {0x01FE, 0x02C6, 0x032A, 0x038E};
+static float Power_Supply_Default_Voltage[] = {0.1f, 0.1f, 0.1f, 0.1f};
+static uint8_t Seek_Max_Power_Flag = 1;
+extern SemaphoreHandle_t dm542_USART3_Mutex;
 
 /**
   * @brief  电源任务
@@ -33,17 +41,18 @@ static uint16_t psRegAddr[] = {0x006E, 0x00D2, 0x0136, 0x019A};
   **/
 static void power_supply_task(void * param)
 {
-	float currentVoltage = 0.0f;
+	float currentVoltage = 0.1f;
 	float currentPower = 0.0f;
 	FunctionalState enableUsart = ENABLE;
 	FRESULT res;
+	struct Optimal_v_p_t currentOptimalVP;
+	struct CurrentV_P_Ch_t currentVPCh;
 	
 	/* 将 g_PowerSupplyTaskHandle 插入链表 */
 	insert_task_handle(g_PowerSupplyTaskHandle, "power_supply");
 	
 	/* 设置电源的起始电压 */
-	// void set_voltage_for_power(float voltage); //TODO: 在 bsp_power.c 中实现这个函数
-	// set_voltage_for_power(POWER_SUPPLY_DEFAULT_VOLTAGE); //TODO: 实现完该函数再取消注释
+	set_voltage_for_power(Power_Supply_Default_Voltage);
 	
 	while (1)
 	{
@@ -104,44 +113,68 @@ static void power_supply_task(void * param)
 			
 				break;
 			case demandTwo:
-				if (enableUsart == ENABLE)
+				xSemaphoreTake(dm542_USART3_Mutex, portMAX_DELAY);
+				Seek_Max_Power_Flag = 1;
+				for (int i = 0; (i < 4) && (Seek_Max_Power_Flag == 1); i ++)
 				{
-					pm_usart_it_config(enableUsart);
-					enableUsart = DISABLE;
-				}
-
-				for (int i = 0; i < 4; i ++)
-				{
-					/* 发送电压 */
-					set_power_supply_voltage(PS_SLAVE_ADDR, PS_REG_ADDR(i), currentVoltage);
-					vTaskDelay(TIME_OF_FINISHING_SETTING_VOL);
-					/* 得到发送的电压对应的功率值 */
-					if (!parse_power_from_buf(&currentPower))
+					while(currentVoltage < MAX_VAL)
 					{
-						/* 长时间没收到串口数据 */
-						command->commandType = demandFault; // 设置命令状态异常
-						enableUsart = ENABLE;
-						mutual_printf("No serial port data received. Please check the connection between the serial port and the power meter!\r\n");
-					}
+						/* 发送电压 */
+						set_power_supply_voltage(PS_SLAVE_ADDR, PS_REG_ADDR(i), currentVoltage);
+						vTaskDelay(TIME_OF_FINISHING_SETTING_VOL);
+						currentVPCh.channel = i + 1;
+						currentVPCh.currentV = currentVoltage;
+						pm_usart_it_config(ENABLE);//设置好电压后开启串口中断接收数据
+						if (parse_power_from_buf(&currentPower))
+						{
+							pm_usart_it_config(DISABLE);//解析完成后关闭串口2
+							currentVPCh.currentP = currentPower;
+							xQueueSend(g_currentVPChQueue, &currentVPCh, 10);
+							if (currentPower > s_bestPowers[i])
+							{
+								s_bestVoltages[i] = currentVoltage;
+								s_bestPowers[i] = currentPower;
+							}
+//							mutual_printf("channel=%d, P=%.3fW, V=%.2fV, Best(P,V)=(%.3f, %.2f)\r\n",
+//													i, currentPower, currentVoltage, s_bestPowers[i], s_bestVoltages[i]);	
+						}
 						
-					/* 电压、功率值记录 */
-					detect_optimal_voltage(currentVoltage, currentPower, MULTI_CHANNELS_SCANNING, i);
+						/* 未得到发送的电压对应的功率值 */
+						else if (!parse_power_from_buf(&currentPower))
+						{
+							/* 长时间没收到串口数据 */
+							command->commandType = demandFault; // 设置命令状态异常
+							enableUsart = ENABLE;
+							mutual_printf("No serial port data received. Please check the connection between the serial port and the power meter!\r\n");
+						}
+						/* 设置下次的发送电压 */
+						currentVoltage += VOL_STEP;
+					}
+					set_power_supply_voltage(PS_SLAVE_ADDR, PS_REG_ADDR(i), s_bestVoltages[i]);
+					vTaskDelay(VOL_SENDING_TIME_INTERVAL);
+					currentVoltage = 0.1f;
+						
+//					/* 电压、功率值记录 */
+//					detect_optimal_voltage(currentVoltage, currentPower, MULTI_CHANNELS_SCANNING, i);
 				}
-
-				/* 设置下次的发送电压 */
-				currentVoltage += VOL_STEP;
-				if (currentVoltage >= MAX_VAL)
-				{
-					mutual_printf("Best(P,V)=(%.3f, %.2f)\r\n", s_bestPower, s_bestVoltage);
-					enableUsart = ENABLE;
-					command->commandType = noDemand; // 命令完成
-				}
-
+				// mutual_printf("V1 = %.2fV, V2 = %.2fV, V3 = %.2fV, V4 = %.2fV, P = %.3fdBm",
+				// 			s_bestVoltages[0], s_bestVoltages[1], s_bestVoltages[2], s_bestVoltages[3], s_bestPowers[3]);
+				Seek_Max_Power_Flag = 0;//只扫描一次
+				LED2_TOGGLE;//扫描完成后绿灯闪烁
+				currentOptimalVP.optimalVs[0] = s_bestVoltages[0];
+				currentOptimalVP.optimalVs[1] = s_bestVoltages[1];
+				currentOptimalVP.optimalVs[2] = s_bestVoltages[2];
+				currentOptimalVP.optimalVs[3] = s_bestVoltages[3];
+				currentOptimalVP.optimalP = s_bestPowers[3];
+				xQueueSend(g_optimalVPDataQueue, &currentOptimalVP, 10);
+				command->commandType = noDemand; // 命令完成
+				xSemaphoreGive(dm542_USART3_Mutex);
+				vTaskDelay(1000);
 				break;
 			default:
 				reset_ps_data();
 				pm_usart_it_config(DISABLE);
-				mutual_printf("Power supply closed!");
+				mutual_printf("Power supply closed!\r\n");
 				vTaskSuspend(NULL); // 完成任务将自身挂起，节约系统资源
 				break;
 		}
