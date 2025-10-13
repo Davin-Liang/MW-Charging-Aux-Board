@@ -2,6 +2,7 @@
 #define	__BSP_DM542_H
 
 #include "FreeRTOS.h"
+#include "semphr.h"
 
 #define DM542_SUBDIVISION   5 // DM542细分数
 #define SCREW_LEAD          10.f // 丝杆导程
@@ -84,6 +85,8 @@ typedef struct {
     int x;
     int y;
 } Point2D;
+
+extern SemaphoreHandle_t dm542_USART3_Mutex;
 
 void hor_dm542_init(uint32_t period, uint16_t prescaler, uint32_t pulse);
 void ver_dm542_init(uint32_t period, uint16_t prescaler, uint32_t pulse);

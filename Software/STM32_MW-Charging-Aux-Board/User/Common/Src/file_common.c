@@ -57,15 +57,15 @@ FRESULT write_arrays_to_CSV(const TCHAR * path, float * historyVoltages, float *
   * @param  path 文件名
   * @param  voltage 当前电压
   * @param  power 功率
-  * @param  index 索引
   * @param  channel 通道
   * @return 写入结果
   **/
-FRESULT write_v_p_to_csv(const TCHAR * path, float voltage, float power, int index, int channel)
+FRESULT write_v_p_to_csv(const TCHAR * path, float voltage, float power, int channel)
 {
     FRESULT res;
     FIL fil;
     char buffer[64];
+    static int index = 0;
     
     // 尝试以追加方式打开现有文件
     res = f_open(&fil, path, FA_WRITE | FA_OPEN_EXISTING);
@@ -79,6 +79,7 @@ FRESULT write_v_p_to_csv(const TCHAR * path, float voltage, float power, int ind
     {
         // 文件不存在，创建新文件
         res = f_open(&fil, path, FA_WRITE | FA_CREATE_NEW);
+        index = 0;
         if (res == FR_OK) 
         {
             // 写入表头
@@ -93,6 +94,7 @@ FRESULT write_v_p_to_csv(const TCHAR * path, float voltage, float power, int ind
     
     // 写入数据
     sprintf(buffer, "%d,%.3f,%.3f,%d\n", index, voltage, power, channel);
+    index ++;
     f_puts(buffer, &fil);
     
     res = f_close(&fil);
@@ -140,6 +142,31 @@ FRESULT write_x_y_v_p_to_csv(const TCHAR * path, float x, float y, float * optim
     // 写入数据
     sprintf(buffer, "%.3f,%.3f,%.3f\n", x, y, optimalP);
     f_puts(buffer, &fil);
+		
+		f_lseek(&fil, 0);  // 偏移量设为0
+		
+		printf("size = %d", f_size(&fil));
+		
+    printf("文件内容:\r\n");
+    printf("--------------------------------\r\n");
+    
+    // 循环读取文件内容
+		UINT br;     // 读取的字节数
+   
+        // 读取文件内容到缓冲区
+        f_read(&fil, buffer, sizeof(buffer) - 1, &br);
+		
+				printf("br = %d", (int)br);
+        
+        // 在缓冲区末尾添加字符串结束符
+        buffer[br] = '\0';
+        
+        // 使用printf打印内容
+        printf("%s", buffer);
+    
+    
+    printf("\r\n--------------------------------\r\n");
+    printf("文件读取完成\r\n");
     
     res = f_close(&fil);
     return res;

@@ -4,6 +4,7 @@
 static uint16_t modbus_crc16(const uint8_t *buf, uint16_t len);
 static void ps_serial_send_byte(uint8_t byte);
 static void ps_serial_send_mul_bytes(uint8_t *bytes, uint16_t length);
+static uint16_t psRegAddr[] = {0x01FE, 0x02C6, 0x032A, 0x038E};//5、7、8、9通道写入电压寄存器地址
 
 /**
   * @brief  电源串口(USART2) 初始化 PB10 PB11
@@ -134,4 +135,18 @@ static void ps_serial_send_mul_bytes(uint8_t *bytes, uint16_t length)
   {
     ps_serial_send_byte(bytes[i]);
   }
+}
+
+/**
+  * @brief  给电源通道设置初始电压
+	* @param  voltage 存放初始电压值的数组
+	* @return void
+  **/
+void set_voltage_for_power(float *voltage)
+{
+	for(int i = 0; i<=3; i++)
+	{
+		set_power_supply_voltage(0X01, psRegAddr[i], voltage[i]);
+		vTaskDelay(500);//等待电源电压变为0.1
+	}
 }
