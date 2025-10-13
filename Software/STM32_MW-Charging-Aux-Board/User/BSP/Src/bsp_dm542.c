@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "FreeRTOS.h"
+#include "semphr.h"
 #include "task.h"
 #include "bsp_spi_flash.h"
 #include "bsp_debug_usart.h"
@@ -22,6 +23,8 @@ struct ScrewMotorStatus verSM = {
     .movingCompletionStatus = finished,
 		.currentPosition = 0.0f
 };
+
+SemaphoreHandle_t dm542_USART3_Mutex;
 
 /**
   * @brief  初始化和DM542的通讯设置
@@ -126,6 +129,8 @@ void hor_dm542_init(uint32_t period, uint16_t prescaler, uint32_t pulse)
 		
     TIM_Cmd(HOR_DM542_SLAVE_TIM, ENABLE);
     TIM_Cmd(HOR_DM542_SLAVE_TIM, DISABLE);
+		
+		dm542_USART3_Mutex = xSemaphoreCreateMutex();//创建电机控制和串口3互斥锁
 }
 
 void ver_dm542_init(uint32_t period, uint16_t prescaler, uint32_t pulse)

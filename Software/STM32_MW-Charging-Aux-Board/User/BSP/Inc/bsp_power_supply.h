@@ -4,10 +4,10 @@
 #include <stdint.h>
 
 #define POWER_SUPPLY_DEFAULT_VOLTAGE 14.0f // 电源默认电压
-#define TIME_OF_FINISHING_SETTING_VOL 50 // 设置电源电压成功所需要的时间
-#define VOL_SENDING_TIME_INTERVAL 1000
+#define TIME_OF_FINISHING_SETTING_VOL 100 // 设置电源电压成功所需要的时间
+#define VOL_SENDING_TIME_INTERVAL 2000
 
-#define PS_USART              USART2
+#define PS_USART              USART3
 #define PS_USART_RX_GPIO_CLK  RCC_AHB1Periph_GPIOB
 #define PS_USART_TX_GPIO_CLK  RCC_AHB1Periph_GPIOB
 #define PS_USART_CLK 		  RCC_APB1Periph_USART3
@@ -27,9 +27,10 @@
 #define PS_SLAVE_ADDR         0x01
 
 /* 电源寄存器地址（4 路输出） */
-#define PS_REG_ADDR(index) ((uint16_t[]){0x006E, 0x00D2, 0x0136, 0x019A})[index] // 通过索引获取对应值
+#define PS_REG_ADDR(index) ((uint16_t[]){0x01FE, 0x02C6, 0x032A, 0x038E})[index] // 通过索引获取对应值
 
 void usart_power_supply_init(void);
 void set_power_supply_voltage(uint8_t slaveAddr, uint16_t regAddr, float voltage);
+void set_voltage_for_power(float *voltage);
 
 #endif

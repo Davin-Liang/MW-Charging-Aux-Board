@@ -6,6 +6,7 @@
 #include "FreeRTOS.h"
 #include "bsp_debug_usart.h"
 #include "task.h"
+#include "bsp_led.h"
 
 static void NVIC_Configuration(void);
 static int get_receiving_status_of_pm_info(void);
@@ -112,7 +113,7 @@ void USART2_IRQHandler(void)
 {
 	if (USART_GetITStatus(PM_USART, USART_IT_RXNE) == SET)
 	{
-		uint8_t rxData = USART_ReceiveData(PM_USART);
+		uint16_t rxData = USART_ReceiveData(PM_USART);
 		
 		if ((g_pmUsartRxSta & 0x8000) == 0) // 尚未接收完成
 		{
@@ -125,8 +126,22 @@ void USART2_IRQHandler(void)
 				}
 				else
 				{
-						if (rxData == 0x0D)
-								g_pmUsartRxSta |= 0x4000; // 标记收到 0x0D
+						if((g_pmUsartRxSta & 0x3FFF) == 0)
+						{
+						   if (rxData== '$')  /* 收到$开头 */
+                {
+                    g_pmUsartRxBuf[0]= rxData;
+                    g_pmUsartRxSta = 1;    /* 开始接收有效数据 */
+                }
+                /* 如果不是$开头，保持rx_sta为0，等待正确开头 */ 
+						
+						}
+						else  /* 已经开始接收数据 */
+					{
+					  if (rxData == 0x0D)
+						{
+								g_pmUsartRxSta |= 0x4000;
+						} // 标记收到 0x0D
 						else
 						{
 								g_pmUsartRxBuf[g_pmUsartRxSta & 0x3FFF] = rxData;
@@ -135,16 +150,20 @@ void USART2_IRQHandler(void)
 										g_pmUsartRxSta = 0; // 超界，复位
 						}
 				}
+			}
 		}	
-
+		LED2_ON;
+		
 		USART_ClearITPendingBit(PM_USART, USART_IT_RXNE); // 清除标志位
 	}
 }
 
+
+
 /**
-  * @brief  将功率计缓冲（ASCII）转为 float，忽略末尾 CRLF
+  * @brief  判断一帧数据是否已经接收完成
   * @param  无
-  * @return 无
+  * @return 接收数据寄存器最高位值
   **/
 static int get_receiving_status_of_pm_info(void)
 {
@@ -152,11 +171,11 @@ static int get_receiving_status_of_pm_info(void)
 }
 
 /**
-  * @brief  将功率计缓冲（ASCII）转为 float，忽略末尾 CRLF
-  * @param  无
-  * @return 无
+  * @brief  将接收到的数据进行处理，只保留功率值大小数据（float型数字）
+  * @param  outPower：接收数据并解析完成之后得到的功率值结果
+  * @return 1或0分别表示成功解析数据和解析失败两种情况
   **/
-int parse_power_from_buf(float * outPower)
+int parse_power_from_buf(float *outPower)
 {
     int timeCount = 0;
 	
@@ -172,32 +191,95 @@ int parse_power_from_buf(float * outPower)
 		if (timeCount == 10)
 			return 0;
 		
-		mutual_printf("Get Data!\r\n");
+//		mutual_printf("Get Data!\r\n");
 		
 		
 		char temp[PM_USART_REC_LEN + 1] = {0};
-    uint16_t len = (g_pmUsartRxSta & 0x3FFF);
+    uint16_t len = (g_pmUsartRxSta & 0x1FFF);
     if (len == 0 || len >= PM_USART_REC_LEN) 
 			return 0;
 
-    memcpy(temp, g_pmUsartRxBuf, len);
-    temp[len] = '\0';
+    memcpy(temp, g_pmUsartRxBuf + 1, len - 1);
+    //temp[len] = '\0';
 
-    /* 去掉尾部可能的空白/CRLF */
+    /* 去除末尾的CRLF */
     for (int i = (int)len - 1; i >= 0; --i)
     {
-        if (temp[i] == '\r' || temp[i] == '\n' || temp[i] == ' ' || temp[i] == '\t')
+        if (temp[i] == '\r' || temp[i] == '\n')
             temp[i] = '\0';
         else 
-					break;
+            break;
     }
 
+    /* 查找"dBm"字符串 */
+    char *dbm_ptr = strstr(temp, "m");//指针不带*时表示访问该指针指向的地址
+    if (dbm_ptr == NULL)
+    {
+        printf("未找到dBm\n");  // 调试输出
+        return 0;
+    }
+    
+//    printf("找到dBm位置: %s\n", dbm_ptr);  // 调试输出
+    
+    /* 将dBm之后的内容置空 */
+//		memset(&dbm_ptr+1, 'A', (temp+ len - 1 - dbm_ptr) * sizeof(char));
+    *dbm_ptr = '\0';
+//    printf("截断后: %s\n", temp);  // 调试输出
+    
+    /* 现在从截断后的字符串中查找最后一个逗号 */
+    char *comma_ptr = strrchr(temp, ',');
+    if (comma_ptr == NULL)
+    {
+        printf("未找到逗号\n");  // 调试输出
+        return 0;
+    }
+    
+//    printf("找到逗号位置: %s\n", comma_ptr);  // 调试输出
+    
+    /* 提取逗号后的数值部分 */
+    char *num_start = comma_ptr + 1;
+    char *num_end = dbm_ptr;
+    
+//    printf("num_start: %s\n", num_start);  // 调试输出
+//    printf("num_end: %s\n", num_end);  // 调试输出
+    
+    /* 去除可能的前后空格 */
+    while (*num_start == ' ') num_start++;
+    
+//    printf("去除空格后num_start: %s\n", num_start);  // 调试输出
+    
+    /* 检查数值部分是否有效 */
+    if (num_start >= num_end)
+    {
+        printf("错误: num_start >= num_end (%p >= %p)\n", num_start, num_end);  // 调试输出
+        printf("可能原因: 逗号和dBm之间没有内容或只有空格\n");
+        return 0;
+    }
+    
+    /* 截取数值字符串 */
+    char num_buf[100] = {0};
+    int num_len = num_end - num_start;
+    if (num_len <= 0 || num_len >= sizeof(num_buf))
+    {
+        printf("数值长度错误: %d\n", num_len);  // 调试输出
+        return 0;
+    }
+    
+    memcpy(num_buf, num_start, num_len);
+    num_buf[num_len] = '\0';
+    
+//    printf("提取的数值字符串: '%s'\n", num_buf);  // 调试输出
+    
+    /* 转换为浮点数 */
     char *endp = NULL;
-    float val = strtof(temp, &endp);
-		
-    if (endp == temp) 
-			return 0;  /* 解析失败 */
-		
+    float val = strtof(num_buf, &endp);
+    
+    if (endp == num_buf) 
+    {
+        printf("转换失败: '%s'\n", num_buf);  // 调试输出
+        return 0;
+    }
+    
     *outPower = val;
     return 1;
 }
@@ -212,3 +294,5 @@ void pm_usart_it_config(FunctionalState NewState)
 	USART_ITConfig(PM_USART, USART_IT_RXNE, NewState);
 	USART_ClearITPendingBit(PM_USART, USART_IT_RXNE);
 }
+
+
