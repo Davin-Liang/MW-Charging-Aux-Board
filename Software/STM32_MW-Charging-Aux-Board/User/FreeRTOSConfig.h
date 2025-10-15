@@ -165,7 +165,7 @@
 #define configUSE_MUTEXES						    1    
 
 //使用递归互斥信号量                                            
-#define configUSE_RECURSIVE_MUTEXES			0   
+#define configUSE_RECURSIVE_MUTEXES			1   
 
 //为1时使用计数信号量
 #define configUSE_COUNTING_SEMAPHORES		0
@@ -305,6 +305,7 @@
 
 
 /* 以下为使用Percepio Tracealyzer需要的东西，不需要时将 configUSE_TRACE_FACILITY 定义为 0 */
+//#define configUSE_TRACE_FACILITY 1
 #if ( configUSE_TRACE_FACILITY == 1 )
 #include "trcRecorder.h"
 #define INCLUDE_xTaskGetCurrentTaskHandle               1   // 启用一个可选函数（该函数被 Trace源码使用，默认该值为0 表示不用）

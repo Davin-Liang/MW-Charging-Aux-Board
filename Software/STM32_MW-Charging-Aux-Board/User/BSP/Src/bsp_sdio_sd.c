@@ -224,6 +224,9 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "bsp_sdio_sd.h"
+#include "FreeRTOS.h"
+#include "semphr.h"
+#include "ff.h"
 
 
 /** @addtogroup Utilities
@@ -694,6 +697,29 @@ SD_Error SD_Init(void)
   }  
 
   return(errorstatus);
+}
+
+/* 创建同步对象 */
+int ff_cre_syncobj (BYTE vol, _SYNC_t *sobj) {
+    (void)vol; // 未使用参数
+    *sobj = xSemaphoreCreateMutex();
+    return (int)(*sobj != NULL);
+}
+
+/* 删除同步对象 */
+int ff_del_syncobj (_SYNC_t sobj) {
+    vSemaphoreDelete(sobj);
+    return 1;
+}
+
+/* 请求访问权限（获取锁） */
+int ff_req_grant (_SYNC_t sobj) {
+    return (int)(xSemaphoreTake(sobj, _FS_TIMEOUT) == pdTRUE);
+}
+
+/* 释放访问权限（释放锁） */
+void ff_rel_grant (_SYNC_t sobj) {
+    xSemaphoreGive(sobj);
 }
 
 /**
