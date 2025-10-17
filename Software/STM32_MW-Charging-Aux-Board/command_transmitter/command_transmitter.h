@@ -4,12 +4,25 @@
 #include <string>
 #include <vector>
 #include "command_struct.h"
+#include <QTcpServer>
+#include <QTcpSocket>
+#include <QObject>
+#include <QList>
+#include <QByteArray>
+#include <cstdint>
+#include <string>
 
-class CommandTransmitter {
+class CommandTransmitter : public QObject {
+    Q_OBJECT
 public:
     /* 构造函数和析构函数 */
-    CommandTransmitter();
+    CommandTransmitter(QObject *parent = nullptr);
     virtual ~CommandTransmitter();
+
+    bool param_initialize(const std::string & filename);
+
+    bool start_server(quint16 port);
+    void stop_server();
 
     int build_command_frame(uint8_t* buffer, CommandType_t cmdType, 
                        uint16_t seqNum, const void* data, uint16_t dataLen);
@@ -20,6 +33,14 @@ public:
                                 float cirTrajRad, uint8_t squThajStepLen, 
                                 float maxVolfloat volStepLen);
     int send_find_opt_command(void);
+    int send_time_command(void);
+    void set_current_time(DateTime_t * dt);
+
+private slots:
+    void on_new_connection(void);
+    void on_ready_read(void);
+    void on_disconnected(void);
+    void on_error_occurred(QAbstractSocket::SocketError error);
 
 private:
     uint8_t calculate_checksum(const uint8_t* data, uint16_t len);
@@ -29,6 +50,12 @@ private:
     FindOptimalCmd_t findOptCmd;
     MotorData_t motorData;
     DateTime_t timeData;
+
+    /* TCP 服务器相关私有变量 */
+    QTcpServer * m_tcpServer;           // TCP 服务器实例
+    QTcpSocket * m_clientSocket;        // 当前连接的客户端（假设单连接）
+    quint16 m_serverPort;              // 服务器端口
+    bool m_isServerRunning;            // 服务器运行状态
 };
 
 #endif // __COMMAND_TRANSMITTER_H

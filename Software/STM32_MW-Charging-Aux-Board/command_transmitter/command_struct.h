@@ -10,7 +10,7 @@ typedef enum {
     CMD_FIND_OPT_RES = 0x02, // 寻优
     MOTOR_DATA_READ = 0x03, // 电机数据读取
     CMD_OPT_RES_READ = 0x04, // 寻优结果读取
-    CMD_PASS_DATE_TIME = 0x05, // 向下位机传递数据
+    CMD_PASS_DATE_TIME = 0x05, // 向下位机传递时间
     CMD_RESPONSE = 0x80 // 响应命令
 } CommandType_t;
 
