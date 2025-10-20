@@ -7,6 +7,7 @@
 #include "command_struct.h"
 #include "stdio.h"
 #include <string.h> 
+#include "send_command.h"
 
 static void data_sum_Task(void * param);
 static int datetime_to_filename(const DateTime_t *dt, const char *filename, 
@@ -41,7 +42,7 @@ static void data_sum_Task(void * param)
         /* 打印电机数据 */
         mutual_printf("Position:(%.2f,%.2f)\r\n", currentMotorData.x, currentMotorData.y);
         /* 通过以太网上传电机数据 */
-
+        send_motor_data_command(1, currentMotorData.x, currentMotorData.y, 0); // TODO:
       }
 
       if (pdPASS == xQueueReceive(g_timeDataQueue, &g_currentDateTime, 10))
@@ -75,7 +76,10 @@ static void data_sum_Task(void * param)
                               currentOptimalVP.optimalP);
 
         /* 通过以太网上传最优结果 */
-
+        send_opt_res_data_command(1, currentMotorData.x, 
+                                      currentMotorData.y, 
+                                      currentOptimalVP.optimalP, 
+                                      currentOptimalVP.optimalVs); // TODO:
       }
 
       if (pdPASS == xQueueReceive(g_currentVPChQueue, &currentVPCh, 10))
@@ -94,7 +98,7 @@ static void data_sum_Task(void * param)
                           currentVPCh.channel);
 
         /* 通过以太网上传当前通道的电压、功率、通道 */
-
+        send_current_vpch_command(1, currentVPCh.channel, currentVPCh.currentV, currentVPCh.currentP);
       }
 
       vTaskDelay(10);

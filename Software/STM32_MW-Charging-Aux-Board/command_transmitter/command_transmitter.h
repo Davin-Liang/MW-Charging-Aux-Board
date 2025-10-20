@@ -20,12 +20,12 @@ public:
     virtual ~CommandTransmitter();
 
     bool param_initialize(const std::string & filename);
+    bool param_record(const std::string & filename);
 
     bool start_server(quint16 port);
     void stop_server();
 
-    int build_command_frame(uint8_t* buffer, CommandType_t cmdType, 
-                       uint16_t seqNum, const void* data, uint16_t dataLen);
+    int build_command_frame(uint8_t* buffer, CommandType_t cmdType, const void* data, uint16_t dataLen);
     int parse_command_frame(const uint8_t * buffer, uint16_t len, CommandFrame_t * cmd);
     int send_motor_command(int sock, float x, float y, uint16_t speed = 0);
     int send_motor_command(void);

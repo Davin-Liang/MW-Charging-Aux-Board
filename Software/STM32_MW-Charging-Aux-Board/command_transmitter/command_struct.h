@@ -10,7 +10,8 @@ typedef enum {
     CMD_FIND_OPT_RES = 0x02, // 寻优
     MOTOR_DATA_READ = 0x03, // 电机数据读取
     CMD_OPT_RES_READ = 0x04, // 寻优结果读取
-    CMD_PASS_DATE_TIME = 0x05, // 向下位机传递时间
+    CURRENT_VPCH_READ = 0x05,
+    CMD_PASS_DATE_TIME = 0x06, // 向下位机传递数据
     CMD_RESPONSE = 0x80 // 响应命令
 } CommandType_t;
 
@@ -62,10 +63,16 @@ typedef struct __attribute__((packed)) {
 } MotorData_t;
 
 typedef struct __attribute__((packed)) {
-    float motorX;
-    float motorY;
-    int motorSpeed;
+    MotorData_t motorData;
+    float optimalPower;
+    float optimalVs[4]; 
 } OptResData_t;
+
+typedef struct __attribute__((packed)) {
+    uint8_t currentChannel;
+    float currentV;
+    float currentP; 
+} CurrentVPCh_t;
 
 // 寻优控制命令
 typedef struct __attribute__((packed)) {
@@ -92,6 +99,8 @@ typedef struct __attribute__((packed)) {
         MotorCmd_t motorCmd;
         FindOptimalCmd_t findOptCmd;
         MotorData_t motorData;
+        OptResData_t optResData;
+        CurrentVPCh_t currentVPCh;
         DateTime_t timeData;
         ResponseData_t response;
         uint8_t rawData[128];  // 原始数据存储

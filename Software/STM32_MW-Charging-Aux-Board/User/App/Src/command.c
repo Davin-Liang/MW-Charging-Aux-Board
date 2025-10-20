@@ -3,12 +3,12 @@
 #include "stdio.h"
 #include <string.h> 
 
-#define  PC_OR_32 0 // 1 ä»£è¡¨ ç”µè„‘ç«¯ | 0 ä»£è¡¨32ç«¯
+#define  PC_OR_32 0 // 1 ´ú±í µçÄÔ¶Ë | 0 ´ú±í32¶Ë
 
 /**
-  * @brief  è®¡ç®—æ ¡éªŒå’Œ
-  * @param  data æ•°æ®åœ°å€
-  * @param  len æ•°æ®é•¿åº¦
+  * @brief  ¼ÆËãĞ£ÑéºÍ
+  * @param  data Êı¾İµØÖ·
+  * @param  len Êı¾İ³¤¶È
   * @return void
   **/
 uint8_t calculate_checksum(const uint8_t* data, uint16_t len) 
@@ -18,33 +18,32 @@ uint8_t calculate_checksum(const uint8_t* data, uint16_t len)
     {
         sum += data[i];
     }
-    return ~sum + 1;  // è¡¥ç 
+    return ~sum + 1;  // ²¹Âë
 }
 
 /**
-  * @brief  æ„å»ºå‘½ä»¤å¸§
-  * @param  data æ•°æ®åœ°å€
-  * @param  len æ•°æ®é•¿åº¦
-  * @return -1 æ•°æ®é•¿åº¦è¶…å‡ºé™åˆ¶ | [æœ‰æ•ˆæ•°æ®é•¿åº¦]
+  * @brief  ¹¹½¨ÃüÁîÖ¡
+  * @param  data Êı¾İµØÖ·
+  * @param  len Êı¾İ³¤¶È
+  * @return -1 Êı¾İ³¤¶È³¬³öÏŞÖÆ | [ÓĞĞ§Êı¾İ³¤¶È]
   **/
-int build_command_frame(uint8_t* buffer, CommandType_t cmdType, 
-                       uint16_t seqNum, const void* data, uint16_t dataLen) 
+int build_command_frame(uint8_t* buffer, CommandType_t cmdType, const void* data, uint16_t dataLen) 
 {
     if (dataLen > 128) return -1;
     
     CommandFrame_t * frame = (CommandFrame_t*)buffer;
     
-    // å¡«å……å‘½ä»¤å¤´
+    // Ìî³äÃüÁîÍ·
     frame->header.startMagic = 0xAA;
     frame->header.cmdId = cmdType;
-    frame->header.seqNum = seqNum;
+    // frame->header.seqNum = seqNum;
     frame->header.dataLen = dataLen;
     
-    // æ‹·è´æ•°æ®
+    // ¿½±´Êı¾İ
     if (dataLen > 0 && data != NULL)
         memcpy(frame->payload.rawData, data, dataLen);
     
-    // è®¡ç®—æ ¡éªŒå’Œï¼ˆåªè®¡ç®—å¤´éƒ¨ï¼‰
+    // ¼ÆËãĞ£ÑéºÍ£¨Ö»¼ÆËãÍ·²¿£©
     frame->header.checksum = calculate_checksum((uint8_t*)&frame->header, 
                                                sizeof(CmdHeader_t) - 1);
     
@@ -52,11 +51,11 @@ int build_command_frame(uint8_t* buffer, CommandType_t cmdType,
 }
 
 /**
-  * @brief  è§£æå‘½ä»¤å¸§
-  * @param  buffer æ•°æ®åœ°å€
-  * @param  len æ•°æ®é•¿åº¦
-  * @param  cmd å‘½ä»¤ç»“æ„ä½“
-  * @return -1 æ•°æ®é•¿åº¦è¿‡äºå° | -2 å‘½ä»¤å¸§å¸§å¤´ä¸å¯¹ | -3 å‘½ä»¤å¸§æ ¡éªŒå’Œä¸å¯¹ | -4 æ•°æ®é•¿åº¦ä¸å¯¹
+  * @brief  ½âÎöÃüÁîÖ¡
+  * @param  buffer Êı¾İµØÖ·
+  * @param  len Êı¾İ³¤¶È
+  * @param  cmd ÃüÁî½á¹¹Ìå
+  * @return -1 Êı¾İ³¤¶È¹ıÓÚĞ¡ | -2 ÃüÁîÖ¡Ö¡Í·²»¶Ô | -3 ÃüÁîÖ¡Ğ£ÑéºÍ²»¶Ô | -4 Êı¾İ³¤¶È²»¶Ô
   **/
 int parse_command_frame(const uint8_t* buffer, uint16_t len, CommandFrame_t* cmd) 
 {
@@ -64,17 +63,17 @@ int parse_command_frame(const uint8_t* buffer, uint16_t len, CommandFrame_t* cmd
     
     memcpy(cmd, buffer, sizeof(CmdHeader_t));
     
-    // éªŒè¯èµ·å§‹æ ‡å¿—
+    // ÑéÖ¤ÆğÊ¼±êÖ¾
     if(cmd->header.startMagic != 0xAA) return -2;
     
-    // éªŒè¯æ ¡éªŒå’Œ
+    // ÑéÖ¤Ğ£ÑéºÍ
     uint8_t calc_checksum = calculate_checksum(buffer, sizeof(CmdHeader_t) - 1);
     if(calc_checksum != cmd->header.checksum) return -3;
     
-    // éªŒè¯æ•°æ®é•¿åº¦
+    // ÑéÖ¤Êı¾İ³¤¶È
     if(len < sizeof(CmdHeader_t) + cmd->header.dataLen) return -4;
     
-    // æ‹·è´æ•°æ®éƒ¨åˆ†
+    // ¿½±´Êı¾İ²¿·Ö
     if(cmd->header.dataLen > 0)
         memcpy(cmd->payload.rawData, buffer + sizeof(CmdHeader_t), cmd->header.dataLen);
     
@@ -82,11 +81,11 @@ int parse_command_frame(const uint8_t* buffer, uint16_t len, CommandFrame_t* cmd
 }
 
 /**
-  * @brief  æ‰§è¡Œå‘½ä»¤å¹¶æ”¾å›å“åº”æ•°æ®
-  * @param  buffer æ•°æ®åœ°å€
-  * @param  len æ•°æ®é•¿åº¦
-  * @param  cmd å‘½ä»¤ç»“æ„ä½“
-  * @return -1 æ•°æ®é•¿åº¦è¿‡äºå° | -2 å‘½ä»¤å¸§å¸§å¤´ä¸å¯¹ | -3 å‘½ä»¤å¸§æ ¡éªŒå’Œä¸å¯¹ | -4 æ•°æ®é•¿åº¦ä¸å¯¹
+  * @brief  Ö´ĞĞÃüÁî²¢·Å»ØÏìÓ¦Êı¾İ
+  * @param  buffer Êı¾İµØÖ·
+  * @param  len Êı¾İ³¤¶È
+  * @param  cmd ÃüÁî½á¹¹Ìå
+  * @return -1 Êı¾İ³¤¶È¹ıÓÚĞ¡ | -2 ÃüÁîÖ¡Ö¡Í·²»¶Ô | -3 ÃüÁîÖ¡Ğ£ÑéºÍ²»¶Ô | -4 Êı¾İ³¤¶È²»¶Ô
   **/
 ResponseStatus_t execute_command(const CommandFrame_t* cmd, uint8_t* responseData, uint16_t* respLen) 
 {
@@ -140,9 +139,9 @@ ResponseStatus_t execute_command(const CommandFrame_t* cmd, uint8_t* responseDat
 
     #endif
     
-    // æ„å»ºå“åº”æ•°æ®ï¼ˆå¦‚æœæœ‰éœ€è¦è¿”å›çš„æ•°æ®ï¼‰
+    // ¹¹½¨ÏìÓ¦Êı¾İ£¨Èç¹ûÓĞĞèÒª·µ»ØµÄÊı¾İ£©
     *respLen = 0;
-    // å¯ä»¥åœ¨è¿™é‡Œå¡«å……response_data
+    // ¿ÉÒÔÔÚÕâÀïÌî³äresponse_data
     
     return status;
 }

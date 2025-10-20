@@ -80,10 +80,10 @@ lwip_start:
                 /* 执行命令 */
                 // ResponseStatus_t status = execute_command(&receivedCmd, respData, &respDataLen);
                 ResponseStatus_t status = STATUS_SUCCESS;
-                switch(receivedCmd.header.cmdId) 
+                switch (receivedCmd.header.cmdId) 
                 {
                     case CMD_MOTOR_CONTROL:
-                        if(receivedCmd.header.dataLen == sizeof(MotorCmd_t))
+                        if (receivedCmd.header.dataLen == sizeof(MotorCmd_t))
                         {
                             xQueueSend(g_motorCmdQueue, &receivedCmd.payload.motorCmd, 10);
                             command.commandType = demandMotorControl;
@@ -96,7 +96,7 @@ lwip_start:
                         break;
                         
                     case CMD_FIND_OPT_RES:
-                        if(receivedCmd.header.dataLen == sizeof(OptResData_t))     
+                        if (receivedCmd.header.dataLen == sizeof(OptResData_t))     
                         {
                             xQueueSend(g_optResDataQueue, &receivedCmd.payload.findOptCmd, 10);
                             // TODO:完善 g_optResDataQueue 队列的接收部分
@@ -109,7 +109,7 @@ lwip_start:
                         break;
 
                     case CMD_PASS_DATE_TIME:
-                        if(receivedCmd.header.dataLen == sizeof(DateTime_t))     
+                        if (receivedCmd.header.dataLen == sizeof(DateTime_t))     
                         {
                             xQueueSend(g_timeDataQueue, &receivedCmd.payload.timeData, 10);
                         }

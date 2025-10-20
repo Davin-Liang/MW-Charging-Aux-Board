@@ -4,17 +4,18 @@
 
 #include <stdint.h>
 
-// å‘½ä»¤ç±»å‹æšä¸¾
+// ÃüÁîÀàĞÍÃ¶¾Ù
 typedef enum {
-    CMD_MOTOR_CONTROL = 0x01, // ç”µæœºæ§åˆ¶  
-    CMD_FIND_OPT_RES = 0x02, // å¯»ä¼˜
-    MOTOR_DATA_READ = 0x03, // ç”µæœºæ•°æ®è¯»å–
-    CMD_OPT_RES_READ = 0x04, // å¯»ä¼˜ç»“æœè¯»å–
-    CMD_PASS_DATE_TIME = 0x05, // å‘ä¸‹ä½æœºä¼ é€’æ•°æ®
-    CMD_RESPONSE = 0x80 // å“åº”å‘½ä»¤
+    CMD_MOTOR_CONTROL = 0x01, // µç»ú¿ØÖÆ  
+    CMD_FIND_OPT_RES = 0x02, // Ñ°ÓÅ
+    MOTOR_DATA_READ = 0x03, // µç»úÊı¾İ¶ÁÈ¡
+    CMD_OPT_RES_READ = 0x04, // Ñ°ÓÅ½á¹û¶ÁÈ¡
+    CURRENT_VPCH_READ = 0x05,
+    CMD_PASS_DATE_TIME = 0x06, // ÏòÏÂÎ»»ú´«µİÊı¾İ
+    CMD_RESPONSE = 0x80 // ÏìÓ¦ÃüÁî
 } CommandType_t;
 
-// å“åº”çŠ¶æ€
+// ÏìÓ¦×´Ì¬
 typedef enum {
     STATUS_SUCCESS = 0,
     STATUS_INVALID_CMD,
@@ -23,36 +24,36 @@ typedef enum {
     STATUS_BUSY
 } ResponseStatus_t;
 
-// å‘½ä»¤å¤´ç»“æ„
+// ÃüÁîÍ·½á¹¹
 typedef struct __attribute__((packed)) {
-    uint8_t startMagic; // èµ·å§‹æ ‡å¿— 0xAA
-    uint16_t cmdId; // å‘½ä»¤ID
-    uint16_t seqNum; // åºåˆ—å·
-    uint16_t dataLen; // æ•°æ®é•¿åº¦
-    uint8_t checksum; // å¤´æ ¡éªŒå’Œ
+    uint8_t startMagic; // ÆğÊ¼±êÖ¾ 0xAA
+    uint16_t cmdId; // ÃüÁîID
+    uint16_t seqNum; // ĞòÁĞºÅ
+    uint16_t dataLen; // Êı¾İ³¤¶È
+    uint8_t checksum; // Í·Ğ£ÑéºÍ
 } CmdHeader_t;
 
-// æ—¥æœŸæ—¶é—´ç»“æ„
+// ÈÕÆÚÊ±¼ä½á¹¹
 typedef struct __attribute__((packed)) {
-    uint16_t year;          // å¹´ä»½ 2023-2100
-    uint8_t month;          // æœˆä»½ 1-12
-    uint8_t day;            // æ—¥æœŸ 1-31
-    uint8_t hour;           // å°æ—¶ 0-23
-    uint8_t minute;         // åˆ†é’Ÿ 0-59
-    uint8_t week_day;       // æ˜ŸæœŸ 0-6 (0=å‘¨æ—¥)
+    uint16_t year;          // Äê·İ 2023-2100
+    uint8_t month;          // ÔÂ·İ 1-12
+    uint8_t day;            // ÈÕÆÚ 1-31
+    uint8_t hour;           // Ğ¡Ê± 0-23
+    uint8_t minute;         // ·ÖÖÓ 0-59
+    uint8_t week_day;       // ĞÇÆÚ 0-6 (0=ÖÜÈÕ)
 } DateTime_t;
 
-// ç”µæœºæ§åˆ¶å‘½ä»¤  
+// µç»ú¿ØÖÆÃüÁî  
 typedef struct __attribute__((packed)) {
-    float x; // æ¥æ”¶å¤©çº¿ X åæ ‡[m]
-    float y; // æ¥æ”¶å¤©çº¿ Y åæ ‡[m]
-    uint16_t speed; // æ¥æ”¶å¤©çº¿ç§»åŠ¨é€Ÿåº¦â€”â€”0 è¡¨ç¤ºä¸è®¾ç½®é€Ÿåº¦/ >0 è¡¨ç¤ºè®¾ç½®é€Ÿåº¦
+    float x; // ½ÓÊÕÌìÏß X ×ø±ê[m]
+    float y; // ½ÓÊÕÌìÏß Y ×ø±ê[m]
+    uint16_t speed; // ½ÓÊÕÌìÏßÒÆ¶¯ËÙ¶È¡ª¡ª0 ±íÊ¾²»ÉèÖÃËÙ¶È/ >0 ±íÊ¾ÉèÖÃËÙ¶È
 } MotorCmd_t;
 
-// è½¨è¿¹ç±»å‹
+// ¹ì¼£ÀàĞÍ
 typedef enum {
-    SQU_TRAJ = 0, // æ–¹å‹è½¨è¿¹
-    CIR_TRAJ, // åœ†å½¢è½¨è¿¹
+    SQU_TRAJ = 0, // ·½ĞÍ¹ì¼£
+    CIR_TRAJ, // Ô²ĞÎ¹ì¼£
 } ThajType_t;
 
 typedef struct __attribute__((packed)) {
@@ -62,46 +63,52 @@ typedef struct __attribute__((packed)) {
 } MotorData_t;
 
 typedef struct __attribute__((packed)) {
-    float motorX;
-    float motorY;
-    int motorSpeed;
+    MotorData_t motorData;
+    float optimalPower;
+    float optimalVs[4]; 
 } OptResData_t;
 
-// å¯»ä¼˜æ§åˆ¶å‘½ä»¤
 typedef struct __attribute__((packed)) {
-    ThajType_t whichThaj; // å“ªç§è½¨è¿¹
-    float cirTrajRad; // åœ†å½¢è½¨è¿¹åŠå¾„[m]
-    uint8_t squThajStepLen; // æ‰§è¡Œæ–¹å½¢è½¨è¿¹çš„æ­¥é•¿[mm]
-    float maxVol; // é€šé“å¯è®¾ç½®çš„æœ€å¤§ç”µå‹[v]
-    float volStepLen; // è®¾ç½®ç”µå‹æ—¶ç”µå‹è·³å˜çš„æ­¥é•¿[v]    
+    uint8_t currentChannel;
+    float currentV;
+    float currentP; 
+} CurrentVPCh_t;
+
+// Ñ°ÓÅ¿ØÖÆÃüÁî
+typedef struct __attribute__((packed)) {
+    ThajType_t whichThaj; // ÄÄÖÖ¹ì¼£
+    float cirTrajRad; // Ô²ĞÎ¹ì¼£°ë¾¶[m]
+    uint8_t squThajStepLen; // Ö´ĞĞ·½ĞÎ¹ì¼£µÄ²½³¤[mm]
+    float maxVol; // Í¨µÀ¿ÉÉèÖÃµÄ×î´óµçÑ¹[v]
+    float volStepLen; // ÉèÖÃµçÑ¹Ê±µçÑ¹Ìø±äµÄ²½³¤[v]    
 } FindOptimalCmd_t;
 
-// å“åº”ç»“æ„
+// ÏìÓ¦½á¹¹
 typedef struct __attribute__((packed)) {
-    uint16_t originalSeq;   // åŸå‘½ä»¤åºåˆ—å·
-    uint8_t status;          // æ‰§è¡ŒçŠ¶æ€
-    uint32_t timestamp;      // æ—¶é—´æˆ³
-    uint16_t dataLen;       // å“åº”æ•°æ®é•¿åº¦
-    uint8_t data[];          // å“åº”æ•°æ®(æŸ”æ€§æ•°ç»„)
+    uint16_t originalSeq;   // Ô­ÃüÁîĞòÁĞºÅ
+    uint8_t status;          // Ö´ĞĞ×´Ì¬
+    uint32_t timestamp;      // Ê±¼ä´Á
+    uint16_t dataLen;       // ÏìÓ¦Êı¾İ³¤¶È
+    uint8_t data[];          // ÏìÓ¦Êı¾İ(ÈáĞÔÊı×é)
 } ResponseData_t;
 
-// å®Œæ•´å‘½ä»¤å¸§ç»“æ„
+// ÍêÕûÃüÁîÖ¡½á¹¹
 typedef struct __attribute__((packed)) {
     CmdHeader_t header;
     union __attribute__((packed)) {
         MotorCmd_t motorCmd;
         FindOptimalCmd_t findOptCmd;
         MotorData_t motorData;
+        CurrentVPCh_t currentVPCh;
         DateTime_t timeData;
         ResponseData_t response;
-        uint8_t rawData[128];  // åŸå§‹æ•°æ®å­˜å‚¨
+        uint8_t rawData[128];  // Ô­Ê¼Êı¾İ´æ´¢
     } payload;
 } CommandFrame_t;
 
-// å‡½æ•°å£°æ˜
+// º¯ÊıÉùÃ÷
 uint8_t calculate_checksum(const uint8_t* data, uint16_t len);
-int build_command_frame(uint8_t* buffer, CommandType_t cmdType, 
-                       uint16_t seqNum, const void* data, uint16_t dataLen);
+int build_command_frame(uint8_t* buffer, CommandType_t cmdType, const void* data, uint16_t dataLen);
 int parse_command_frame(const uint8_t* buffer, uint16_t len, CommandFrame_t* cmd);
 ResponseStatus_t execute_command(const CommandFrame_t* cmd, uint8_t* responseData, uint16_t* respLen);
 

@@ -192,14 +192,18 @@ bool CommandTransmitter::param_initialize(const std::string & filename)
     }
 }
 
+bool CommandTransmitter::param_record(const std::string & filename) 
+{
+
+}
+
 /**
   * @brief  构建命令帧
   * @param  data 数据地址
   * @param  len 数据长度
   * @return -1 数据长度超出限制 | [有效数据长度]
   **/
-int CommandTransmitter::build_command_frame(uint8_t* buffer, CommandType_t cmdType, 
-                       uint16_t seqNum, const void* data, uint16_t dataLen) 
+int CommandTransmitter::build_command_frame(uint8_t* buffer, CommandType_t cmdType, const void* data, uint16_t dataLen) 
 {
     if (dataLen > 128) return -1;
     
@@ -266,6 +270,77 @@ int CommandTransmitter::parse_command_frame(const uint8_t * buffer, uint16_t len
         std::memcpy(cmd->payload.rawData, buffer + sizeof(CmdHeader_t), cmd->header.dataLen);
     
     return 0;
+}
+
+/** @brief  执行命令并放回响应数据
+  * @param  buffer 数据地址
+  * @param  len 数据长度
+  * @param  cmd 命令结构体
+  * @return -1 数据长度过于小 | -2 命令帧帧头不对 | -3 命令帧校验和不对 | -4 数据长度不对
+  **/
+void execute_command(const CommandFrame_t* cmd) 
+{
+    switch(cmd->header.cmdId) 
+    {     
+        case MOTOR_DATA_READ:
+            if(cmd->header.dataLen == sizeof(MotorData_t)) 
+            {
+                motorData.motorX = cmd->motorData.motorX;
+                motorData.motorY = cmd->motorData.motorY;
+                motorData.motorSpeed = cmd->motorData.motorSpeed;
+            }
+            
+            break;
+
+        case CMD_OPT_RES_READ:
+            if(cmd->header.dataLen == sizeof(OptResData_t)) 
+            {
+                optResData.motorData.motorX = cmd->optResData.motorData.motorX;
+                optResData.motorData.motorY = cmd->optResData.motorData.motorY;
+                optResData.optimalPower = cmd->optResData.optimalPower;
+                for (int i = 0; i < 0; i ++)
+                    optResData.optimalVs[i] = cmd->optResData.optimalVs[i];
+            }
+            
+            break;
+
+        case CURRENT_VPCH_READ:
+            if(cmd->header.dataLen == sizeof(CurrentVPCh_t)) 
+            {
+                currentVPCh.currentChannel = cmd->currentVPCh.currentChannel;
+                currentVPCh.currentV = cmd->currentVPCh.currentV;
+                currentVPCh.currentP = cmd->currentVPCh.currentP;
+            }
+            
+            break;
+
+        case MOTOR_DATA_READ:
+            if(cmd->header.dataLen == sizeof(MotorData_t)) 
+            {
+                motorData.motorX = cmd->motorData.motorX;
+                motorData.motorY = cmd->motorData.motorY;
+                motorData.motorSpeed = cmd->motorData.motorSpeed;
+            }
+            
+            break;
+            
+        case CMD_RESPONSE:
+            if(cmd->header.dataLen == sizeof(ResponseData_t))
+                ;// system_control(&cmd->payload.response);
+            
+            break;
+            
+        default:
+            break;
+    }
+
+    #endif
+    
+    // 构建响应数据（如果有需要返回的数据）
+    *respLen = 0;
+    // 可以在这里填充response_data
+    
+    return status;
 }
 
 /**
