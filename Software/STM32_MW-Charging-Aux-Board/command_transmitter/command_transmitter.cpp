@@ -26,6 +26,7 @@ CommandTransmitter::CommandTransmitter(QObject * parent)
     memset(&findOptCmd, 0, sizeof(findOptCmd));
     memset(&motorData, 0, sizeof(motorData));
     memset(&timeData, 0, sizeof(timeData));
+    memset(&optResData, 0, sizeof(optResData));
 
     /* 从json 配置文件中读取结构体数据 */
     param_initialize("config.json");
@@ -379,8 +380,14 @@ int CommandTransmitter::send_motor_command(void)
     
     int frameLen = build_command_frame(buffer, CMD_MOTOR_CONTROL, &motorCmd, sizeof(MotorCmd_t));
     
-    if(frameLen > 0) 
-        return send(sock, buffer, frameLen, 0); // TODO: 可能要改成 QT socket 的发送函数，这里用的是 socket 的标准版本的发送函数
+    // if(frameLen > 0) 
+    //     return send(sock, buffer, frameLen, 0); // TODO: 可能要改成 QT socket 的发送函数，这里用的是 socket 的标准版本的发送函数
+
+    if (frameLen > 0) 
+    {
+        /* 使用 QTcpSocket 的 write 函数发送数据 */
+        qint64 bytesWritten = m_clientSocket->write(reinterpret_cast<const char*>(buffer), frameLen);
+    }
 
     return -1;
 }

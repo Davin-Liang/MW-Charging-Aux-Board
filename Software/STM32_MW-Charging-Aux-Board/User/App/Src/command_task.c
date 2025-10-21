@@ -12,6 +12,7 @@
 #include "attenuator_task.h"
 #include "queue.h"
 #include "lwip_recv_task.h"
+#include "DM542_task.h"
 
 #define DEBUG 1
 

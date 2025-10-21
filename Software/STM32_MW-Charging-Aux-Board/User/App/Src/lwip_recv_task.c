@@ -23,7 +23,7 @@ static struct CommandInfo command;
 
 QueueHandle_t g_motorCmdQueue = NULL;
 QueueHandle_t g_commandQueue = NULL;
-QueueHandle_t g_optResDataQueue = NULL;
+QueueHandle_t g_findOptCmdQueue = NULL;
 QueueHandle_t g_timeDataQueue = NULL;
 
 static void lwip_recv_task(void * param)
@@ -36,7 +36,7 @@ static void lwip_recv_task(void * param)
 
     g_motorCmdQueue = xQueueCreate(MOTOR_CMD_QUEUE_LEN, sizeof(MotorCmd_t));
     g_commandQueue = xQueueCreate(COMMAND_QUEUE_LEN, sizeof(struct CommandInfo));
-    g_optResDataQueue = xQueueCreate(OPT_RES_QUEUE_LEN, sizeof(struct CommandInfo));
+    g_findOptCmdQueue = xQueueCreate(OPT_RES_QUEUE_LEN, sizeof(struct CommandInfo));
     g_timeDataQueue = xQueueCreate(TIME_DATA_QUEUE_LEN, sizeof(DateTime_t));
 
 lwip_start:     
@@ -72,13 +72,12 @@ lwip_start:
             
             /* 解析命令 */
             int parse_result = parse_command_frame(g_lwipDemoRecvBuf, recvDataLen, &receivedCmd);
-            if(parse_result == 0) 
+            if (parse_result == 0) 
             {
                 // uint16_t respDataLen = 0;
                 // uint8_t respData[LWIP_RX_BUFSIZE];
                 
                 /* 执行命令 */
-                // ResponseStatus_t status = execute_command(&receivedCmd, respData, &respDataLen);
                 ResponseStatus_t status = STATUS_SUCCESS;
                 switch (receivedCmd.header.cmdId) 
                 {
@@ -96,9 +95,9 @@ lwip_start:
                         break;
                         
                     case CMD_FIND_OPT_RES:
-                        if (receivedCmd.header.dataLen == sizeof(OptResData_t))     
+                        if (receivedCmd.header.dataLen == sizeof(FindOptimalCmd_t))     
                         {
-                            xQueueSend(g_optResDataQueue, &receivedCmd.payload.findOptCmd, 10);
+                            xQueueSend(g_findOptCmdQueue, &receivedCmd.payload.findOptCmd, 10);
                             // TODO:完善 g_optResDataQueue 队列的接收部分
                             command.commandType = demandTwo;
                              xQueueSend(g_commandQueue, &command, 10);
