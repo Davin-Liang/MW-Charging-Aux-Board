@@ -4,6 +4,8 @@
 
 #include <stdint.h>
 
+#define BUFFER_LEN 40
+
 // 命令类型枚举
 typedef enum {
     CMD_MOTOR_CONTROL = 0x01, // 电机控制  
@@ -28,7 +30,7 @@ typedef enum {
 typedef struct __attribute__((packed)) {
     uint8_t startMagic; // 起始标志 0xAA
     uint16_t cmdId; // 命令ID
-    uint16_t seqNum; // 序列号
+    // uint16_t seqNum; // 序列号
     uint16_t dataLen; // 数据长度
     uint8_t checksum; // 头校验和
 } CmdHeader_t;
@@ -103,7 +105,7 @@ typedef struct __attribute__((packed)) {
         CurrentVPCh_t currentVPCh;
         DateTime_t timeData;
         ResponseData_t response;
-        uint8_t rawData[128];  // 原始数据存储
+        uint8_t rawData[BUFFER_LEN];  // 原始数据存储
     } payload;
 } CommandFrame_t;
 

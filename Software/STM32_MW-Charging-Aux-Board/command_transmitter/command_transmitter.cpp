@@ -7,9 +7,15 @@
 #include <nlohmann/json.hpp>
 #include <QDebug>
 #include <QHostAddress>
+#include <iostream>
 
 using json = nlohmann::json;
 
+/**
+  * @brief  构造函数：初始化TCP服务器、私有结构体、从json文件中读取默认参数
+  * @param  parent
+  * @return void
+  **/
 CommandTransmitter::CommandTransmitter(QObject * parent)
     : QObject(parent)
     , m_tcpServer(nullptr)
@@ -32,6 +38,24 @@ CommandTransmitter::CommandTransmitter(QObject * parent)
     param_initialize("config.json");
 }
 
+CommandTransmitter::~CommandTransmitter()
+{
+    /* 清理资源 */
+    stop_server();
+    
+    /* 如果手动分配了其他资源，在这里释放 */
+    if (m_tcpServer) 
+    {
+        m_tcpServer->deleteLater();
+        m_tcpServer = nullptr;
+    }
+}
+
+/**
+  * @brief  服务器开始监听端口
+  * @param  port 端口号
+  * @return true 成功 / false 失败
+  **/
 bool CommandTransmitter::start_server(quint16 port)
 {
     if (m_isServerRunning) 
@@ -51,6 +75,11 @@ bool CommandTransmitter::start_server(quint16 port)
     return true;
 }
 
+/**
+  * @brief  服务器停止监听端口
+  * @param  void
+  * @return void
+  **/
 void CommandTransmitter::stop_server(void)
 {
     if (m_clientSocket) 
@@ -67,6 +96,11 @@ void CommandTransmitter::stop_server(void)
     qDebug() << "服务器已停止";
 }
 
+/**
+  * @brief  QT槽函数：监听新连接
+  * @param  void
+  * @return void
+  **/
 void CommandTransmitter::on_new_connection(void)
 {
     if (m_clientSocket) 
@@ -83,10 +117,10 @@ void CommandTransmitter::on_new_connection(void)
     m_clientSocket = m_tcpServer->nextPendingConnection();
     if (m_clientSocket) 
     {
-        connect(m_clientSocket, &QTcpSocket::readyRead, this, &CommandTransmitter::onReadyRead);
-        connect(m_clientSocket, &QTcpSocket::disconnected, this, &CommandTransmitter::onDisconnected);
+        connect(m_clientSocket, &QTcpSocket::readyRead, this, &CommandTransmitter::on_ready_read);
+        connect(m_clientSocket, &QTcpSocket::disconnected, this, &CommandTransmitter::on_disconnected);
         connect(m_clientSocket, QOverload<QAbstractSocket::SocketError>::of(&QAbstractSocket::errorOccurred),
-                this, &CommandTransmitter::onErrorOccurred);
+                this, &CommandTransmitter::on_error_occurred);
         
         qDebug() << "新的下位机连接:" << m_clientSocket->peerAddress().toString() 
                  << ":" << m_clientSocket->peerPort();
@@ -109,7 +143,7 @@ void CommandTransmitter::on_ready_read(void)
                                data.length(), &cmd) == 0) 
         {
             // 成功解析命令帧
-            qDebug() << "解析到命令帧，类型:" << cmd.cmdType << "序列号:" << cmd.seqNum;
+            qDebug() << "解析到命令帧，类型:" << cmd.header.cmdId;
         }
     }
 }
@@ -133,7 +167,7 @@ void CommandTransmitter::on_error_occurred(QAbstractSocket::SocketError error)
 /**
   * @brief 从JSON文件初始化参数
   * @param filename JSON文件名
-  * @return true-成功, false-失败
+  * @return true 成功 \ false 失败
   **/
 bool CommandTransmitter::param_initialize(const std::string & filename) 
 {
@@ -143,7 +177,7 @@ bool CommandTransmitter::param_initialize(const std::string & filename)
         std::ifstream file(filename);
         if (!file.is_open()) 
         {
-            std::cerr << "错误: 无法打开文件 " << filename << std::endl;
+            std::cout << "错误: 无法打开文件 " << filename << std::endl;
             return false;
         }
         
@@ -161,7 +195,7 @@ bool CommandTransmitter::param_initialize(const std::string & filename)
         } 
         else 
         {
-            std::cerr << "错误: JSON中缺少 motorCmd 部分" << std::endl;
+            std::cout << "错误: JSON中缺少 motorCmd 部分" << std::endl;
             return false;
         }
 
@@ -195,7 +229,7 @@ bool CommandTransmitter::param_initialize(const std::string & filename)
 
 bool CommandTransmitter::param_record(const std::string & filename) 
 {
-
+    // TODO:
 }
 
 /**
@@ -206,14 +240,14 @@ bool CommandTransmitter::param_record(const std::string & filename)
   **/
 int CommandTransmitter::build_command_frame(uint8_t* buffer, CommandType_t cmdType, const void* data, uint16_t dataLen) 
 {
-    if (dataLen > 128) return -1;
+    if (dataLen > BUFFER_LEN) return -1;
     
     CommandFrame_t * frame = (CommandFrame_t*)buffer;
     
     /* 填充命令头 */
     frame->header.startMagic = 0xAA;
     frame->header.cmdId = cmdType;
-    frame->header.seqNum = seqNum;
+    // frame->header.seqNum = seqNum;
     frame->header.dataLen = dataLen;
     
     /* 拷贝数据 */
@@ -279,16 +313,16 @@ int CommandTransmitter::parse_command_frame(const uint8_t * buffer, uint16_t len
   * @param  cmd 命令结构体
   * @return -1 数据长度过于小 | -2 命令帧帧头不对 | -3 命令帧校验和不对 | -4 数据长度不对
   **/
-void execute_command(const CommandFrame_t* cmd) 
+void CommandTransmitter::execute_command(const CommandFrame_t* cmd) 
 {
     switch(cmd->header.cmdId) 
     {     
         case MOTOR_DATA_READ:
             if(cmd->header.dataLen == sizeof(MotorData_t)) 
             {
-                motorData.motorX = cmd->motorData.motorX;
-                motorData.motorY = cmd->motorData.motorY;
-                motorData.motorSpeed = cmd->motorData.motorSpeed;
+                motorData.motorX = cmd->payload.motorData.motorX;
+                motorData.motorY = cmd->payload.motorData.motorY;
+                motorData.motorSpeed = cmd->payload.motorData.motorSpeed;
             }
             
             break;
@@ -296,11 +330,11 @@ void execute_command(const CommandFrame_t* cmd)
         case CMD_OPT_RES_READ:
             if(cmd->header.dataLen == sizeof(OptResData_t)) 
             {
-                optResData.motorData.motorX = cmd->optResData.motorData.motorX;
-                optResData.motorData.motorY = cmd->optResData.motorData.motorY;
-                optResData.optimalPower = cmd->optResData.optimalPower;
+                optResData.motorData.motorX = cmd->payload.optResData.motorData.motorX;
+                optResData.motorData.motorY = cmd->payload.optResData.motorData.motorY;
+                optResData.optimalPower = cmd->payload.optResData.optimalPower;
                 for (int i = 0; i < 0; i ++)
-                    optResData.optimalVs[i] = cmd->optResData.optimalVs[i];
+                    optResData.optimalVs[i] = cmd->payload.optResData.optimalVs[i];
             }
             
             break;
@@ -308,22 +342,22 @@ void execute_command(const CommandFrame_t* cmd)
         case CURRENT_VPCH_READ:
             if(cmd->header.dataLen == sizeof(CurrentVPCh_t)) 
             {
-                currentVPCh.currentChannel = cmd->currentVPCh.currentChannel;
-                currentVPCh.currentV = cmd->currentVPCh.currentV;
-                currentVPCh.currentP = cmd->currentVPCh.currentP;
+                currentVPCh.currentChannel = cmd->payload.currentVPCh.currentChannel;
+                currentVPCh.currentV = cmd->payload.currentVPCh.currentV;
+                currentVPCh.currentP = cmd->payload.currentVPCh.currentP;
             }
             
             break;
 
-        case MOTOR_DATA_READ:
-            if(cmd->header.dataLen == sizeof(MotorData_t)) 
-            {
-                motorData.motorX = cmd->motorData.motorX;
-                motorData.motorY = cmd->motorData.motorY;
-                motorData.motorSpeed = cmd->motorData.motorSpeed;
-            }
+        // case MOTOR_DATA_READ:
+        //     if(cmd->header.dataLen == sizeof(MotorData_t)) 
+        //     {
+        //         motorData.motorX = cmd->motorData.motorX;
+        //         motorData.motorY = cmd->motorData.motorY;
+        //         motorData.motorSpeed = cmd->motorData.motorSpeed;
+        //     }
             
-            break;
+        //     break;
             
         case CMD_RESPONSE:
             if(cmd->header.dataLen == sizeof(ResponseData_t))
@@ -334,36 +368,30 @@ void execute_command(const CommandFrame_t* cmd)
         default:
             break;
     }
-
-    #endif
     
     // 构建响应数据（如果有需要返回的数据）
-    *respLen = 0;
+    // *respLen = 0;
     // 可以在这里填充response_data
     
-    return status;
+    // return status;
 }
 
 /**
-  * @brief  发送电机命令帧
-  * @param  sock socket 编号
+  * @brief  发送控制电机命令帧（不使用类私有变量）
   * @param  x 目标电机位置 X 坐标
   * @param  y 目标电机位置 Y 坐标
   * @param  speed 目标电机速度
-  * @return y 目标电机位置 Y 坐标
+  * @return 发送的字节数
   **/
-int CommandTransmitter::send_motor_command(int sock, float x, float y, uint16_t speed = 0) 
+int CommandTransmitter::send_motor_command(float x, float y, uint16_t speed) 
 {
-    uint8_t buffer[128];
+    uint8_t buffer[BUFFER_LEN];
     motorCmd.x = x;
     motorCmd.y = y;
     if (speed != 0)
         motorCmd.speed = speed;
     
     int frameLen = build_command_frame(buffer, CMD_MOTOR_CONTROL, &motorCmd, sizeof(MotorCmd_t));
-    
-    // if(frameLen > 0) 
-    //     return send(sock, buffer, frameLen, 0); // TODO: 可能要改成 QT socket 的发送函数，这里用的是 socket 的标准版本的发送函数
 
     if (frameLen > 0) 
     {
@@ -374,14 +402,16 @@ int CommandTransmitter::send_motor_command(int sock, float x, float y, uint16_t 
     return -1;
 }
 
+/**
+  * @brief  发送控制电机命令帧（使用类私有变量）
+  * @param  void 
+  * @return void
+  **/
 int CommandTransmitter::send_motor_command(void) 
 {
-    uint8_t buffer[128];
+    uint8_t buffer[BUFFER_LEN];
     
     int frameLen = build_command_frame(buffer, CMD_MOTOR_CONTROL, &motorCmd, sizeof(MotorCmd_t));
-    
-    // if(frameLen > 0) 
-    //     return send(sock, buffer, frameLen, 0); // TODO: 可能要改成 QT socket 的发送函数，这里用的是 socket 的标准版本的发送函数
 
     if (frameLen > 0) 
     {
@@ -392,20 +422,26 @@ int CommandTransmitter::send_motor_command(void)
     return -1;
 }
 
-int CommandTransmitter::send_find_opt_command(int sock, ThajType_t whichThaj, 
+/**
+  * @brief  发送寻优控制命令帧（不使用类私有变量）
+  * @param  whichThaj 哪种轨迹- CIR_TRAJ 圆形轨迹 \ SQU_TRAJ 方型轨迹
+  * @param  cirTrajRad 如果使用圆形轨迹，将设置圆形轨迹半径
+  * @param  squThajStepLen 如果使用方形轨迹，将设置执行方形轨迹的步长
+  * @param  maxVol 通道最大电压
+  * @param  volStepLen 电压步长
+  * @return 发送的字节数
+  **/
+int CommandTransmitter::send_find_opt_command(ThajType_t whichThaj, 
                                                 float cirTrajRad, uint8_t squThajStepLen, 
-                                                float maxVolfloat volStepLen) 
+                                                float maxVol, float volStepLen) 
 {
-    uint8_t buffer[128];
+    uint8_t buffer[BUFFER_LEN];
     findOptCmd.whichThaj = whichThaj;
     findOptCmd.cirTrajRad = cirTrajRad;
     findOptCmd.squThajStepLen = squThajStepLen;
     findOptCmd.volStepLen = volStepLen;
     
     int frameLen = build_command_frame(buffer, CMD_FIND_OPT_RES, &findOptCmd, sizeof(FindOptimalCmd_t));
-    
-    // if(frameLen > 0) 
-    //     return send(sock, buffer, frameLen, 0); // TODO: 可能要改成 QT socket 的发送函数，这里用的是 socket 的标准版本的发送函数
 
     if (frameLen > 0) 
     {
@@ -434,14 +470,16 @@ int CommandTransmitter::send_find_opt_command(int sock, ThajType_t whichThaj,
     return -1;
 }
 
+/**
+  * @brief  发送寻优控制命令帧（使用类私有变量）
+  * @param  void
+  * @return 发送的字节数
+  **/
 int CommandTransmitter::send_find_opt_command(void) 
 {
-    uint8_t buffer[128];
+    uint8_t buffer[BUFFER_LEN];
     
     int frameLen = build_command_frame(buffer, CMD_FIND_OPT_RES, &findOptCmd, sizeof(FindOptimalCmd_t));
-    
-    // if(frameLen > 0) 
-    //     return send(sock, buffer, frameLen, 0); // TODO: 可能要改成 QT socket 的发送函数，这里用的是 socket 的标准版本的发送函数
 
     if (frameLen > 0) 
     {
@@ -452,16 +490,18 @@ int CommandTransmitter::send_find_opt_command(void)
     return -1;
 }
 
+/**
+  * @brief  发送当前时间命令帧（使用类私有变量）
+  * @param  void
+  * @return 发送的字节数
+  **/
 int CommandTransmitter::send_time_command(void) 
 {
-    uint8_t buffer[128];
+    uint8_t buffer[BUFFER_LEN];
     
     set_current_time(&timeData);
 
     int frameLen = build_command_frame(buffer, CMD_PASS_DATE_TIME, &timeData, sizeof(DateTime_t));
-    
-    // if (frameLen > 0) 
-    //     return send(sock, buffer, frameLen, 0); // TODO: 可能要改成 QT socket 的发送函数，这里用的是 socket 的标准版本的发送函数
 
     if (frameLen > 0) 
     {
@@ -472,6 +512,11 @@ int CommandTransmitter::send_time_command(void)
     return -1;
 }
 
+/**
+  * @brief  为私有变量设置时间
+  * @param  dt 时间
+  * @return void
+  **/
 void CommandTransmitter::set_current_time(DateTime_t * dt) 
 {
     if (dt == nullptr)

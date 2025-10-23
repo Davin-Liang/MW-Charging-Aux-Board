@@ -27,14 +27,17 @@ public:
 
     int build_command_frame(uint8_t* buffer, CommandType_t cmdType, const void* data, uint16_t dataLen);
     int parse_command_frame(const uint8_t * buffer, uint16_t len, CommandFrame_t * cmd);
-    int send_motor_command(int sock, float x, float y, uint16_t speed = 0);
+    void execute_command(const CommandFrame_t* cmd);
+    int send_motor_command(float x, float y, uint16_t speed = 0);
     int send_motor_command(void);
-    int send_find_opt_command(int sock, ThajType_t whichThaj, 
+    int send_find_opt_command(ThajType_t whichThaj, 
                                 float cirTrajRad, uint8_t squThajStepLen, 
-                                float maxVolfloat volStepLen);
+                                float maxVol, float volStepLen);
     int send_find_opt_command(void);
     int send_time_command(void);
     void set_current_time(DateTime_t * dt);
+
+    QTcpSocket * m_clientSocket;        // 当前连接的客户端（假设单连接）
 
 private slots:
     void on_new_connection(void);
@@ -50,10 +53,11 @@ private:
     FindOptimalCmd_t findOptCmd;
     MotorData_t motorData;
     DateTime_t timeData;
+    OptResData_t optResData;
+    CurrentVPCh_t currentVPCh;
 
     /* TCP 服务器相关私有变量 */
     QTcpServer * m_tcpServer;           // TCP 服务器实例
-    QTcpSocket * m_clientSocket;        // 当前连接的客户端（假设单连接）
     quint16 m_serverPort;              // 服务器端口
     bool m_isServerRunning;            // 服务器运行状态
 };
