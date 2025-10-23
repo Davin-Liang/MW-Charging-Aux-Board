@@ -11,6 +11,8 @@
 #include "power_supply_task.h"
 #include "attenuator_task.h"
 #include "queue.h"
+#include "lwip_recv_task.h"
+#include "DM542_task.h"
 
 #define DEBUG 1
 
@@ -22,7 +24,7 @@ static TaskHandle_t g_commandTaskHandle = NULL;
 static struct CommandInfo command;
 /* 所有任务的链表 */
 static struct TaskHandleNode *g_taskNode = NULL;
-QueueHandle_t g_commandQueueHandle;
+// QueueHandle_t g_commandQueue;
 
 /**
   * @brief  command_task任务主体
@@ -36,10 +38,9 @@ static void command_task(void * param)
   register_command_for_attenuator(&command);
   register_command_for_dm542(&command);
 	insert_task_handle(g_commandTaskHandle, "command");
-  g_commandQueueHandle = xQueueCreate(COMMAND_QUEUE_LENGTH, sizeof(struct CommandInfo));
+  // g_commandQueue = xQueueCreate(COMMAND_QUEUE_LENGTH, sizeof(struct CommandInfo));
 
   #if DEBUG
-
   /* 用假消息测试功能 */
   struct CommandInfo fuckCommand = {
     .commandType = demandTwo,
@@ -49,22 +50,22 @@ static void command_task(void * param)
   };
 
 //	vTaskDelay(3000);
-  xQueueSend(g_commandQueueHandle, &fuckCommand, 10);
-	
-
+  xQueueSend(g_commandQueue, &fuckCommand, 10);
   #endif
 	
 	while (1)
   {
-		if (pdPASS == xQueueReceive(g_commandQueueHandle, &command, COMMAND_QUEUE_LEN))
+		if (pdPASS == xQueueReceive(g_commandQueue, &command, portMAX_DELAY))
     {
       switch ((int)(command.commandType))
       {
         case demandOne:
         case demandTwo:
           vTaskResume(find_task_node_by_name("dm542")->taskHandle);  
-//					vTaskDelay(1000);
           vTaskResume(find_task_node_by_name("power_supply")->taskHandle);
+          break;
+        case demandMotorControl:
+          vTaskResume(find_task_node_by_name("dm542")->taskHandle);
           break;
         case demandThree:
         
@@ -77,7 +78,7 @@ static void command_task(void * param)
 		  }      
     }
 		
-		xQueueSend(g_commandQueueHandle, &fuckCommand, 10);
+		// xQueueSend(g_commandQueue, &fuckCommand, 10);
 		
 		vTaskDelay(1000);
   }
