@@ -54,8 +54,8 @@ typedef struct __attribute__((packed)) {
 
 // 轨迹类型
 typedef enum {
-    SQU_TRAJ = 0, // 方型轨迹
-    CIR_TRAJ, // 圆形轨迹
+    SQU_TRAJ = 0x01, // 方型轨迹
+    CIR_TRAJ = 0x02, // 圆形轨迹
 } ThajType_t;
 
 typedef struct __attribute__((packed)) {
@@ -78,7 +78,7 @@ typedef struct __attribute__((packed)) {
 
 // 寻优控制命令
 typedef struct __attribute__((packed)) {
-    ThajType_t whichThaj; // 哪种轨迹
+    uint8_t whichThaj; // 哪种轨迹
     float cirTrajRad; // 圆形轨迹半径[m]
     uint8_t squThajStepLen; // 执行方形轨迹的步长[mm]
     float maxVol; // 通道可设置的最大电压[v]

@@ -136,14 +136,18 @@ void CommandTransmitter::on_ready_read(void)
     qDebug() << "接收到下位机数据，长度:" << data.length();
     
     /* 解析下位机的响应或状态数据 */
-    if (data.length() >= sizeof(CommandFrame_t)) 
+    qDebug() << "sizeof(CommandFrame_t):" << sizeof(CommandFrame_t);
+    if (data.length() <= sizeof(CommandFrame_t)) 
     {
         CommandFrame_t cmd;
-        if (parse_command_frame(reinterpret_cast<const uint8_t*>(data.constData()), 
-                               data.length(), &cmd) == 0) 
+        int parseResult = parse_command_frame(reinterpret_cast<const uint8_t*>(data.constData()), 
+                               data.length(), &cmd);
+        qDebug() << "parseResult:" << parseResult;
+        if (parseResult == 0) 
         {
             // 成功解析命令帧
             qDebug() << "解析到命令帧，类型:" << cmd.header.cmdId;
+            execute_command(&cmd);
         }
     }
 }
@@ -203,7 +207,7 @@ bool CommandTransmitter::param_initialize(const std::string & filename)
         if (config.contains("findOptCmd")) 
         {
             json optConfig = config["findOptCmd"];
-            findOptCmd.whichThaj = static_cast<ThajType_t>(optConfig["whichThaj"]);
+            findOptCmd.whichThaj = optConfig["whichThaj"];
             findOptCmd.cirTrajRad = optConfig["cirTrajRad"];
             findOptCmd.squThajStepLen = optConfig["squThajStepLen"];
             findOptCmd.maxVol = optConfig["maxVol"];
@@ -249,6 +253,7 @@ int CommandTransmitter::build_command_frame(uint8_t* buffer, CommandType_t cmdTy
     frame->header.cmdId = cmdType;
     // frame->header.seqNum = seqNum;
     frame->header.dataLen = dataLen;
+    std::cout << "dataLen = " << dataLen << std::endl;
     
     /* 拷贝数据 */
     if (dataLen > 0 && data != NULL)
@@ -323,6 +328,10 @@ void CommandTransmitter::execute_command(const CommandFrame_t* cmd)
                 motorData.motorX = cmd->payload.motorData.motorX;
                 motorData.motorY = cmd->payload.motorData.motorY;
                 motorData.motorSpeed = cmd->payload.motorData.motorSpeed;
+
+                std::cout << "motorData.motorX" << motorData.motorX
+                        << "motorData.motorY" << motorData.motorY
+                        << "motorData.motorSpeed" << motorData.motorSpeed << std::endl;
             }
             
             break;
@@ -333,8 +342,22 @@ void CommandTransmitter::execute_command(const CommandFrame_t* cmd)
                 optResData.motorData.motorX = cmd->payload.optResData.motorData.motorX;
                 optResData.motorData.motorY = cmd->payload.optResData.motorData.motorY;
                 optResData.optimalPower = cmd->payload.optResData.optimalPower;
-                for (int i = 0; i < 0; i ++)
+                for (int i = 0; i < 4; i ++)
                     optResData.optimalVs[i] = cmd->payload.optResData.optimalVs[i];
+
+                std::cout << "optResData.motorData.motorX" << optResData.motorData.motorX
+                        << "optResData.motorData.motorY" << optResData.motorData.motorY
+                        << "optResData.optimalPower" << optResData.optimalPower
+                        << "optResData.optimalVs[0]" << optResData.optimalVs[0]
+                        << "optResData.optimalVs[1]" << optResData.optimalVs[1]
+                        << "optResData.optimalVs[2]" << optResData.optimalVs[2]
+                        << "optResData.optimalVs[3]" << optResData.optimalVs[3]
+                         << std::endl;
+
+                std::string resultFileName = generate_file_name("optimal_result.csv", &timeData);
+
+                /* 将数据记录到文件中 */
+                write_opt_res_to_csv(resultFileName, &optResData);
             }
             
             break;
@@ -343,8 +366,21 @@ void CommandTransmitter::execute_command(const CommandFrame_t* cmd)
             if(cmd->header.dataLen == sizeof(CurrentVPCh_t)) 
             {
                 currentVPCh.currentChannel = cmd->payload.currentVPCh.currentChannel;
+                // std::cout << "cmd->payload.rawData[5] = " << cmd->payload.rawData[5] << std::endl;
+                std::cout << (currentVPCh.currentChannel == 2) << std::endl;
                 currentVPCh.currentV = cmd->payload.currentVPCh.currentV;
                 currentVPCh.currentP = cmd->payload.currentVPCh.currentP;
+
+                std::cout 
+                        << "currentVPCh.currentV" << currentVPCh.currentV
+                        << "currentVPCh.currentP" << currentVPCh.currentP 
+                        << "currentVPCh.currentChannel" << currentVPCh.currentChannel
+                        << std::endl;
+
+                std::string resultFileName = generate_file_name("channel_info.csv", &timeData);
+
+                /* 将数据记录到文件中 */
+                write_cur_channel_info_to_csv(resultFileName, &currentVPCh);
             }
             
             break;
@@ -397,6 +433,31 @@ int CommandTransmitter::send_motor_command(float x, float y, uint16_t speed)
     {
         /* 使用 QTcpSocket 的 write 函数发送数据 */
         qint64 bytesWritten = m_clientSocket->write(reinterpret_cast<const char*>(buffer), frameLen);
+        
+        if (bytesWritten == frameLen) 
+        {
+           /*  立即刷新发送缓冲区 */
+            if (m_clientSocket->flush()) 
+            {
+                qDebug() << "电机命令发送成功，长度:" << frameLen;
+                return 0;
+            } 
+            else 
+            {
+                qDebug() << "电机命令发送但刷新缓冲区失败";
+                return -3;
+            }
+        } 
+        else if (bytesWritten == -1) 
+        {
+            qDebug() << "电机命令发送失败:" << m_clientSocket->errorString();
+            return -2;
+        } 
+        else 
+        {
+            qDebug() << "电机命令发送不完整，预期:" << frameLen << "实际:" << bytesWritten;
+            return -4;
+        }
     }
 
     return -1;
@@ -417,6 +478,31 @@ int CommandTransmitter::send_motor_command(void)
     {
         /* 使用 QTcpSocket 的 write 函数发送数据 */
         qint64 bytesWritten = m_clientSocket->write(reinterpret_cast<const char*>(buffer), frameLen);
+        
+        if (bytesWritten == frameLen) 
+        {
+           /*  立即刷新发送缓冲区 */
+            if (m_clientSocket->flush()) 
+            {
+                qDebug() << "电机命令发送成功，长度:" << frameLen;
+                return 0;
+            } 
+            else 
+            {
+                qDebug() << "电机命令发送但刷新缓冲区失败";
+                return -3;
+            }
+        } 
+        else if (bytesWritten == -1) 
+        {
+            qDebug() << "电机命令发送失败:" << m_clientSocket->errorString();
+            return -2;
+        } 
+        else 
+        {
+            qDebug() << "电机命令发送不完整，预期:" << frameLen << "实际:" << bytesWritten;
+            return -4;
+        }
     }
 
     return -1;
@@ -436,10 +522,13 @@ int CommandTransmitter::send_find_opt_command(ThajType_t whichThaj,
                                                 float maxVol, float volStepLen) 
 {
     uint8_t buffer[BUFFER_LEN];
-    findOptCmd.whichThaj = whichThaj;
+    findOptCmd.whichThaj = (uint8_t)whichThaj;
     findOptCmd.cirTrajRad = cirTrajRad;
     findOptCmd.squThajStepLen = squThajStepLen;
+    findOptCmd.maxVol = maxVol;
     findOptCmd.volStepLen = volStepLen;
+    // printf("sizeof(ThajType_t) = %d\n", sizeof(ThajType_t));
+    std::cout << "sizeof(ThajType_t) = " << sizeof(ThajType_t) << std::endl;
     
     int frameLen = build_command_frame(buffer, CMD_FIND_OPT_RES, &findOptCmd, sizeof(FindOptimalCmd_t));
 
@@ -448,23 +537,30 @@ int CommandTransmitter::send_find_opt_command(ThajType_t whichThaj,
         /* 使用 QTcpSocket 的 write 函数发送数据 */
         qint64 bytesWritten = m_clientSocket->write(reinterpret_cast<const char*>(buffer), frameLen);
         
-        // if (bytesWritten == frameLen) 
-        // {
-        //     // 可选：立即刷新发送缓冲区
-        //     if (m_clientSocket->flush()) {
-        //         qDebug() << "电机命令发送成功，长度:" << frameLen;
-        //         return 0;
-        //     } else {
-        //         qDebug() << "电机命令发送但刷新缓冲区失败";
-        //         return -3;
-        //     }
-        // } else if (bytesWritten == -1) {
-        //     qDebug() << "电机命令发送失败:" << m_clientSocket->errorString();
-        //     return -2;
-        // } else {
-        //     qDebug() << "电机命令发送不完整，预期:" << frameLen << "实际:" << bytesWritten;
-        //     return -4;
-        // }
+        if (bytesWritten == frameLen) 
+        {
+           /*  立即刷新发送缓冲区 */
+            if (m_clientSocket->flush()) 
+            {
+                qDebug() << "电机命令发送成功，长度:" << frameLen;
+                return 0;
+            } 
+            else 
+            {
+                qDebug() << "电机命令发送但刷新缓冲区失败";
+                return -3;
+            }
+        } 
+        else if (bytesWritten == -1) 
+        {
+            qDebug() << "电机命令发送失败:" << m_clientSocket->errorString();
+            return -2;
+        } 
+        else 
+        {
+            qDebug() << "电机命令发送不完整，预期:" << frameLen << "实际:" << bytesWritten;
+            return -4;
+        }
     }
 
     return -1;
@@ -478,6 +574,9 @@ int CommandTransmitter::send_find_opt_command(ThajType_t whichThaj,
 int CommandTransmitter::send_find_opt_command(void) 
 {
     uint8_t buffer[BUFFER_LEN];
+
+    std::cout << "sizeof(CommandType_t) = " << sizeof(CommandType_t) << std::endl;
+    std::cout << "sizeof(ThajType_t) = " << sizeof(ThajType_t) << std::endl;
     
     int frameLen = build_command_frame(buffer, CMD_FIND_OPT_RES, &findOptCmd, sizeof(FindOptimalCmd_t));
 
@@ -485,6 +584,31 @@ int CommandTransmitter::send_find_opt_command(void)
     {
         /* 使用 QTcpSocket 的 write 函数发送数据 */
         qint64 bytesWritten = m_clientSocket->write(reinterpret_cast<const char*>(buffer), frameLen);
+        
+        if (bytesWritten == frameLen) 
+        {
+           /*  立即刷新发送缓冲区 */
+            if (m_clientSocket->flush()) 
+            {
+                qDebug() << "电机命令发送成功，长度:" << frameLen;
+                return 0;
+            } 
+            else 
+            {
+                qDebug() << "电机命令发送但刷新缓冲区失败";
+                return -3;
+            }
+        } 
+        else if (bytesWritten == -1) 
+        {
+            qDebug() << "电机命令发送失败:" << m_clientSocket->errorString();
+            return -2;
+        } 
+        else 
+        {
+            qDebug() << "电机命令发送不完整，预期:" << frameLen << "实际:" << bytesWritten;
+            return -4;
+        }
     }
 
     return -1;
@@ -507,6 +631,31 @@ int CommandTransmitter::send_time_command(void)
     {
         /* 使用 QTcpSocket 的 write 函数发送数据 */
         qint64 bytesWritten = m_clientSocket->write(reinterpret_cast<const char*>(buffer), frameLen);
+        
+        if (bytesWritten == frameLen) 
+        {
+           /*  立即刷新发送缓冲区 */
+            if (m_clientSocket->flush()) 
+            {
+                qDebug() << "电机命令发送成功，长度:" << frameLen;
+                return 0;
+            } 
+            else 
+            {
+                qDebug() << "电机命令发送但刷新缓冲区失败";
+                return -3;
+            }
+        } 
+        else if (bytesWritten == -1) 
+        {
+            qDebug() << "电机命令发送失败:" << m_clientSocket->errorString();
+            return -2;
+        } 
+        else 
+        {
+            qDebug() << "电机命令发送不完整，预期:" << frameLen << "实际:" << bytesWritten;
+            return -4;
+        }
     }
 
     return -1;
@@ -520,7 +669,7 @@ int CommandTransmitter::send_time_command(void)
 void CommandTransmitter::set_current_time(DateTime_t * dt) 
 {
     if (dt == nullptr)
-        return;  // 安全检查
+        return; // 安全检查
     
     /* 获取当前时间 */
     std::time_t currentTime = std::time(nullptr);
@@ -533,4 +682,105 @@ void CommandTransmitter::set_current_time(DateTime_t * dt)
     dt->hour = localTime->tm_hour;             // tm_hour 范围是 0-23
     dt->minute = localTime->tm_min;            // tm_min 范围是 0-59
     dt->week_day = localTime->tm_wday;         // tm_wday 范围是 0-6 (0=周日)
+}
+
+/**
+  * @brief  生成带有时间信息的文件名（含星期信息）
+  * @param  fileSuffix 文件名后半部分
+  * @param  datetime 时间信息
+  * @return 带有时间信息的文件名
+  **/
+std::string CommandTransmitter::generate_file_name(const std::string& fileSuffix, const DateTime_t* datetime) 
+{
+    if (!datetime)
+        return "default_" + fileSuffix;
+    
+    const char* weekDays[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+    
+    std::ostringstream filename;
+    
+    /* 添加时间戳部分: YYYYMMDD_HHMM_Week */
+    filename << std::setw(4) << std::setfill('0') << datetime->year
+                << std::setw(2) << std::setfill('0') << static_cast<int>(datetime->month)
+                << std::setw(2) << std::setfill('0') << static_cast<int>(datetime->day)
+                << "_"
+                << std::setw(2) << std::setfill('0') << static_cast<int>(datetime->hour)
+                << std::setw(2) << std::setfill('0') << static_cast<int>(datetime->minute)
+                << "_"
+                << weekDays[datetime->week_day % 7];
+    
+    /* 添加文件后缀 */
+    filename << "_" << fileSuffix;
+    
+    return filename.str();
+}
+
+/**
+  * @brief  写入优化结果到CSV文件
+  * @param  filename 文件名
+  * @param  optData 寻优结果
+  * @return true 写入文件成功 \ false 打开文件失败
+  **/
+bool CommandTransmitter::write_opt_res_to_csv(const std::string& filename, const OptResData_t * optData) 
+{
+    /* 打开文件，如果文件不存在则创建，如果存在则追加写入 */
+    std::ofstream file(filename, std::ios::app);
+    
+    if (!file.is_open())
+        return false; // 文件打开失败
+    
+    /* 检查文件是否为空，如果为空则写入表头 */
+    file.seekp(0, std::ios::end);
+    if (file.tellp() == 0)
+        file << "X,Y,P,V1,V2,V3,V4\n";
+    
+    /* 设置浮点数输出精度 */
+    file << std::fixed << std::setprecision(6);
+    
+    /* 写入数据 */
+    file << optData->motorData.motorX << ","
+            << optData->motorData.motorY << ","
+            << optData->optimalPower << ","
+            << optData->optimalVs[0] << ","
+            << optData->optimalVs[1] << ","
+            << optData->optimalVs[2] << ","
+            << optData->optimalVs[3] << "\n";
+    
+    file.close();
+    return true;
+}
+
+/**
+  * @brief  写入当前通道信息到CSV文件
+  * @param  filename 文件名
+  * @param  channelData 当前通道信息
+  * @return true 写入文件成功 \ false 打开文件失败
+  **/
+bool CommandTransmitter::write_cur_channel_info_to_csv(const std::string& filename, const CurrentVPCh_t * channelData) 
+{
+    /* 打开文件，如果文件不存在则创建，如果存在则追加写入 */
+    std::ofstream file(filename, std::ios::app);
+    static uint32_t index = 0;
+    
+    if (!file.is_open())
+        return false; // 文件打开失败
+    
+    /* 检查文件是否为空，如果为空则写入表头 */
+    file.seekp(0, std::ios::end);
+    if (file.tellp() == 0)
+        file << "Index,Voltage,Power,Channel\n";
+    else
+        index = 0;
+    
+    // 设置浮点数输出精度
+    file << std::fixed << std::setprecision(6);
+    
+    // 写入数据
+    file << index << ","  // 自动生成索引
+            << channelData->currentV << ","
+            << channelData->currentP << ","
+            << static_cast<int>(channelData->currentChannel) << "\n";
+    
+    file.close();
+    return true;
 }
