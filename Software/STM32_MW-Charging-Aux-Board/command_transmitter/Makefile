@@ -130,6 +130,7 @@ DIST          = /usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/qt_config.prf \
 		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++/qmake.conf \
 		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/spec_post.prf \
+		.qmake.stash \
 		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/exclusive_builds.prf \
 		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/toolchain.prf \
 		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/default_pre.prf \
@@ -236,6 +237,7 @@ Makefile: CommandTransmitter.pro /usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g+
 		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/qt_config.prf \
 		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++/qmake.conf \
 		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/spec_post.prf \
+		.qmake.stash \
 		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/exclusive_builds.prf \
 		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/toolchain.prf \
 		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/default_pre.prf \
@@ -329,6 +331,7 @@ Makefile: CommandTransmitter.pro /usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g+
 /usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/qt_config.prf:
 /usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++/qmake.conf:
 /usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/spec_post.prf:
+.qmake.stash:
 /usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/exclusive_builds.prf:
 /usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/toolchain.prf:
 /usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/default_pre.prf:
@@ -423,7 +426,8 @@ build/obj/command_transmitter.o: command_transmitter.cpp command_struct.h \
 		command_transmitter.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/obj/command_transmitter.o command_transmitter.cpp
 
-build/obj/main.o: main.cpp 
+build/obj/main.o: main.cpp command_transmitter.h \
+		command_struct.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/obj/main.o main.cpp
 
 build/obj/moc_command_transmitter.o: build/moc/moc_command_transmitter.cpp 

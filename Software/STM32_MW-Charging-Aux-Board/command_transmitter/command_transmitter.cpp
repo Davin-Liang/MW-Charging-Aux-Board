@@ -136,14 +136,18 @@ void CommandTransmitter::on_ready_read(void)
     qDebug() << "接收到下位机数据，长度:" << data.length();
     
     /* 解析下位机的响应或状态数据 */
-    if (data.length() >= sizeof(CommandFrame_t)) 
+    qDebug() << "sizeof(CommandFrame_t):" << sizeof(CommandFrame_t);
+    if (data.length() <= sizeof(CommandFrame_t)) 
     {
         CommandFrame_t cmd;
-        if (parse_command_frame(reinterpret_cast<const uint8_t*>(data.constData()), 
-                               data.length(), &cmd) == 0) 
+        int parseResult = parse_command_frame(reinterpret_cast<const uint8_t*>(data.constData()), 
+                               data.length(), &cmd);
+        qDebug() << "parseResult:" << parseResult;
+        if (parseResult == 0) 
         {
             // 成功解析命令帧
             qDebug() << "解析到命令帧，类型:" << cmd.header.cmdId;
+            execute_command(&cmd);
         }
     }
 }
@@ -203,7 +207,7 @@ bool CommandTransmitter::param_initialize(const std::string & filename)
         if (config.contains("findOptCmd")) 
         {
             json optConfig = config["findOptCmd"];
-            findOptCmd.whichThaj = static_cast<ThajType_t>(optConfig["whichThaj"]);
+            findOptCmd.whichThaj = optConfig["whichThaj"];
             findOptCmd.cirTrajRad = optConfig["cirTrajRad"];
             findOptCmd.squThajStepLen = optConfig["squThajStepLen"];
             findOptCmd.maxVol = optConfig["maxVol"];
@@ -249,6 +253,7 @@ int CommandTransmitter::build_command_frame(uint8_t* buffer, CommandType_t cmdTy
     frame->header.cmdId = cmdType;
     // frame->header.seqNum = seqNum;
     frame->header.dataLen = dataLen;
+    std::cout << "dataLen = " << dataLen << std::endl;
     
     /* 拷贝数据 */
     if (dataLen > 0 && data != NULL)
@@ -323,6 +328,10 @@ void CommandTransmitter::execute_command(const CommandFrame_t* cmd)
                 motorData.motorX = cmd->payload.motorData.motorX;
                 motorData.motorY = cmd->payload.motorData.motorY;
                 motorData.motorSpeed = cmd->payload.motorData.motorSpeed;
+
+                std::cout << "motorData.motorX" << motorData.motorX
+                        << "motorData.motorY" << motorData.motorY
+                        << "motorData.motorSpeed" << motorData.motorSpeed << std::endl;
             }
             
             break;
@@ -333,12 +342,22 @@ void CommandTransmitter::execute_command(const CommandFrame_t* cmd)
                 optResData.motorData.motorX = cmd->payload.optResData.motorData.motorX;
                 optResData.motorData.motorY = cmd->payload.optResData.motorData.motorY;
                 optResData.optimalPower = cmd->payload.optResData.optimalPower;
-                for (int i = 0; i < 0; i ++)
+                for (int i = 0; i < 4; i ++)
                     optResData.optimalVs[i] = cmd->payload.optResData.optimalVs[i];
-                std::string resultFileName = generate_file_name("optimal_result.csv", timeData);
+
+                std::cout << "optResData.motorData.motorX" << optResData.motorData.motorX
+                        << "optResData.motorData.motorY" << optResData.motorData.motorY
+                        << "optResData.optimalPower" << optResData.optimalPower
+                        << "optResData.optimalVs[0]" << optResData.optimalVs[0]
+                        << "optResData.optimalVs[1]" << optResData.optimalVs[1]
+                        << "optResData.optimalVs[2]" << optResData.optimalVs[2]
+                        << "optResData.optimalVs[3]" << optResData.optimalVs[3]
+                         << std::endl;
+
+                std::string resultFileName = generate_file_name("optimal_result.csv", &timeData);
 
                 /* 将数据记录到文件中 */
-                write_opt_res_to_csv(resultFileName, &timeData);
+                write_opt_res_to_csv(resultFileName, &optResData);
             }
             
             break;
@@ -347,9 +366,18 @@ void CommandTransmitter::execute_command(const CommandFrame_t* cmd)
             if(cmd->header.dataLen == sizeof(CurrentVPCh_t)) 
             {
                 currentVPCh.currentChannel = cmd->payload.currentVPCh.currentChannel;
+                // std::cout << "cmd->payload.rawData[5] = " << cmd->payload.rawData[5] << std::endl;
+                std::cout << (currentVPCh.currentChannel == 2) << std::endl;
                 currentVPCh.currentV = cmd->payload.currentVPCh.currentV;
                 currentVPCh.currentP = cmd->payload.currentVPCh.currentP;
-                std::string resultFileName = generate_file_name("channel_info.csv", timeData);
+
+                std::cout 
+                        << "currentVPCh.currentV" << currentVPCh.currentV
+                        << "currentVPCh.currentP" << currentVPCh.currentP 
+                        << "currentVPCh.currentChannel" << currentVPCh.currentChannel
+                        << std::endl;
+
+                std::string resultFileName = generate_file_name("channel_info.csv", &timeData);
 
                 /* 将数据记录到文件中 */
                 write_cur_channel_info_to_csv(resultFileName, &currentVPCh);
@@ -405,12 +433,6 @@ int CommandTransmitter::send_motor_command(float x, float y, uint16_t speed)
     {
         /* 使用 QTcpSocket 的 write 函数发送数据 */
         qint64 bytesWritten = m_clientSocket->write(reinterpret_cast<const char*>(buffer), frameLen);
-    }
-
-    if (frameLen > 0) 
-    {
-        /* 使用 QTcpSocket 的 write 函数发送数据 */
-        qint64 bytesWritten = m_clientSocket->write(reinterpret_cast<const char*>(buffer), frameLen);
         
         if (bytesWritten == frameLen) 
         {
@@ -451,12 +473,6 @@ int CommandTransmitter::send_motor_command(void)
     uint8_t buffer[BUFFER_LEN];
     
     int frameLen = build_command_frame(buffer, CMD_MOTOR_CONTROL, &motorCmd, sizeof(MotorCmd_t));
-
-    if (frameLen > 0) 
-    {
-        /* 使用 QTcpSocket 的 write 函数发送数据 */
-        qint64 bytesWritten = m_clientSocket->write(reinterpret_cast<const char*>(buffer), frameLen);
-    }
 
     if (frameLen > 0) 
     {
@@ -506,10 +522,13 @@ int CommandTransmitter::send_find_opt_command(ThajType_t whichThaj,
                                                 float maxVol, float volStepLen) 
 {
     uint8_t buffer[BUFFER_LEN];
-    findOptCmd.whichThaj = whichThaj;
+    findOptCmd.whichThaj = (uint8_t)whichThaj;
     findOptCmd.cirTrajRad = cirTrajRad;
     findOptCmd.squThajStepLen = squThajStepLen;
+    findOptCmd.maxVol = maxVol;
     findOptCmd.volStepLen = volStepLen;
+    // printf("sizeof(ThajType_t) = %d\n", sizeof(ThajType_t));
+    std::cout << "sizeof(ThajType_t) = " << sizeof(ThajType_t) << std::endl;
     
     int frameLen = build_command_frame(buffer, CMD_FIND_OPT_RES, &findOptCmd, sizeof(FindOptimalCmd_t));
 
@@ -555,14 +574,11 @@ int CommandTransmitter::send_find_opt_command(ThajType_t whichThaj,
 int CommandTransmitter::send_find_opt_command(void) 
 {
     uint8_t buffer[BUFFER_LEN];
+
+    std::cout << "sizeof(CommandType_t) = " << sizeof(CommandType_t) << std::endl;
+    std::cout << "sizeof(ThajType_t) = " << sizeof(ThajType_t) << std::endl;
     
     int frameLen = build_command_frame(buffer, CMD_FIND_OPT_RES, &findOptCmd, sizeof(FindOptimalCmd_t));
-
-    if (frameLen > 0) 
-    {
-        /* 使用 QTcpSocket 的 write 函数发送数据 */
-        qint64 bytesWritten = m_clientSocket->write(reinterpret_cast<const char*>(buffer), frameLen);
-    }
 
     if (frameLen > 0) 
     {
@@ -610,12 +626,6 @@ int CommandTransmitter::send_time_command(void)
     set_current_time(&timeData);
 
     int frameLen = build_command_frame(buffer, CMD_PASS_DATE_TIME, &timeData, sizeof(DateTime_t));
-
-    if (frameLen > 0) 
-    {
-        /* 使用 QTcpSocket 的 write 函数发送数据 */
-        qint64 bytesWritten = m_clientSocket->write(reinterpret_cast<const char*>(buffer), frameLen);
-    }
 
     if (frameLen > 0) 
     {
@@ -711,7 +721,7 @@ std::string CommandTransmitter::generate_file_name(const std::string& fileSuffix
   * @param  optData 寻优结果
   * @return true 写入文件成功 \ false 打开文件失败
   **/
-bool CommandTransmitter::write_opt_res_to_csv(const std::string& filename, const OptResData_t& optData) 
+bool CommandTransmitter::write_opt_res_to_csv(const std::string& filename, const OptResData_t * optData) 
 {
     /* 打开文件，如果文件不存在则创建，如果存在则追加写入 */
     std::ofstream file(filename, std::ios::app);
@@ -728,13 +738,13 @@ bool CommandTransmitter::write_opt_res_to_csv(const std::string& filename, const
     file << std::fixed << std::setprecision(6);
     
     /* 写入数据 */
-    file << optData.motorData.x << ","
-            << optData.motorData.y << ","
-            << optData.optimalPower << ","
-            << optData.optimalVs[0] << ","
-            << optData.optimalVs[1] << ","
-            << optData.optimalVs[2] << ","
-            << optData.optimalVs[3] << "\n";
+    file << optData->motorData.motorX << ","
+            << optData->motorData.motorY << ","
+            << optData->optimalPower << ","
+            << optData->optimalVs[0] << ","
+            << optData->optimalVs[1] << ","
+            << optData->optimalVs[2] << ","
+            << optData->optimalVs[3] << "\n";
     
     file.close();
     return true;
@@ -746,7 +756,7 @@ bool CommandTransmitter::write_opt_res_to_csv(const std::string& filename, const
   * @param  channelData 当前通道信息
   * @return true 写入文件成功 \ false 打开文件失败
   **/
-bool CommandTransmitter::write_cur_channel_info_to_csv(const std::string& filename, const CurrentVPCh_t& channelData) 
+bool CommandTransmitter::write_cur_channel_info_to_csv(const std::string& filename, const CurrentVPCh_t * channelData) 
 {
     /* 打开文件，如果文件不存在则创建，如果存在则追加写入 */
     std::ofstream file(filename, std::ios::app);
@@ -767,9 +777,9 @@ bool CommandTransmitter::write_cur_channel_info_to_csv(const std::string& filena
     
     // 写入数据
     file << index << ","  // 自动生成索引
-            << channelData.currentV << ","
-            << channelData.currentP << ","
-            << static_cast<int>(channelData.currentChannel) << "\n";
+            << channelData->currentV << ","
+            << channelData->currentP << ","
+            << static_cast<int>(channelData->currentChannel) << "\n";
     
     file.close();
     return true;
