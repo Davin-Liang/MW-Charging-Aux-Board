@@ -36,6 +36,9 @@ public:
     int send_find_opt_command(void);
     int send_time_command(void);
     void set_current_time(DateTime_t * dt);
+    std::string generate_file_name(const std::string& fileSuffix, const DateTime_t* datetime);
+    bool write_opt_res_to_csv(const std::string& filename, const OptResData_t * optData);
+    bool write_cur_channel_info_to_csv(const std::string& filename, const CurrentVPCh_t * channelData);
 
     QTcpSocket * m_clientSocket;        // 当前连接的客户端（假设单连接）
 
