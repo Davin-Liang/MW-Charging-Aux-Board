@@ -53,6 +53,8 @@ private slots:
     void onChannelDataReceived(const CurrentVPCh_t &data);
     void onOptResDataReceived(const OptResData_t &data);
 
+    void on_label_status_linkActivated(const QString &link);
+
 private:
     Ui::MainWindow *ui;
     QTcpSocket *tcpSocket;                     // TCP套接字（保留用于兼容性）

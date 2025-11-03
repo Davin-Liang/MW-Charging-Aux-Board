@@ -449,6 +449,8 @@ void MainWindow::on_pushButton_connect_clicked()
         ui->label_status->setStyleSheet("color: orange;");
         ui->pushButton_connect->setEnabled(false);
         ui->pushButton_disconnect->setEnabled(true);
+        ui->label_status->setText("服务器启动，正在监听端口");
+        ui->label_status->setStyleSheet("color: green;");
         displayMessage(QString("服务器已启动，监听端口: %1").arg(serverPort));
     } else {
         QMessageBox::critical(this, "错误", "无法启动服务器");
