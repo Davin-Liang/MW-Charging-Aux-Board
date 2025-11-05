@@ -713,7 +713,7 @@
              <family>宋体</family>
              <pointsize>12</pointsize>
              <bold>false</bold>
-             <hintingpreference>PreferDefaultHinting</hintingpreference>
+             <!-- <hintingpreference>PreferDefaultHinting</hintingpreference> -->
             </font>
            </property>
            <property name="text">
