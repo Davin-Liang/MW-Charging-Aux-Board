@@ -536,7 +536,7 @@ int CommandTransmitter::send_motor_command(void)
   **/
 int CommandTransmitter::send_find_opt_command(ThajType_t whichThaj,
                                                 float cirTrajRad, float squThajLen, uint8_t squThajStepLen,
-                                                float maxVol, float volStepLen) 
+                                                float maxVol, float volStepLen,float initialVol)
 {
     uint8_t buffer[BUFFER_LEN];
     findOptCmd.whichThaj = (uint8_t)whichThaj;
@@ -545,6 +545,7 @@ int CommandTransmitter::send_find_opt_command(ThajType_t whichThaj,
     findOptCmd.squThajStepLen = squThajStepLen;
     findOptCmd.maxVol = maxVol;
     findOptCmd.volStepLen = volStepLen;
+    findOptCmd.initialVol = initialVol;
     // printf("sizeof(ThajType_t) = %d\n", sizeof(ThajType_t));
     std::cout << "sizeof(ThajType_t) = " << sizeof(ThajType_t) << std::endl;
     

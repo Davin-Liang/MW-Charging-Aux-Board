@@ -277,10 +277,12 @@ void MainWindow::initializeUIWithConfig()
         ui->comboBox_traj_type->setCurrentIndex(1);
     }
 
+
     ui->lineEdit_square_step_2->setText(QString::number(findOptCmd.squThajLen, 'f', 2));
     ui->lineEdit_square_step->setText(QString::number(findOptCmd.squThajStepLen));
     ui->lineEdit_circle_radius->setText(QString::number(findOptCmd.cirTrajRad, 'f', 2));
     ui->lineEdit_max_voltage->setText(QString::number(findOptCmd.maxVol, 'f', 2));
+    ui->lineEdit_initial_voltage->setText(QString::number(findOptCmd.initialVol, 'f', 2));
     ui->lineEdit_voltage_step->setText(QString::number(findOptCmd.volStepLen, 'f', 2));
 
     // 初始化工况状态 - 确保UI状态正确
@@ -386,9 +388,10 @@ void MainWindow::on_pushButton_find_optimal_clicked()
 
     // 根据轨迹类型获取正确的参数
     float cirTrajRad = 0.0f;
-     float squThajLen = 0.0f;  // 新增：方形轨迹边长
+    float squThajLen = 0.0f;  // 新增：方形轨迹边长
     uint8_t squThajStepLen = 0;
     float maxVol = ui->lineEdit_max_voltage->text().toFloat();
+    float initialVol = ui->lineEdit_initial_voltage->text().toFloat();
     float volStepLen = ui->lineEdit_voltage_step->text().toFloat();
 
     if (whichThaj == SQU_TRAJ) {
@@ -442,7 +445,7 @@ void MainWindow::on_pushButton_find_optimal_clicked()
         // 即使时间命令失败，也继续发送寻优命令
     }
 
-    int result = commandTransmitter->send_find_opt_command(whichThaj, cirTrajRad, squThajLen, squThajStepLen, maxVol, volStepLen);
+    int result = commandTransmitter->send_find_opt_command(whichThaj, cirTrajRad, squThajLen, squThajStepLen, maxVol, volStepLen,initialVol);
     if (result == 0) {
         qDebug()<<"寻优控制命令发送成功";
 
@@ -454,16 +457,17 @@ void MainWindow::on_pushButton_find_optimal_clicked()
         findOptCmd.squThajStepLen = squThajStepLen;
         findOptCmd.maxVol = maxVol;
         findOptCmd.volStepLen = volStepLen;
+        findOptCmd.initialVol = initialVol;
         commandTransmitter->setFindOptCmd(findOptCmd);
 
         // 显示发送的参数信息
         QString paramInfo;
         if (whichThaj == SQU_TRAJ) {
-            paramInfo = QString("轨迹类型: 方形轨迹, 方形边长: %1mm, 方形步长: %2mm, 最大电压: %3V, 电压步长: %4V")
-                            .arg(squThajLen).arg(squThajStepLen).arg(maxVol).arg(volStepLen);
+            paramInfo = QString("轨迹类型: 方形轨迹, 方形边长: %1mm, 方形步长: %2mm, 最大电压: %3V, 电压步长: %4V, 初始电压: %3V")
+                            .arg(squThajLen).arg(squThajStepLen).arg(maxVol).arg(volStepLen).arg(initialVol);
         } else {
-            paramInfo = QString("轨迹类型: 圆形轨迹, 圆形半径: %1m, 最大电压: %2V, 电压步长: %3V")
-                            .arg(cirTrajRad).arg(maxVol).arg(volStepLen);
+            paramInfo = QString("轨迹类型: 圆形轨迹, 圆形半径: %1m, 最大电压: %2V, 电压步长: %3V, 初始电压: %2V")
+                            .arg(cirTrajRad).arg(maxVol).arg(volStepLen).arg(initialVol);
         }
        qDebug()<<paramInfo;
     } else {

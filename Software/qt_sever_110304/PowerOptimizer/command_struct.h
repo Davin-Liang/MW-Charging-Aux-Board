@@ -83,7 +83,8 @@ typedef struct __attribute__((packed)) {
     float squThajLen; // 方形轨迹边长[mm]
     uint8_t squThajStepLen; // 执行方形轨迹的步长[mm]
     float maxVol; // 通道可设置的最大电压[v]
-    float volStepLen; // 设置电压时电压跳变的步长[v]    
+    float volStepLen; // 设置电压时电压跳变的步长[v]
+    float initialVol;//通道初始电压
 } FindOptimalCmd_t;
 
 // 响应结构
