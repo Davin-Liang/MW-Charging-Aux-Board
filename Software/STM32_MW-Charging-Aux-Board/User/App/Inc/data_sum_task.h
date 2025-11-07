@@ -5,6 +5,7 @@
 #include "queue.h"
 
 BaseType_t create_task_for_data_sum(uint16_t size, UBaseType_t priority);
+void data_sum_test1(void);
 
 struct MotorData_t
 {

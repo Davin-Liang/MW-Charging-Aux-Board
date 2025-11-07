@@ -22,6 +22,8 @@ enum MWCommandDef{
 	demandTwo,
 	demandThree,
 	demandFault,
+	demandMotorControl,
+	demandMutiFindOpt,
 	noDemand
 };
 
