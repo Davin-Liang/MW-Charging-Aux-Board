@@ -80,6 +80,7 @@ typedef struct __attribute__((packed)) {
 typedef struct __attribute__((packed)) {
     uint8_t whichThaj; // 哪种轨迹
     float cirTrajRad; // 圆形轨迹半径[m]
+    float squThajLen; // 方形轨迹边长[mm]
     uint8_t squThajStepLen; // 执行方形轨迹的步长[mm]
     float maxVol; // 通道可设置的最大电压[v]
     float volStepLen; // 设置电压时电压跳变的步长[v]    

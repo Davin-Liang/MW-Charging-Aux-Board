@@ -12,7 +12,7 @@
   **/
 int send_motor_data_command(int sock, float x, float y, uint16_t speed) 
 {
-    uint8_t buffer[128];
+    uint8_t buffer[30];
 
     MotorData_t currentMotorData;
     currentMotorData.motorX = x;
@@ -64,11 +64,12 @@ int send_opt_res_data_command(int sock, float x, float y, float optimalPower, fl
   * @param  p 当前功率
   * @return 发送的字节数
   **/
+CurrentVPCh_t currentVPCh;
 int send_current_vpch_command(int sock, uint8_t channel, float v, float p) 
 {
     uint8_t buffer[128];
 
-    CurrentVPCh_t currentVPCh;
+//    CurrentVPCh_t currentVPCh;
     currentVPCh.currentChannel = channel;
     currentVPCh.currentV = v;
     currentVPCh.currentP = p;

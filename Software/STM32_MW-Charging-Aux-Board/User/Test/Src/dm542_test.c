@@ -61,11 +61,11 @@ void dm542_test3(void)
 
 void dm542_test4(void)
 {
-    vTaskDelay(4000);
+    vTaskDelay(2000);
     motor_status_write_from_flash();
-    motor_position_ctrl(100, 100);
+    motor_position_ctrl(200, 200);
 
-    vTaskDelay(4000);
+    vTaskDelay(2000);
 	motor_status_write_from_flash();
     motor_position_ctrl(0, 0);
 }
