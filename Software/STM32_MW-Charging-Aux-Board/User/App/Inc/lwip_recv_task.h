@@ -17,6 +17,8 @@ extern QueueHandle_t g_commandQueue;
 extern QueueHandle_t g_findOptCmdQueue;
 extern QueueHandle_t g_timeDataQueue;
 
+extern int g_sock;
+
 BaseType_t create_task_for_lwip_recv(uint16_t size, UBaseType_t priority);
 
 #endif

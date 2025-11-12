@@ -15,6 +15,8 @@
 #include "dm542_task.h"
 #include "bsp_dm542.h"
 #include "data_sum_task.h"
+#include "command_struct.h"
+#include "lwip_recv_task.h"
 
 static void power_supply_task(void * param);
 static void detect_optimal_voltage(float currentVoltage, float currentPower, int mode, int channel);
@@ -33,6 +35,8 @@ static uint16_t psRegAddr[] = {0x01FE, 0x02C6, 0x032A, 0x038E};
 static float Power_Supply_Default_Voltage[] = {0.1f, 0.1f, 0.1f, 0.1f};
 static uint8_t Seek_Max_Power_Flag = 1;
 extern SemaphoreHandle_t dm542_USART3_Mutex;
+
+static FindOptimalCmd_t findOptCmd;
 
 /**
   * @brief  电源任务
@@ -113,11 +117,15 @@ static void power_supply_task(void * param)
 			
 				break;
 			case demandTwo:
+				if (pdPASS != xQueueReceive(g_findOptCmdQueue, &findOptCmd, 0))
+					break;
+				
 				xSemaphoreTake(dm542_USART3_Mutex, portMAX_DELAY);
 				Seek_Max_Power_Flag = 1;
 				for (int i = 0; (i < 4) && (Seek_Max_Power_Flag == 1); i ++)
 				{
-					while(currentVoltage < MAX_VAL)
+					// while(currentVoltage < MAX_VAL)
+					while (currentVoltage < findOptCmd.maxVol)
 					{
 						/* 发送电压 */
 						set_power_supply_voltage(PS_SLAVE_ADDR, PS_REG_ADDR(i), currentVoltage);
@@ -148,11 +156,12 @@ static void power_supply_task(void * param)
 							mutual_printf("No serial port data received. Please check the connection between the serial port and the power meter!\r\n");
 						}
 						/* 设置下次的发送电压 */
-						currentVoltage += VOL_STEP;
+						currentVoltage += findOptCmd.volStepLen;
 					}
 					set_power_supply_voltage(PS_SLAVE_ADDR, PS_REG_ADDR(i), s_bestVoltages[i]);
 					vTaskDelay(VOL_SENDING_TIME_INTERVAL);
-					currentVoltage = 0.1f;
+					// currentVoltage = 0.1f;
+					currentVoltage = findOptCmd.initialVol;
 						
 //					/* 电压、功率值记录 */
 //					detect_optimal_voltage(currentVoltage, currentPower, MULTI_CHANNELS_SCANNING, i);

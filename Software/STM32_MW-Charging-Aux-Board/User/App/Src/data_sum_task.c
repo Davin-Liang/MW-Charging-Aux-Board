@@ -8,6 +8,8 @@
 #include "stdio.h"
 #include <string.h> 
 #include "send_command.h"
+#include "command_task.h"
+#include "main.h"
 
 static void data_sum_Task(void * param);
 static int datetime_to_filename(const DateTime_t *dt, const char *filename, 
@@ -31,9 +33,11 @@ static TaskHandle_t g_dataSumTaskHandle = NULL;
   **/
 static void data_sum_Task(void * param)
 {	
-    g_motorDataQueue = xQueueCreate(MOTOR_DATA_QUEUE_LEN, sizeof(struct MotorData_t));
+    insert_task_handle(g_dataSumTaskHandle, "data_sum");
+		g_motorDataQueue = xQueueCreate(MOTOR_DATA_QUEUE_LEN, sizeof(struct MotorData_t));
     g_optimalVPDataQueue = xQueueCreate(OPTIMAL_V_P_DATA_QUEUE_LEN, sizeof(struct Optimal_v_p_t));
     g_currentVPChQueue = xQueueCreate(CURRENT_V_P_CH_QUEUE_LEN, sizeof(struct CurrentV_P_Ch_t));
+		vTaskSuspend(NULL);
   
     while (1)
     {
@@ -68,12 +72,14 @@ static void data_sum_Task(void * param)
 
 
         /* 往 SD 卡中写入电机数据、最优功率和四个通道的最优电压 */
+        #if SD_NOTE
         datetime_to_filename(&g_currentDateTime, "optimal_result.csv", g_nameOutput, sizeof(g_nameOutput));
-        write_x_y_v_p_to_csv(g_nameOutput,
+        write_x_y_v_p_to_csv(g_nameOutput, // g_nameOutput
                               currentMotorData.x,
                               currentMotorData.y,
                               currentOptimalVP.optimalVs,
                               currentOptimalVP.optimalP);
+        #endif
 
         /* 通过以太网上传最优结果 */
         send_opt_res_data_command(1, currentMotorData.x, 
@@ -91,11 +97,13 @@ static void data_sum_Task(void * param)
         currentVPCh.currentP);
 
         /* 往 SD 卡中写入当前通道的电压、功率、通道 */
+        #if SD_NOTE
         datetime_to_filename(&g_currentDateTime, "current_result.csv", g_nameOutput, sizeof(g_nameOutput));
-        write_v_p_to_csv(g_nameOutput, 
+        write_v_p_to_csv(g_nameOutput, // g_nameOutput
                           currentVPCh.currentV, 
                           currentVPCh.currentP, 
                           currentVPCh.channel);
+        #endif
 
         /* 通过以太网上传当前通道的电压、功率、通道 */
         send_current_vpch_command(1, currentVPCh.channel, currentVPCh.currentV, currentVPCh.currentP);
@@ -200,5 +208,32 @@ static int datetime_to_filename(const DateTime_t *dt, const char *filename,
         return -3; // 缓冲区不足或格式化错误
     
     return 0; // 成功
+}
+
+void data_sum_test1(void)
+{
+  struct MotorData_t currentMotorData;
+  struct Optimal_v_p_t currentOptimalVP;
+  struct CurrentV_P_Ch_t currentVPCh;
+
+  currentMotorData.x = 10;
+  currentMotorData.y = 100;
+  send_motor_data_command(g_sock, currentMotorData.x, currentMotorData.y, 0);
+  vTaskDelay(2000);
+
+  currentOptimalVP.optimalP = 10.11;
+  for (int i = 0; i < 4; i ++)
+    currentOptimalVP.optimalVs[i] = 13.5;
+  send_opt_res_data_command(g_sock, currentMotorData.x, 
+                                      currentMotorData.y, 
+                                      currentOptimalVP.optimalP, 
+                                      currentOptimalVP.optimalVs);
+  vTaskDelay(2000);
+  
+  currentVPCh.channel = 2;
+  currentVPCh.currentP = 12.22;
+  currentVPCh.currentV = 5.55;
+  send_current_vpch_command(g_sock, currentVPCh.channel, currentVPCh.currentV, currentVPCh.currentP); 
+  vTaskDelay(2000);                                   
 }
 

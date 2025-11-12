@@ -14,7 +14,7 @@
 #include "lwip_recv_task.h"
 #include "DM542_task.h"
 
-#define DEBUG 1
+#define DEBUG 0
 
 static void command_task(void * param);
 
@@ -61,7 +61,7 @@ static void command_task(void * param)
       {
         case demandOne:
         case demandTwo:
-          vTaskResume(find_task_node_by_name("dm542")->taskHandle);  
+          // vTaskResume(find_task_node_by_name("dm542")->taskHandle);  
           vTaskResume(find_task_node_by_name("power_supply")->taskHandle);
           break;
         case demandMotorControl:
@@ -72,6 +72,9 @@ static void command_task(void * param)
           break;
         case demandFault:
           
+          break;
+        case demandMutiFindOpt:
+          vTaskResume(find_task_node_by_name("dm542")->taskHandle);
           break;
         case noDemand:
           break;
