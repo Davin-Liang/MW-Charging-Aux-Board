@@ -79,7 +79,7 @@ public:
      * @brief 获取当前从站地址
      * @return 当前从站地址
      */
-    int get_slave_id() const;
+    int get_slave_id() const { return m_slaveId; }
     const char* get_port() const { return m_port; }
     const bool get_connect_status() const { return m_isConnected; }
 };

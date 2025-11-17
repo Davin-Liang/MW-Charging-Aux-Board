@@ -3,13 +3,16 @@
 
 int main()
 {
-    TTC = TurntableController();
+    TurntableController TTC = TurntableController("/dev/ttyUSB0");
 
-    while (TTC.get_connect_status() != false){
+    while (TTC.get_connect_status() == false){
         if (TTC.connect(9600, 'N', 8, 1))
             break;
+        std::cout << "尝试连接" << std::endl;
         sleep(2);
     };
+
+    std::cout << "连接上了" << std::endl;
         
 
     while (TTC.get_connect_status() == true){
@@ -17,6 +20,7 @@ int main()
         sleep(2);
         TTC.set_manual_rotation(Pitch, Right);
         sleep(2);
+        std::cout << "1" << std::endl;
 
         TTC.stop_manual_rotation(Yaw);
         sleep(2);
@@ -28,9 +32,9 @@ int main()
         TTC.reset_axis_coord(Pitch);
         sleep(2);
 
-        TTC.set_axis_speed(Yaw, 2.5);
+        TTC.set_axis_speed(Yaw, 10.0);
         sleep(2);
-        TTC.set_axis_speed(Pitch, 2.5);
+        TTC.set_axis_speed(Pitch, 5.0);
         sleep(2);
 
         // float speed;
@@ -58,6 +62,8 @@ int main()
         sleep(2);
         TTC.set_axis_relative_motion(Pitch, -10.0);
         sleep(2);
+
+        break;
     }
 
     return 0;

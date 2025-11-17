@@ -1,4 +1,4 @@
-#include "turntable_controller.h"
+#include "include/turntable_controller.h"
 
 /**
  * @brief 构造函数
@@ -33,6 +33,7 @@ bool TurntableController::connect(int baudrate, char parity, int dataBit, int st
 {
     /* 创建 RTU 模式的 Modbus 上下文 */
     m_ctx = modbus_new_rtu(m_port, baudrate, parity, dataBit, stopBit);
+    modbus_set_debug(m_ctx, TRUE);
     
     /* 检查上下文是否创建成功 */
     if (m_ctx == nullptr) {
@@ -286,16 +287,17 @@ bool TurntableController::read_input_registers(int addr, int nb, uint16_t* dest)
  * @param dir 左转还是右转
  * @return 操作成功返回 true，失败返回 false
  */
-bool set_manual_rotation(enum YawOrPitch_t axis, enum LeftOrRight_t dir)
+bool TurntableController::set_manual_rotation(enum YawOrPitch_t axis, enum LeftOrRight_t dir)
 {
-    if (Yaw == axis)
+    if (Yaw == axis){
         if (Left == dir)
-            return write_single_register(0x001E, 0xFF00);
-        return write_single_register(0x001F, 0xFF00);
+            return write_single_coil(0x001E, 0xFF00);
+        return write_single_coil(0x001F, 0xFF00);        
+    }
         
     if (Left == dir)
-        return write_single_register(0x0020, 0xFF00);
-    return write_single_register(0x0021, 0xFF00);
+        return write_single_coil(0x0020, 0xFF00);
+    return write_single_coil(0x0021, 0xFF00);
 }
 
 /**
@@ -303,11 +305,11 @@ bool set_manual_rotation(enum YawOrPitch_t axis, enum LeftOrRight_t dir)
  * @param axis 要设置哪个轴
  * @return 操作成功返回 true，失败返回 false
  */
-bool stop_manual_rotation(enum YawOrPitch_t axis)
+bool TurntableController::stop_manual_rotation(enum YawOrPitch_t axis)
 {
     if (Yaw == axis)
-        return write_single_register(0x001E, 0x0000);
-    return write_single_register(0x001F, 0x0000);
+        return write_single_coil(0x001E, 0x0000);
+    return write_single_coil(0x001F, 0x0000);
 }
 
 /**
@@ -315,11 +317,11 @@ bool stop_manual_rotation(enum YawOrPitch_t axis)
  * @param axis 要设置哪个轴
  * @return 操作成功返回 true，失败返回 false
  */
-bool reset_axis_coord(enum YawOrPitch_t axis)
+bool TurntableController::reset_axis_coord(enum YawOrPitch_t axis)
 {
     if (Yaw == axis)
-        return write_single_register(0x0024, 0xFF00);
-    return write_single_register(0x0025, 0xFF00);    
+        return write_single_coil(0x0024, 0xFF00);
+    return write_single_coil(0x0025, 0xFF00);    
 }
 
 /**
@@ -328,19 +330,19 @@ bool reset_axis_coord(enum YawOrPitch_t axis)
  * @param goalSpeed 目标速度
  * @return 操作成功返回 true，失败返回 false
  */
-bool set_axis_speed(enum YawOrPitch_t axis, float goalSpeed)
+bool TurntableController::set_axis_speed(enum YawOrPitch_t axis, float goalSpeed)
 {
     union FloatToBytes_t speed;
 
-    if (speed > MAX_AXIS_SPEED)
+    if (goalSpeed > MAX_AXIS_SPEED)
         speed.floatValue = MAX_AXIS_SPEED;
     else
         speed.floatValue = goalSpeed;
 
     /* 交换高两字节和低两字节 */
-    uint16_t temp = speed.words[0];
-    speed.words[0] = speed.words[1];
-    speed.words[1] = temp;
+    // uint16_t temp = speed.words[0];
+    // speed.words[0] = speed.words[1];
+    // speed.words[1] = temp;
     
     if (Yaw == axis)
         return write_multiple_registers(0x0007, 2, speed.words);
@@ -353,7 +355,7 @@ bool set_axis_speed(enum YawOrPitch_t axis, float goalSpeed)
  * @param speed 要读取的速度
  * @return 操作成功返回 true，失败返回 false
  */
-bool read_axis_speed(enum YawOrPitch_t axis, float * readedSpeed)
+bool TurntableController::read_axis_speed(enum YawOrPitch_t axis, float * readedSpeed)
 {
     union FloatToBytes_t speed;
     bool result;
@@ -381,7 +383,7 @@ bool read_axis_speed(enum YawOrPitch_t axis, float * readedSpeed)
  * @param goalAngle 目标角度
  * @return 操作成功返回 true，失败返回 false
  */
-bool set_axis_angle(enum YawOrPitch_t axis, float goalAngle)
+bool TurntableController::set_axis_angle(enum YawOrPitch_t axis, float goalAngle)
 {
     union FloatToBytes_t angle;
 
@@ -393,13 +395,13 @@ bool set_axis_angle(enum YawOrPitch_t axis, float goalAngle)
             angle.floatValue = goalAngle;
 
     /* 交换高两字节和低两字节 */
-    uint16_t temp = angle.words[0];
-    angle.words[0] = angle.words[1];
-    angle.words[1] = temp;
+    // uint16_t temp = angle.words[0];
+    // angle.words[0] = angle.words[1];
+    // angle.words[1] = temp;
     
     if (Yaw == axis)
-        return write_multiple_registers(0x0016, 2, speed.words);
-    return write_multiple_registers(0x0018, 2, speed.words);     
+        return write_multiple_registers(0x0016, 2, angle.words);
+    return write_multiple_registers(0x0018, 2, angle.words);     
 }
 
 /**
@@ -408,7 +410,7 @@ bool set_axis_angle(enum YawOrPitch_t axis, float goalAngle)
  * @param angle 要读取的角度
  * @return 操作成功返回 true，失败返回 false
  */
-bool read_axis_angle(enum YawOrPitch_t axis, float * readedAngle)
+bool TurntableController::read_axis_angle(enum YawOrPitch_t axis, float * readedAngle)
 {
     union FloatToBytes_t angle;
     bool result;
@@ -419,9 +421,9 @@ bool read_axis_angle(enum YawOrPitch_t axis, float * readedAngle)
 
     if (result) {
         /* 交换高两字节和低两字节 */
-        uint16_t temp   = speed.words[0];
-        speed.words[0]  = speed.words[1];
-        speed.words[1]  = temp;   
+        uint16_t temp   = angle.words[0];
+        angle.words[0]  = angle.words[1];
+        angle.words[1]  = temp;   
         *readedAngle    = angle.floatValue;
 
         return true;
@@ -436,16 +438,16 @@ bool read_axis_angle(enum YawOrPitch_t axis, float * readedAngle)
  * @param angle 要运动的相对角度
  * @return 操作成功返回 true，失败返回 false
  */
-bool set_axis_relative_motion(enum YawOrPitch_t axis, float goalAngle)
+bool TurntableController::set_axis_relative_motion(enum YawOrPitch_t axis, float goalAngle)
 {
     union FloatToBytes_t angle;
 
     angle.floatValue = goalAngle;
 
     /* 交换高两字节和低两字节 */
-    uint16_t temp = angle.words[0];
-    angle.words[0] = angle.words[1];
-    angle.words[1] = temp;
+    // uint16_t temp = angle.words[0];
+    // angle.words[0] = angle.words[1];
+    // angle.words[1] = temp;
     
     if (Yaw == axis)
         return write_multiple_registers(0x001c, 2, angle.words);
@@ -481,13 +483,4 @@ void TurntableController::set_slave_id(int slaveId)
     m_slaveId = slaveId;
     if (m_ctx)
         modbus_set_slave(m_ctx, m_slaveId);
-}
-
-    /**
-     * @brief 获取连接的串口设备路径
-     * @return 串口设备路径
-     */
-int TurntableController::get_slave_id() const 
-{
-    return m_slaveId;
 }
