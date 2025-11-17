@@ -130,7 +130,7 @@ FRESULT write_x_y_v_p_to_csv(const TCHAR * path, float x, float y, float * optim
         if (res == FR_OK) 
         {
             // 写入表头
-            f_puts("X,Y,P\n", &fil);
+            f_puts("X,Y,V1,V2,V3,V4,P\n", &fil);
         }
     }
     
@@ -140,33 +140,33 @@ FRESULT write_x_y_v_p_to_csv(const TCHAR * path, float x, float y, float * optim
     }
     
     // 写入数据
-    sprintf(buffer, "%.3f,%.3f,%.3f\n", x, y, optimalP);
+    sprintf(buffer, "%.3f,%.3f,%.2f,%.2f,%.2f,%.2f,%.3f\n", x, y, optimalVs[0], optimalVs[1], optimalVs[2], optimalVs[3], optimalP);
     f_puts(buffer, &fil);
 		
 		f_lseek(&fil, 0);  // 偏移量设为0
 		
-		printf("size = %d", f_size(&fil));
-		
-    printf("文件内容:\r\n");
-    printf("--------------------------------\r\n");
+//		printf("size = %d", f_size(&fil));
+//		
+//    printf("文件内容:\r\n");
+//    printf("--------------------------------\r\n");
     
-    // 循环读取文件内容
-		UINT br;     // 读取的字节数
-   
-        // 读取文件内容到缓冲区
-        f_read(&fil, buffer, sizeof(buffer) - 1, &br);
-		
-				printf("br = %d", (int)br);
-        
-        // 在缓冲区末尾添加字符串结束符
-        buffer[br] = '\0';
-        
-        // 使用printf打印内容
-        printf("%s", buffer);
-    
-    
-    printf("\r\n--------------------------------\r\n");
-    printf("文件读取完成\r\n");
+//    // 循环读取文件内容
+//		UINT br;     // 读取的字节数
+//   
+//        // 读取文件内容到缓冲区
+//        f_read(&fil, buffer, sizeof(buffer) - 1, &br);
+//		
+//				printf("br = %d", (int)br);
+//        
+//        // 在缓冲区末尾添加字符串结束符
+//        buffer[br] = '\0';
+//        
+//        // 使用printf打印内容
+//        printf("%s", buffer);
+//    
+//    
+//    printf("\r\n--------------------------------\r\n");
+//    printf("文件读取完成\r\n");
     
     res = f_close(&fil);
     return res;

@@ -147,6 +147,6 @@ void set_voltage_for_power(float *voltage)
 	for(int i = 0; i<=3; i++)
 	{
 		set_power_supply_voltage(0X01, psRegAddr[i], voltage[i]);
-		vTaskDelay(500);//等待电源电压变为0.1
+		vTaskDelay(2000);//等待电源电压变为0.1
 	}
 }

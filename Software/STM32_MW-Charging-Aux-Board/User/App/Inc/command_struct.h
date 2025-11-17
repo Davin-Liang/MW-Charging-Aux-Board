@@ -8,10 +8,11 @@
 typedef enum {
     CMD_MOTOR_CONTROL = 0x01, // 电机控制  
     CMD_FIND_OPT_RES = 0x02, // 寻优
-    MOTOR_DATA_READ = 0x03, // 电机数据读取
-    CMD_OPT_RES_READ = 0x04, // 寻优结果读取
-    CURRENT_VPCH_READ = 0x05,
-    CMD_PASS_DATE_TIME = 0x06, // 向下位机传递数据
+		CMD_POWER_SCAN = 0x03,
+    MOTOR_DATA_READ = 0x04, // 电机数据读取
+    CMD_OPT_RES_READ = 0x05, // 寻优结果读取
+    CURRENT_VPCH_READ = 0x06,
+    CMD_PASS_DATE_TIME = 0x07, // 向下位机传递数据
     CMD_RESPONSE = 0x80 // 响应命令
 } CommandType_t;
 
@@ -84,6 +85,13 @@ typedef struct __attribute__((packed)) {
     float volStepLen; // 设置电压时电压跳变的步长[v]
     float initialVol; // 通道初始电压    
 } FindOptimalCmd_t;
+
+typedef struct __attribute__((packed)) {
+    uint8_t whichThaj; // 哪种轨迹
+    float cirTrajRad; // 圆形轨迹半径[m]
+    float squThajLen; // 方形轨迹边长[mm]
+    uint8_t squThajStepLen; // 执行方形轨迹的步长[mm] 
+} PowerScan_t;
 
 // 响应结构
 typedef struct __attribute__((packed)) {
