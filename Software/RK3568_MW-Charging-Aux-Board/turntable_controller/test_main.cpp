@@ -37,26 +37,26 @@ int main()
         TTC.set_axis_speed(Pitch, 5.0);
         sleep(2);
 
-        // float speed;
-        // TTC.read_axis_speed(Yaw, &speed);
-        // std::cout << yaw << ":speed"  << speed << std::endl;
-        // sleep(2);
-        // TTC.read_axis_speed(Pitch, &speed);
-        // std::cout << Pitch << ":speed"  << speed << std::endl;
-        // sleep(2);
+        float speed = 0;
+        TTC.read_axis_speed(Yaw, &speed);
+        std::cout << Yaw << ":speed"  << speed << std::endl;
+        sleep(2);
+        TTC.read_axis_speed(Pitch, &speed);
+        std::cout << Pitch << ":speed"  << speed << std::endl;
+        sleep(2);
 
         TTC.set_axis_angle(Yaw, 2.5);
         sleep(2);
         TTC.set_axis_angle(Pitch, 2.5);
         sleep(2);
 
-        // float angle;
-        // TTC.read_axis_angle(Yaw, &angle);
-        // std::cout << yaw << ":angle"  << angle << std::endl;
-        // sleep(2);
-        // TTC.read_axis_angle(Pitch, &angle);
-        // std::cout << Pitch << ":angle"  << angle << std::endl;
-        // sleep(2);
+        float angle = 0;
+        TTC.read_axis_angle(Yaw, &angle);
+        std::cout << Yaw << ":angle"  << angle << std::endl;
+        sleep(2);
+        TTC.read_axis_angle(Pitch, &angle);
+        std::cout << Pitch << ":angle"  << angle << std::endl;
+        sleep(2);
 
         TTC.set_axis_relative_motion(Yaw, 10.0);
         sleep(2);
