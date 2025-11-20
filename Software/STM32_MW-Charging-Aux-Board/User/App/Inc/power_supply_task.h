@@ -4,7 +4,7 @@
 #include "FreeRTOS.h"
 #include "command.h"
 
-#define VOL_STEP 0.1f
+#define VOL_STEP 0.2f
 #define MAX_VAL 14.f
 #define SINGLE_CHANNEL_SCANNING 1
 #define MULTI_CHANNELS_SCANNING 2

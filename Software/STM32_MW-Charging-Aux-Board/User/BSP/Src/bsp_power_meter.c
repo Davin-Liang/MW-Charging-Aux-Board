@@ -76,7 +76,7 @@ void usart_power_meter_init(void)
 	NVIC_Configuration();
   
 	/* 先失能串口接收中断 */
-	pm_usart_it_config(DISABLE);
+	pm_usart_it_config(ENABLE);
 	
   /* 使能串口 */
   USART_Cmd(PM_USART, ENABLE);
