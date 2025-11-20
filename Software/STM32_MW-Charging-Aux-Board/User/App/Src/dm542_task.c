@@ -14,6 +14,7 @@ static void dm542_Task(void * param); /* Test_Task任务实现 */
 static TaskHandle_t g_dm542TaskHandle = NULL;/* LED任务句柄 */
 static struct CommandInfo * command;
 static MotorCmd_t motorCmd;
+static FindOptimalCmd_t findOptCmd;
 
 extern SemaphoreHandle_t dm542_USART3_Mutex;
 
@@ -33,19 +34,37 @@ static void dm542_Task(void * param)
     // vTaskDelay(5000);
     switch ((int)command->commandType)
     {
-        case demandTwo:
-          for (float x = -30.0f; x < 30.0f; x = x + 10)
+        case demandMutiFindOpt:
+          if (pdPASS == xQueueReceive(g_findOptCmdQueue, &findOptCmd, portMAX_DELAY))
           {
-            for (float y = -30.0f; y < 30.0f; y = y + 10)
+            if (findOptCmd.whichThaj == SQU_TRAJ)
             {
-                xSemaphoreTake(dm542_USART3_Mutex, portMAX_DELAY);
-                motor_position_ctrl(x, y);
-                currentMotorData.x = x;
-                currentMotorData.y = y;
-                xQueueSend(g_motorDataQueue, &currentMotorData, 10);
-                xSemaphoreGive(dm542_USART3_Mutex);
-                vTaskDelay(5000);
+              for (float x = (-(findOptCmd.squThajLen*100)/2); x <= (findOptCmd.squThajLen*100)/2; x = x + findOptCmd.squThajStepLen)
+              {
+                for (float y = (-(findOptCmd.squThajLen*100)/2); y <= (findOptCmd.squThajLen*100)/2; y = y + findOptCmd.squThajStepLen)
+                {
+                    xSemaphoreTake(dm542_USART3_Mutex, portMAX_DELAY);
+                    /* 每次移动位置执行一次寻优 */
+                    command->commandType = demandTwo;
+                    /* 唤醒功率计任务 */
+                    vTaskResume(find_task_node_by_name("power_supply")->taskHandle);
+                    /* 电机开始移动 */
+                    motor_position_ctrl(x, y);
+                    /* 上报数据 */
+                    currentMotorData.x = x;
+                    currentMotorData.y = y;
+                    xQueueSend(g_motorDataQueue, &currentMotorData, 10);
+                    xSemaphoreGive(dm542_USART3_Mutex);
+                    vTaskDelay(5000);
+                }
+              }
             }
+            else if (findOptCmd.whichThaj == CIR_TRAJ)
+            {
+
+            }
+
+            command->commandType = noDemand;
           }
 
           break;
@@ -57,6 +76,8 @@ static void dm542_Task(void * param)
           }
 
           break;
+					
+				case demand
         case noDemand:
           vTaskSuspend(NULL);
     }

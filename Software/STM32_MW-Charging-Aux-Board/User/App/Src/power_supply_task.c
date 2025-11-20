@@ -15,10 +15,12 @@
 #include "dm542_task.h"
 #include "bsp_dm542.h"
 #include "data_sum_task.h"
+#include "command_struct.h"
+#include "lwip_recv_task.h"
 
 static void power_supply_task(void * param);
 static void detect_optimal_voltage(float currentVoltage, float currentPower, int mode, int channel);
-static void reset_ps_data(void);
+static void reset_ps_data(float * bestPowers);
 
 static TaskHandle_t g_PowerSupplyTaskHandle = NULL;
 static struct CommandInfo * command;
@@ -30,9 +32,11 @@ static float s_bestPowers[4] = {-1e30f, -1e30f, -1e30f, -1e30f};
 static float historyVoltages[140] = {0.0f};
 static float historyPowers[140] = {0.0f};
 static uint16_t psRegAddr[] = {0x01FE, 0x02C6, 0x032A, 0x038E};
-static float Power_Supply_Default_Voltage[] = {0.1f, 0.1f, 0.1f, 0.1f};
+static float Power_Supply_Default_Voltage[] = {0.2f, 0.2f, 0.2f, 0.2f};
 static uint8_t Seek_Max_Power_Flag = 1;
 extern SemaphoreHandle_t dm542_USART3_Mutex;
+
+static FindOptimalCmd_t findOptCmd;
 
 /**
   * @brief  电源任务
@@ -41,7 +45,7 @@ extern SemaphoreHandle_t dm542_USART3_Mutex;
   **/
 static void power_supply_task(void * param)
 {
-	float currentVoltage = 0.1f;
+	float currentVoltage = 0.2f;
 	float currentPower = 0.0f;
 	FunctionalState enableUsart = ENABLE;
 	FRESULT res;
@@ -113,11 +117,15 @@ static void power_supply_task(void * param)
 			
 				break;
 			case demandTwo:
+				if (pdPASS != xQueueReceive(g_findOptCmdQueue, &findOptCmd, 0))
+					break;
+				
 				xSemaphoreTake(dm542_USART3_Mutex, portMAX_DELAY);
 				Seek_Max_Power_Flag = 1;
 				for (int i = 0; (i < 4) && (Seek_Max_Power_Flag == 1); i ++)
 				{
-					while(currentVoltage < MAX_VAL)
+					// while(currentVoltage < MAX_VAL)
+					while (currentVoltage < findOptCmd.maxVol)
 					{
 						/* 发送电压 */
 						set_power_supply_voltage(PS_SLAVE_ADDR, PS_REG_ADDR(i), currentVoltage);
@@ -148,11 +156,13 @@ static void power_supply_task(void * param)
 							mutual_printf("No serial port data received. Please check the connection between the serial port and the power meter!\r\n");
 						}
 						/* 设置下次的发送电压 */
-						currentVoltage += VOL_STEP;
+						currentVoltage += findOptCmd.volStepLen;
 					}
 					set_power_supply_voltage(PS_SLAVE_ADDR, PS_REG_ADDR(i), s_bestVoltages[i]);
 					vTaskDelay(VOL_SENDING_TIME_INTERVAL);
-					currentVoltage = 0.1f;
+					
+					// currentVoltage = 0.1f;
+					currentVoltage = findOptCmd.initialVol;
 						
 //					/* 电压、功率值记录 */
 //					detect_optimal_voltage(currentVoltage, currentPower, MULTI_CHANNELS_SCANNING, i);
@@ -168,11 +178,18 @@ static void power_supply_task(void * param)
 				currentOptimalVP.optimalP = s_bestPowers[3];
 				xQueueSend(g_optimalVPDataQueue, &currentOptimalVP, 10);
 				command->commandType = noDemand; // 命令完成
+				reset_ps_data(s_bestPowers);
+				float chanVols[] = {findOptCmd.initialVol, findOptCmd.initialVol, findOptCmd.initialVol, findOptCmd.initialVol};
+				set_voltage_for_power(chanVols);
 				xSemaphoreGive(dm542_USART3_Mutex);
 				vTaskDelay(1000);
 				break;
+				
+			case demandScan:
+				
+				break;
 			default:
-				reset_ps_data();
+//				reset_ps_data();
 				pm_usart_it_config(DISABLE);
 				mutual_printf("Power supply closed!\r\n");
 				vTaskSuspend(NULL); // 完成任务将自身挂起，节约系统资源
@@ -227,12 +244,10 @@ static void detect_optimal_voltage(float currentVoltage, float currentPower, int
 }
 
 
-static void reset_ps_data(void)
+static void reset_ps_data(float * bestPowers)
 {
-	s_bestVoltage = 0.0f;
-	s_bestPower = 0.0f;
-	memset(s_bestVoltages, 0, sizeof(s_bestVoltages));
-	memset(s_bestPowers, 0, sizeof(s_bestPowers));
+		for (int i = 0; i < 4; i ++)
+				bestPowers[i] = -1e30f;
 }
 
 /**

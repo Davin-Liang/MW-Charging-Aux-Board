@@ -8,10 +8,11 @@
 typedef enum {
     CMD_MOTOR_CONTROL = 0x01, // 电机控制  
     CMD_FIND_OPT_RES = 0x02, // 寻优
-    MOTOR_DATA_READ = 0x03, // 电机数据读取
-    CMD_OPT_RES_READ = 0x04, // 寻优结果读取
-    CURRENT_VPCH_READ = 0x05,
-    CMD_PASS_DATE_TIME = 0x06, // 向下位机传递数据
+		CMD_POWER_SCAN = 0x03,
+    MOTOR_DATA_READ = 0x04, // 电机数据读取
+    CMD_OPT_RES_READ = 0x05, // 寻优结果读取
+    CURRENT_VPCH_READ = 0x06,
+    CMD_PASS_DATE_TIME = 0x07, // 向下位机传递数据
     CMD_RESPONSE = 0x80 // 响应命令
 } CommandType_t;
 
@@ -28,7 +29,7 @@ typedef enum {
 typedef struct __attribute__((packed)) {
     uint8_t startMagic; // 起始标志 0xAA
     uint16_t cmdId; // 命令ID
-    uint16_t seqNum; // 序列号
+//    uint16_t seqNum; // 序列号
     uint16_t dataLen; // 数据长度
     uint8_t checksum; // 头校验和
 } CmdHeader_t;
@@ -52,8 +53,8 @@ typedef struct __attribute__((packed)) {
 
 // 轨迹类型
 typedef enum {
-    SQU_TRAJ = 0, // 方型轨迹
-    CIR_TRAJ, // 圆形轨迹
+    SQU_TRAJ = 0x01, // 方型轨迹
+    CIR_TRAJ = 0x02, // 圆形轨迹
 } ThajType_t;
 
 typedef struct __attribute__((packed)) {
@@ -76,12 +77,21 @@ typedef struct __attribute__((packed)) {
 
 // 寻优控制命令
 typedef struct __attribute__((packed)) {
-    ThajType_t whichThaj; // 哪种轨迹
+    uint8_t whichThaj; // 哪种轨迹
     float cirTrajRad; // 圆形轨迹半径[m]
+    float squThajLen; // 方形轨迹边长[mm]
     uint8_t squThajStepLen; // 执行方形轨迹的步长[mm]
     float maxVol; // 通道可设置的最大电压[v]
-    float volStepLen; // 设置电压时电压跳变的步长[v]    
+    float volStepLen; // 设置电压时电压跳变的步长[v]
+    float initialVol; // 通道初始电压    
 } FindOptimalCmd_t;
+
+typedef struct __attribute__((packed)) {
+    uint8_t whichThaj; // 哪种轨迹
+    float cirTrajRad; // 圆形轨迹半径[m]
+    float squThajLen; // 方形轨迹边长[mm]
+    uint8_t squThajStepLen; // 执行方形轨迹的步长[mm] 
+} PowerScan_t;
 
 // 响应结构
 typedef struct __attribute__((packed)) {

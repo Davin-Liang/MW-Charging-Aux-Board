@@ -4,8 +4,8 @@
 #include <stdint.h>
 
 #define POWER_SUPPLY_DEFAULT_VOLTAGE 14.0f // 电源默认电压
-#define TIME_OF_FINISHING_SETTING_VOL 100 // 设置电源电压成功所需要的时间
-#define VOL_SENDING_TIME_INTERVAL 2000
+#define TIME_OF_FINISHING_SETTING_VOL 200 // 设置电源电压成功所需要的时间
+#define VOL_SENDING_TIME_INTERVAL 3000
 
 #define PS_USART              USART3
 #define PS_USART_RX_GPIO_CLK  RCC_AHB1Periph_GPIOB

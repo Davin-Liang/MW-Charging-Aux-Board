@@ -3,6 +3,7 @@
 #include "task.h"
 #include "dm542_test.h"
 #include "bsp_dm542.h"
+#include "data_sum_task.h"
 
 static void only_test_Task(void * param); /* only_test_Task任务实现 */
 
@@ -15,6 +16,7 @@ static TaskHandle_t g_onlyTestTaskHandle = NULL;/* LED任务句柄 */
   **/
 static void only_test_Task(void * param)
 {	
+  vTaskDelay(10000);
   while (1)
   {
 //        test1();
@@ -22,7 +24,8 @@ static void only_test_Task(void * param)
 //       dm542_test2();
 //    dm542_test3();
     // dm542_test4();
-    dm542_test5();
+//    dm542_test5();
+    data_sum_test1();
   }
 }
 
