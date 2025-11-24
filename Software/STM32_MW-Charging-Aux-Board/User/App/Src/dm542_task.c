@@ -76,8 +76,6 @@ static void dm542_Task(void * param)
           }
 
           break;
-					
-				case demand
         case noDemand:
           vTaskSuspend(NULL);
     }
