@@ -20,7 +20,8 @@ MainWindow::MainWindow(QWidget *parent)
     , turntable_controller(nullptr)
 {
     ui->setupUi(this);
-
+    // 在setupUi之后调用
+    ui->comboBox_traj_type->setObjectName(""); // 清空对象名，避免自动连接
 
     // 设置窗口属性
     setWindowTitle("数据采集系统可视化界面");
@@ -37,8 +38,8 @@ MainWindow::MainWindow(QWidget *parent)
     // 不再初始化原来的TCP客户端，因为CommandTransmitter是服务器
     tcpSocket = nullptr;
 
-    sdCardQueryTimer = new QTimer(this);
-    sdCardQueryTimer->setInterval(2000);
+    // sdCardQueryTimer = new QTimer(this);
+    // sdCardQueryTimer->setInterval(2000);
 
     // 初始化命令传输器
     setupCommandTransmitter();
@@ -54,7 +55,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->pushButton_find_optimal, &QPushButton::clicked, this, &MainWindow::on_pushButton_find_optimal_clicked);
     // 确保轨迹类型变化信号正确连接
     connect(ui->comboBox_traj_type, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, &MainWindow::on_traj_type_changed);
+        this, &MainWindow::trajTypeChanged);
+    // connect(ui->comboBox_traj_type, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            // this, &MainWindow::on_traj_type_changed);
     // 连接文件读取相关信号槽
     connect(ui->pushButton_filenamedisplay, &QPushButton::clicked,
             this, &MainWindow::on_pushButton_filenamedisplay_clicked);
@@ -72,7 +75,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     turntableMonitorTimer = new QTimer(this);
     connect(turntableMonitorTimer, &QTimer::timeout, this, &MainWindow::updateTurntableData);
-    turntableImgTimer->start(200);   // 200ms 刷新一次转台图片
+    turntableMonitorTimer->start(5000);  
+    
     setTurntableConnectionStatus(false);
 
     // 设置界面初始状态
@@ -105,7 +109,7 @@ void MainWindow::setupCommandTransmitter()
 // 初始化转台型号框图片（只显示一次）
 void MainWindow::update_turntable_image()
 {
-    QString imgPath = ":/image/turntable.png";  // 图片路径
+    QString imgPath = "./image/turntable.png";  // 图片路径
     QPixmap pix(imgPath);
 
     if (!pix.isNull()) {
@@ -349,11 +353,12 @@ void MainWindow::initializeUIWithConfig()
     ui->lineEdit_voltage_step->setText(QString::number(findOptCmd.volStepLen, 'f', 2));
 
     // 初始化工况状态 - 确保UI状态正确
-    on_traj_type_changed(ui->comboBox_traj_type->currentIndex());
+    trajTypeChanged(ui->comboBox_traj_type->currentIndex());
+    
 }
 
 // 新增：轨迹类型变化处理
-void MainWindow::on_traj_type_changed(int index)
+void MainWindow::trajTypeChanged(int index)
 {
     if (index == 0) { // 方形轨迹
         ui->lineEdit_square_step_2->setEnabled(true); // 方形边长
@@ -699,16 +704,16 @@ void MainWindow::parseEthernetData(const QByteArray &data)
 }
 
 
-// 文本编辑框复制可用状态变化的槽函数
-void MainWindow::on_textEdit_message_copyAvailable(bool available)
-{
-    Q_UNUSED(available)
-}
+// // 文本编辑框复制可用状态变化的槽函数
+// void MainWindow::on_textEdit_message_copyAvailable(bool available)
+// {
+//     Q_UNUSED(available)
+// }
 
-void MainWindow::on_textEdit_sd_data_copyAvailable(bool available)
-{
-    Q_UNUSED(available)
-}
+// void MainWindow::on_textEdit_sd_data_copyAvailable(bool available)
+// {
+//     Q_UNUSED(available)
+// }
 
 // 现代化样式
 void MainWindow::applyModernStyle()
@@ -1112,17 +1117,17 @@ void MainWindow::updateTurntableData()
 
     float xPos = 0.0f, yPos = 0.0f, xSpeed = 0.0f, ySpeed = 0.0f;
 
-    bool ok1 = turntable_controller->read_axis_angle(Yaw, &xPos);
-    bool ok2 = turntable_controller->read_axis_angle(Pitch, &yPos);
-    bool ok3 = turntable_controller->read_axis_speed(Yaw, &xSpeed);
-    bool ok4 = turntable_controller->read_axis_speed(Pitch, &ySpeed);
+    // bool ok1 = turntable_controller->read_axis_angle(Yaw, &xPos);
+    // bool ok2 = turntable_controller->read_axis_angle(Pitch, &yPos);
+    // bool ok3 = turntable_controller->read_axis_speed(Yaw, &xSpeed);
+    // bool ok4 = turntable_controller->read_axis_speed(Pitch, &ySpeed);
 
-    if (ok1 && ok2 && ok3 && ok4) {
-        ui->line_edit_monitor_x_pos->setText(QString::number(xPos, 'f', 2));
-        ui->line_edit_monitor_y_pos->setText(QString::number(yPos, 'f', 2));
-        ui->line_edit_monitor_x_speed->setText(QString::number(xSpeed, 'f', 2));
-        ui->line_edit_monitor_y_speed->setText(QString::number(ySpeed, 'f', 2));
-    }
+    // if (ok1 && ok2 && ok3 && ok4) {
+    //     ui->line_edit_monitor_x_pos->setText(QString::number(xPos, 'f', 2));
+    //     ui->line_edit_monitor_y_pos->setText(QString::number(yPos, 'f', 2));
+    //     ui->line_edit_monitor_x_speed->setText(QString::number(xSpeed, 'f', 2));
+    //     ui->line_edit_monitor_y_speed->setText(QString::number(ySpeed, 'f', 2));
+    // }
 }
 //更新连接状态辅助函数
 void MainWindow::setTurntableConnectionStatus(bool connected)

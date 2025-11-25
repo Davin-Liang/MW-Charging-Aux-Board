@@ -45,10 +45,10 @@ bool TurntableController::connect(int baudrate, char parity, int dataBit, int st
     modbus_set_slave(m_ctx, m_slaveId);
 
     /* 设置响应超时时间 */
-    modbus_set_response_timeout(m_ctx, 1, 0);
+    modbus_set_response_timeout(m_ctx, 0, 0);
 
     /* 设置字节超时时间 */
-    modbus_set_byte_timeout(m_ctx, 0, 100000);
+    modbus_set_byte_timeout(m_ctx, 0, 1000);
 
     /* 建立实际连接 */
     if (modbus_connect(m_ctx) == -1) {

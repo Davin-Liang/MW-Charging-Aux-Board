@@ -50,11 +50,12 @@ private slots:
 
 
 
-    void on_textEdit_message_copyAvailable(bool b);
-    void on_textEdit_sd_data_copyAvailable(bool b);
+    // void on_textEdit_message_copyAvailable(bool b);
+    // void on_textEdit_sd_data_copyAvailable(bool b);
 
     void initializeUIWithConfig();
-    void on_traj_type_changed(int index);
+    // void on_traj_type_changed(int index);
+    void trajTypeChanged(int index);
 
 
     void onMotorDataReceived(const MotorData_t &data);
@@ -93,7 +94,6 @@ private:
     QByteArray receiveBuffer;                 // 重新添加 receiveBuffer
 
     CommandTransmitter *commandTransmitter;
-    QTimer *turntableImgTimer;            // 图片刷新定时器
     QTimer *turntableMonitorTimer;             // 定时器用于数据监控
     TurntableController *turntable_controller; // 转台控制对象
 
