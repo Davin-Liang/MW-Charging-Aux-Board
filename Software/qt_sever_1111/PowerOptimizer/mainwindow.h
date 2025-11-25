@@ -35,22 +35,14 @@ private slots:
     void on_pushButton_connect_clicked();      // 连接按钮点击
     void on_pushButton_disconnect_clicked();   // 断开按钮点击
 
-    void onSocketConnected();                  // 连接成功
-    void onSocketDisconnected();               // 连接断开
-    void onSocketReadyRead();                  // 数据接收
-    void onSocketError(QAbstractSocket::SocketError error); // 连接错误
-
-
-
+   // void onSocketConnected();                  // 连接成功
+   // void onSocketDisconnected();               // 连接断开
+   // void onSocketReadyRead();                  // 数据接收
+   // void onSocketError(QAbstractSocket::SocketError error); // 连接错误
 
     // 新增的按钮槽函数
     void on_pushButton_motor_control_clicked();    // 电机控制
     void on_pushButton_find_optimal_clicked();     // 寻优控制
-
-
-
-    void on_textEdit_message_copyAvailable(bool b);
-    void on_textEdit_sd_data_copyAvailable(bool b);
 
     void initializeUIWithConfig();
     void on_traj_type_changed(int index);
@@ -67,10 +59,10 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    QTcpSocket *tcpSocket;                     // TCP套接字（保留用于兼容性）
+   // QTcpSocket *tcpSocket;                     // TCP套接字
     QTimer *sdCardQueryTimer;                  // SD卡状态查询定时器
     bool isConnected;                          // 连接状态标志
-    QByteArray receiveBuffer;                 // 重新添加 receiveBuffer
+   // QByteArray receiveBuffer;                 // 重新添加 receiveBuffer
 
     CommandTransmitter *commandTransmitter;
 

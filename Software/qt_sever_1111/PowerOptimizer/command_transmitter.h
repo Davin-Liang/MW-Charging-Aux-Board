@@ -22,7 +22,7 @@ public:
     bool param_initialize(const std::string & filename);
     bool param_record(const std::string & filename);
 
-    bool start_server(quint16 port);
+    bool start_server(quint16 port, const QHostAddress &address);
     void stop_server();
 
     int build_command_frame(uint8_t* buffer, CommandType_t cmdType, const void* data, uint16_t dataLen);
@@ -45,13 +45,16 @@ public:
     // 获取配置参数的接口
     MotorCmd_t getMotorCmd() const { return motorCmd; }
     FindOptimalCmd_t getFindOptCmd() const { return findOptCmd; }
+    // bool isServerRunning() const { return m_isServerRunning; }
+    // bool isClientConnected() const { return m_clientSocket && m_clientSocket->state() == QAbstractSocket::ConnectedState; }
 
     // 更新配置参数的接口
     void setMotorCmd(const MotorCmd_t &cmd) { motorCmd = cmd; }
     void setFindOptCmd(const FindOptimalCmd_t &cmd) { findOptCmd = cmd; }
 
 signals:
-    // 新增信号：用于通知UI更新数据
+
+
     void motorDataReceived(const MotorData_t &data);
     void channelDataReceived(const CurrentVPCh_t &data);
     void optResDataReceived(const OptResData_t &data);

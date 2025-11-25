@@ -59,26 +59,28 @@ CommandTransmitter::~CommandTransmitter()
     }
 }
 
+
 /**
   * @brief  服务器开始监听端口
   * @param  port 端口号
   * @return true 成功 / false 失败
+  * @example CommandTransmitter.start_server(8080, QHostAddress("192.168.1.100"));
   **/
-bool CommandTransmitter::start_server(quint16 port)
+bool CommandTransmitter::start_server(quint16 port, const QHostAddress &address)
 {
-    if (m_isServerRunning) 
+    if (m_isServerRunning)
         stop_server();
-    
-    /* 开始监听端口 */
-    if (!m_tcpServer->listen(QHostAddress::Any, port)) 
+
+    /* 开始监听特定IP和端口 */
+    if (!m_tcpServer->listen(address, port))
     {
         qDebug() << "无法启动服务器:" << m_tcpServer->errorString();
         return false;
     }
-    
+
     m_serverPort = port;
     m_isServerRunning = true;
-    qDebug() << "命令传输服务器已启动，监听端口:" << port;
+    qDebug() << "命令传输服务器已启动，监听地址:" << address.toString() << "端口:" << port;
 
     return true;
 }
@@ -90,16 +92,16 @@ bool CommandTransmitter::start_server(quint16 port)
   **/
 void CommandTransmitter::stop_server(void)
 {
-    if (m_clientSocket) 
+    if (m_clientSocket)
     {
         m_clientSocket->close();
         m_clientSocket->deleteLater();
         m_clientSocket = nullptr;
     }
-    
+
     if (m_tcpServer)
         m_tcpServer->close();
-    
+
     m_isServerRunning = false;
     qDebug() << "服务器已停止";
 }
@@ -111,7 +113,7 @@ void CommandTransmitter::stop_server(void)
   **/
 void CommandTransmitter::on_new_connection(void)
 {
-    if (m_clientSocket) 
+    if (m_clientSocket)
     {
         /* 如果已有连接，拒绝新连接 */
         QTcpSocket *newSocket = m_tcpServer->nextPendingConnection();
@@ -121,16 +123,16 @@ void CommandTransmitter::on_new_connection(void)
 
         return;
     }
-    
+
     m_clientSocket = m_tcpServer->nextPendingConnection();
-    if (m_clientSocket) 
+    if (m_clientSocket)
     {
         connect(m_clientSocket, &QTcpSocket::readyRead, this, &CommandTransmitter::on_ready_read);
         connect(m_clientSocket, &QTcpSocket::disconnected, this, &CommandTransmitter::on_disconnected);
         connect(m_clientSocket, QOverload<QAbstractSocket::SocketError>::of(&QAbstractSocket::errorOccurred),
                 this, &CommandTransmitter::on_error_occurred);
-        
-        qDebug() << "新的下位机连接:" << m_clientSocket->peerAddress().toString() 
+
+        qDebug() << "新的下位机连接:" << m_clientSocket->peerAddress().toString()
                  << ":" << m_clientSocket->peerPort();
     }
 }
@@ -162,9 +164,9 @@ void CommandTransmitter::on_ready_read(void)
 
 void CommandTransmitter::on_disconnected()
 {
-    if (m_clientSocket) 
-    {
+    if (m_clientSocket) {
         qDebug() << "下位机断开连接:" << m_clientSocket->peerAddress().toString();
+
         m_clientSocket->deleteLater();
         m_clientSocket = nullptr;
     }

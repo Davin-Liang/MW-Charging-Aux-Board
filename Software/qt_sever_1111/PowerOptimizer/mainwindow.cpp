@@ -20,6 +20,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    qDebug() << "=== 程序重新编译于:" << QDateTime::currentDateTime().toString() << "===";
 
     // 设置窗口属性
     setWindowTitle("数据采集系统可视化界面");
@@ -34,10 +35,10 @@ MainWindow::MainWindow(QWidget *parent)
     QNetworkProxy::setApplicationProxy(QNetworkProxy::NoProxy);
 
     // 不再初始化原来的TCP客户端，因为CommandTransmitter是服务器
-    tcpSocket = nullptr;
+    //tcpSocket = nullptr;
 
-    sdCardQueryTimer = new QTimer(this);
-    sdCardQueryTimer->setInterval(2000);
+    // sdCardQueryTimer = new QTimer(this);
+    // sdCardQueryTimer->setInterval(2000);
 
     // 初始化命令传输器
     setupCommandTransmitter();
@@ -94,6 +95,9 @@ void MainWindow::setupCommandTransmitter()
             this, &MainWindow::onChannelDataReceived);
     connect(commandTransmitter, &CommandTransmitter::optResDataReceived,
             this, &MainWindow::onOptResDataReceived);
+
+
+
 }
 // 初始化电机状态图表
 void MainWindow::initializeMotorChart()
@@ -370,8 +374,6 @@ void MainWindow::on_traj_type_changed(int index)
     }
 }
 
-
-
 MainWindow::~MainWindow()
 {
     if (commandTransmitter) {
@@ -516,27 +518,42 @@ void MainWindow::on_pushButton_find_optimal_clicked()
 // 网络连接按钮点击事件
 void MainWindow::on_pushButton_connect_clicked()
 {
-    // 获取用户输入的端口（现在作为服务器端口）
+    // 获取用户输入的IP地址和端口
+    QString ipText = ui->lineEdit_local_ip->text().trimmed();
     QString portText = ui->lineEdit_local_port->text().trimmed();
-    quint16 serverPort = portText.toUShort();
 
     // 验证输入
+    if (ipText.isEmpty()) {
+        QMessageBox::warning(this, "输入错误", "请输入服务器IP地址");
+        return;
+    }
+
+    quint16 serverPort = portText.toUShort();
     if (serverPort == 0) {
         QMessageBox::warning(this, "输入错误", "请输入正确的服务器端口");
         return;
     }
 
+    QHostAddress serverAddress(ipText);
+    if (serverAddress.isNull()) {
+        QMessageBox::warning(this, "输入错误", "请输入正确的IP地址格式");
+        return;
+    }
+
+    qDebug() << "尝试启动服务器，IP:" << ipText << "端口:" << serverPort;
+
     // 启动服务器
-    if (commandTransmitter->start_server(serverPort)) {
-        ui->label_status->setText("等待连接...");
-        ui->label_status->setStyleSheet("color: orange;");
-        ui->pushButton_connect->setEnabled(false);
-        ui->pushButton_disconnect->setEnabled(true);
+    if (commandTransmitter->start_server(serverPort, serverAddress)) {
         ui->label_status->setText("已连接");
         ui->label_status->setStyleSheet("color: green;");
-        qDebug() << "服务器已启动，监听端口:" << serverPort;
+        ui->pushButton_connect->setEnabled(false);
+        ui->pushButton_disconnect->setEnabled(true);
+        qDebug() << "服务器启动成功，等待客户端连接";
     } else {
         QMessageBox::critical(this, "错误", "无法启动服务器");
+        ui->label_status->setText("启动失败");
+        ui->label_status->setStyleSheet("color: red;");
+        qDebug() << "服务器启动失败";
     }
 }
 
@@ -548,16 +565,16 @@ void MainWindow::on_pushButton_disconnect_clicked()
     }
 
     updateConnectionStatus(false);
-    qDebug()<<"服务器已停止";
+    qDebug() << "服务器已停止";
 }
 
-// 更新连接状态
+// 更新网络连接状态
 void MainWindow::updateConnectionStatus(bool connected)
 {
     if (connected) {
         ui->pushButton_connect->setEnabled(false);
         ui->pushButton_disconnect->setEnabled(true);
-        ui->label_status->setText("STM32已连接");
+        ui->label_status->setText("客户端已连接");
         ui->label_status->setStyleSheet("color: green;");
     } else {
         ui->pushButton_connect->setEnabled(true);
@@ -602,52 +619,6 @@ void MainWindow::setupReadOnlyDataMonitoring()
     ui->lineEdit_read_powermax->setStyleSheet(readOnlyStyle);
 }
 
-// ========== 网络通信处理 ==========
-
-// TCP连接成功 - 现在不需要这个函数，因为CommandTransmitter是服务器
-void MainWindow::onSocketConnected()
-{
-    // 空实现，因为我们现在是服务器模式
-}
-
-// TCP连接断开 - 现在不需要这个函数
-void MainWindow::onSocketDisconnected()
-{
-    // 空实现，因为我们现在是服务器模式
-}
-
-// 接收数据 - 现在不需要这个函数，因为CommandTransmitter处理数据接收
-void MainWindow::onSocketReadyRead()
-{
-    // 空实现，因为CommandTransmitter处理数据接收
-}
-
-// TCP错误处理
-void MainWindow::onSocketError(QAbstractSocket::SocketError error)
-{
-    QString errorMsg;
-    switch (error) {
-    case QAbstractSocket::ConnectionRefusedError:
-        errorMsg = "连接被拒绝";
-        break;
-    case QAbstractSocket::RemoteHostClosedError:
-        errorMsg = "远程主机关闭连接";
-        break;
-    case QAbstractSocket::HostNotFoundError:
-        errorMsg = "找不到主机";
-        break;
-    case QAbstractSocket::SocketTimeoutError:
-        errorMsg = "连接超时";
-        break;
-    default:
-        errorMsg = "连接错误";
-    }
-
-    QMessageBox::critical(this, "连接错误", errorMsg);
-    updateConnectionStatus(false);
-}
-
-
 // 解析以太网数据
 void MainWindow::parseEthernetData(const QByteArray &data)
 {
@@ -670,18 +641,6 @@ void MainWindow::parseEthernetData(const QByteArray &data)
     }
 
     qDebug() << "解析以太网数据:" << data;
-}
-
-
-// 文本编辑框复制可用状态变化的槽函数
-void MainWindow::on_textEdit_message_copyAvailable(bool available)
-{
-    Q_UNUSED(available)
-}
-
-void MainWindow::on_textEdit_sd_data_copyAvailable(bool available)
-{
-    Q_UNUSED(available)
 }
 
 // 现代化样式
@@ -755,7 +714,6 @@ void MainWindow::applyModernStyle()
 
     setStyleSheet(style);
 }
-// 扫描数据文件
 // 扫描数据文件
 void MainWindow::scanDataFiles()
 {
