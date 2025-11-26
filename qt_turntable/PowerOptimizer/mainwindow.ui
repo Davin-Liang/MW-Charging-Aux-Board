@@ -35,7 +35,7 @@
      </font>
     </property>
     <property name="currentIndex">
-     <number>4</number>
+     <number>0</number>
     </property>
     <property name="iconSize">
      <size>
@@ -917,7 +917,6 @@
              <family>宋体</family>
              <pointsize>12</pointsize>
              <bold>false</bold>
-             <!-- <hintingpreference>PreferDefaultHinting</hintingpreference> -->
             </font>
            </property>
            <property name="text">
@@ -995,7 +994,7 @@
         <string/>
        </property>
        <property name="pixmap">
-        <pixmap>:/i18n/PowerOptimizer_zh_CN.qm</pixmap>
+        <pixmap resource="../../../qt_sever _1102(1)/qt_sever _1102/qt_sever _1102/PowerOptimizer/build/Desktop_Qt_6_9_2_MinGW_64_bit-Debug/debug/qmake_qmake_qm_files.qrc">:/i18n/PowerOptimizer_zh_CN.qm</pixmap>
        </property>
       </widget>
      </widget>
@@ -1349,6 +1348,8 @@
    </widget>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../../qt_sever _1102(1)/qt_sever _1102/qt_sever _1102/PowerOptimizer/build/Desktop_Qt_6_9_2_MinGW_64_bit-Debug/debug/qmake_qmake_qm_files.qrc"/>
+ </resources>
  <connections/>
 </ui>

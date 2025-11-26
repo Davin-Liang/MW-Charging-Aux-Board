@@ -22,7 +22,7 @@ public:
     bool param_initialize(const std::string & filename);
     bool param_record(const std::string & filename);
 
-    bool start_server(quint16 port);
+    bool start_server(quint16 port, const QHostAddress &address);
     void stop_server();
 
     int build_command_frame(uint8_t* buffer, CommandType_t cmdType, const void* data, uint16_t dataLen);

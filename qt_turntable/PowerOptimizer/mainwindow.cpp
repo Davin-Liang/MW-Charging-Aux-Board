@@ -20,8 +20,11 @@ MainWindow::MainWindow(QWidget *parent)
     , turntable_controller(nullptr)
 {
     ui->setupUi(this);
+
     // 在setupUi之后调用
     ui->comboBox_traj_type->setObjectName(""); // 清空对象名，避免自动连接
+
+    ui->tabWidget->setCurrentIndex(0);   //显示第0页
 
     // 设置窗口属性
     setWindowTitle("数据采集系统可视化界面");
@@ -88,6 +91,18 @@ MainWindow::MainWindow(QWidget *parent)
     ui->comboBox_traj_type->addItem("方形轨迹");
     ui->comboBox_traj_type->addItem("圆形轨迹");
     ui->comboBox_traj_type->setCurrentIndex(0);
+
+
+    ui->lineEdit_baudrate->setText("9600");
+    ui->lineEdit_parity->setText("N");
+    ui->lineEdit_dataBit->setText("8");
+    ui->lineEdit_stopBit->setText("1");
+
+    // 设置为只读（让它们一直显示，但用户不能修改）
+    ui->lineEdit_baudrate->setReadOnly(true);
+    ui->lineEdit_parity->setReadOnly(true);
+    ui->lineEdit_dataBit->setReadOnly(true);
+    ui->lineEdit_stopBit->setReadOnly(true);
 
 
     // 设置默认服务器端口（可选）
@@ -547,27 +562,42 @@ void MainWindow::on_pushButton_find_optimal_clicked()
 // 网络连接按钮点击事件
 void MainWindow::on_pushButton_connect_clicked()
 {
-    // 获取用户输入的端口（现在作为服务器端口）
+    // 获取用户输入的IP地址和端口
+    QString ipText = ui->lineEdit_local_ip->text().trimmed();
     QString portText = ui->lineEdit_local_port->text().trimmed();
-    quint16 serverPort = portText.toUShort();
 
     // 验证输入
+    if (ipText.isEmpty()) {
+        QMessageBox::warning(this, "输入错误", "请输入服务器IP地址");
+        return;
+    }
+
+    quint16 serverPort = portText.toUShort();
     if (serverPort == 0) {
         QMessageBox::warning(this, "输入错误", "请输入正确的服务器端口");
         return;
     }
 
+    QHostAddress serverAddress(ipText);
+    if (serverAddress.isNull()) {
+        QMessageBox::warning(this, "输入错误", "请输入正确的IP地址格式");
+        return;
+    }
+
+    qDebug() << "尝试启动服务器，IP:" << ipText << "端口:" << serverPort;
+
     // 启动服务器
-    if (commandTransmitter->start_server(serverPort)) {
-        ui->label_status->setText("等待连接...");
-        ui->label_status->setStyleSheet("color: orange;");
-        ui->pushButton_connect->setEnabled(false);
-        ui->pushButton_disconnect->setEnabled(true);
+    if (commandTransmitter->start_server(serverPort, serverAddress)) {
         ui->label_status->setText("已连接");
         ui->label_status->setStyleSheet("color: green;");
-        qDebug() << "服务器已启动，监听端口:" << serverPort;
+        ui->pushButton_connect->setEnabled(false);
+        ui->pushButton_disconnect->setEnabled(true);
+        qDebug() << "服务器启动成功，等待客户端连接";
     } else {
         QMessageBox::critical(this, "错误", "无法启动服务器");
+        ui->label_status->setText("启动失败");
+        ui->label_status->setStyleSheet("color: red;");
+        qDebug() << "服务器启动失败";
     }
 }
 
@@ -579,7 +609,7 @@ void MainWindow::on_pushButton_disconnect_clicked()
     }
 
     updateConnectionStatus(false);
-    qDebug()<<"服务器已停止";
+    qDebug() << "服务器已停止";
 }
 
 // 更新连接状态
@@ -588,7 +618,7 @@ void MainWindow::updateConnectionStatus(bool connected)
     if (connected) {
         ui->pushButton_connect->setEnabled(false);
         ui->pushButton_disconnect->setEnabled(true);
-        ui->label_status->setText("STM32已连接");
+        ui->label_status->setText("客户端已连接");
         ui->label_status->setStyleSheet("color: green;");
     } else {
         ui->pushButton_connect->setEnabled(true);
@@ -1074,10 +1104,10 @@ void MainWindow::on_btn_y_zero_clicked()
 void MainWindow::on_pushButton_connection_clicked()
 {
     QString port = ui->lineEdit_port->text().trimmed();
-    int baudrate = ui->lineEdit_baudrate->text().toInt();
-    char parity = ui->lineEdit_parity->text().toUpper().at(0).toLatin1();
-    int dataBit = ui->lineEdit_dataBit->text().toInt();
-    int stopBit = ui->lineEdit_stopBit->text().toInt();
+    const int baudrate = 9600;
+    const char parity = 'N';
+    const int dataBit = 8;
+    const int stopBit = 1;
 
     if (port.isEmpty()) {
         QMessageBox::warning(this, "错误", "请填写串口路径");
@@ -1093,7 +1123,7 @@ void MainWindow::on_pushButton_connection_clicked()
     bool ok = turntable_controller->connect(baudrate, parity, dataBit, stopBit);
     if (ok) {
         setTurntableConnectionStatus(true);
-        turntableMonitorTimer->start(200); // 每200ms刷新数据
+       // turntableMonitorTimer->start(200); // 每200ms刷新数据
         QMessageBox::information(this, "成功", "转台连接成功");
     } else {
         setTurntableConnectionStatus(false);
@@ -1117,17 +1147,17 @@ void MainWindow::updateTurntableData()
 
     float xPos = 0.0f, yPos = 0.0f, xSpeed = 0.0f, ySpeed = 0.0f;
 
-    // bool ok1 = turntable_controller->read_axis_angle(Yaw, &xPos);
-    // bool ok2 = turntable_controller->read_axis_angle(Pitch, &yPos);
-    // bool ok3 = turntable_controller->read_axis_speed(Yaw, &xSpeed);
-    // bool ok4 = turntable_controller->read_axis_speed(Pitch, &ySpeed);
+    bool ok1 = turntable_controller->read_axis_angle(Yaw, &xPos);
+    bool ok2 = turntable_controller->read_axis_angle(Pitch, &yPos);
+    bool ok3 = turntable_controller->read_axis_speed(Yaw, &xSpeed);
+    bool ok4 = turntable_controller->read_axis_speed(Pitch, &ySpeed);
 
-    // if (ok1 && ok2 && ok3 && ok4) {
-    //     ui->line_edit_monitor_x_pos->setText(QString::number(xPos, 'f', 2));
-    //     ui->line_edit_monitor_y_pos->setText(QString::number(yPos, 'f', 2));
-    //     ui->line_edit_monitor_x_speed->setText(QString::number(xSpeed, 'f', 2));
-    //     ui->line_edit_monitor_y_speed->setText(QString::number(ySpeed, 'f', 2));
-    // }
+    if (ok1 && ok2 && ok3 && ok4) {
+         ui->line_edit_monitor_x_pos->setText(QString::number(xPos, 'f', 2));
+         ui->line_edit_monitor_y_pos->setText(QString::number(yPos, 'f', 2));
+         ui->line_edit_monitor_x_speed->setText(QString::number(xSpeed, 'f', 2));
+         ui->line_edit_monitor_y_speed->setText(QString::number(ySpeed, 'f', 2));
+     }
 }
 //更新连接状态辅助函数
 void MainWindow::setTurntableConnectionStatus(bool connected)

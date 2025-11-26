@@ -63,22 +63,23 @@ CommandTransmitter::~CommandTransmitter()
   * @brief  服务器开始监听端口
   * @param  port 端口号
   * @return true 成功 / false 失败
+  * @example CommandTransmitter.start_server(8080, QHostAddress("192.168.1.100"));
   **/
-bool CommandTransmitter::start_server(quint16 port)
+bool CommandTransmitter::start_server(quint16 port, const QHostAddress &address)
 {
-    if (m_isServerRunning) 
+    if (m_isServerRunning)
         stop_server();
-    
-    /* 开始监听端口 */
-    if (!m_tcpServer->listen(QHostAddress::Any, port)) 
+
+    /* 开始监听特定IP和端口 */
+    if (!m_tcpServer->listen(address, port))
     {
         qDebug() << "无法启动服务器:" << m_tcpServer->errorString();
         return false;
     }
-    
+
     m_serverPort = port;
     m_isServerRunning = true;
-    qDebug() << "命令传输服务器已启动，监听端口:" << port;
+    qDebug() << "命令传输服务器已启动，监听地址:" << address.toString() << "端口:" << port;
 
     return true;
 }
@@ -90,19 +91,20 @@ bool CommandTransmitter::start_server(quint16 port)
   **/
 void CommandTransmitter::stop_server(void)
 {
-    if (m_clientSocket) 
+    if (m_clientSocket)
     {
         m_clientSocket->close();
         m_clientSocket->deleteLater();
         m_clientSocket = nullptr;
     }
-    
+
     if (m_tcpServer)
         m_tcpServer->close();
-    
+
     m_isServerRunning = false;
     qDebug() << "服务器已停止";
 }
+
 
 /**
   * @brief  QT槽函数：监听新连接
