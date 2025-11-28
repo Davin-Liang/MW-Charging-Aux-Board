@@ -45,7 +45,7 @@ bool TurntableController::connect(int baudrate, char parity, int dataBit, int st
     modbus_set_slave(m_ctx, m_slaveId);
 
     /* 设置响应超时时间 */
-    modbus_set_response_timeout(m_ctx, 0, 0);
+    modbus_set_response_timeout(m_ctx, 1, 0);
 
     /* 设置字节超时时间 */
     modbus_set_byte_timeout(m_ctx, 0, 1000);
@@ -362,7 +362,8 @@ bool TurntableController::read_axis_speed(enum YawOrPitch_t axis, float * readed
     
     if (Yaw == axis)
         result = read_input_registers(0x0007, 2, speed.words);
-    result = read_input_registers(0x0009, 2, speed.words);
+    else
+        result = read_input_registers(0x0009, 2, speed.words);
 
     if (result) {
         /* 交换高两字节和低两字节 */
@@ -417,7 +418,8 @@ bool TurntableController::read_axis_angle(enum YawOrPitch_t axis, float * readed
     
     if (Yaw == axis)
         result = read_input_registers(0x0016, 2, angle.words);
-    result = read_input_registers(0x0018, 2, angle.words);
+    else 
+        result = read_input_registers(0x0018, 2, angle.words);
 
     if (result) {
         /* 交换高两字节和低两字节 */
