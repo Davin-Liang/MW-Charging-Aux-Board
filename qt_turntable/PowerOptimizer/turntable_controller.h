@@ -8,7 +8,6 @@
 #define TURNTABLE_CONTROLLER_H
 
 #include <modbus/modbus.h>
-// #include "libmodbus-master/libmodbus-master/src/modbus.h"
 #include <iostream>         // 输入输出流
 #include <cstring>          // 字符串操作
 #include <unistd.h>         // Unix 标准函数，如 usleep
@@ -37,6 +36,9 @@ private:
     const char* m_port;     ///< 串口设备路径，如 "/dev/ttyUSB0"
     int m_slaveId;          ///< 从站设备地址
     bool m_isConnected;     ///< 连接状态标志
+    // 浮点数3412字节顺序转换
+    void floatTo3412(float value, uint16_t words[2]);
+    float floatFrom3412(const uint16_t words[2]);
 
 public:
     TurntableController(const char* port, int slaveId = 0xcc);

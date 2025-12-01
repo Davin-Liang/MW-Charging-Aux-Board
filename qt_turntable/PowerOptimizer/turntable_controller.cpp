@@ -31,6 +31,11 @@ TurntableController::~TurntableController()
  */
 bool TurntableController::connect(int baudrate, char parity, int dataBit, int stopBit) 
 {
+    // 确保之前没有连接
+    if (m_isConnected) {
+        std::cout << "警告：尝试连接已连接的设备，先断开现有连接" << std::endl;
+        disconnect();
+    }
     /* 创建 RTU 模式的 Modbus 上下文 */
     m_ctx = modbus_new_rtu(m_port, baudrate, parity, dataBit, stopBit);
     modbus_set_debug(m_ctx, TRUE);
@@ -76,6 +81,7 @@ void TurntableController::disconnect(void)
         modbus_free(m_ctx);
         m_ctx = nullptr;
         m_isConnected = false;
+        std::cout << "转台控制器连接已断开" << std::endl;
     }
 }
 
@@ -331,19 +337,22 @@ bool TurntableController::reset_axis_coord(enum YawOrPitch_t axis)
  * @return 操作成功返回 true，失败返回 false
  */
 bool TurntableController::set_axis_speed(enum YawOrPitch_t axis, float goalSpeed)
-{
-    union FloatToBytes_t speed;
+{   
+    uint16_t words[2];
 
     if (goalSpeed > MAX_AXIS_SPEED)
-        speed.floatValue = MAX_AXIS_SPEED;
-    else
-        speed.floatValue = goalSpeed;
+        goalSpeed = MAX_AXIS_SPEED;
+
+    // 转换为3412字节顺序
+    floatTo3412(goalSpeed, words);
 
     /* 交换高两字节和低两字节 */
     // uint16_t temp = speed.words[0];
     // speed.words[0] = speed.words[1];
     // speed.words[1] = temp;
-    
+    // 调试输出
+    std::cout << "设置速度: " << goalSpeed << " °/sec, ";
+    std::cout << "转换后数据: 0x" << std::hex << words[0] << " " << words[1] << std::dec << std::endl;
     if (Yaw == axis)
         return write_multiple_registers(0x0007, 2, speed.words);
     return write_multiple_registers(0x0009, 2, speed.words);     
@@ -357,25 +366,49 @@ bool TurntableController::set_axis_speed(enum YawOrPitch_t axis, float goalSpeed
  */
 bool TurntableController::read_axis_speed(enum YawOrPitch_t axis, float * readedSpeed)
 {
-    union FloatToBytes_t speed;
-    bool result;
+    // union FloatToBytes_t speed;
+    // bool result;
     
+    // if (Yaw == axis)
+    //     result = read_input_registers(0x0007, 2, speed.words);
+    // else
+    //     result = read_input_registers(0x0009, 2, speed.words);
+
+    // if (result) {
+    //     /* 交换高两字节和低两字节 */
+    //     uint16_t temp   = speed.words[0];
+    //     speed.words[0]  = speed.words[1];
+    //     speed.words[1]  = temp;
+    //     *readedSpeed    = speed.floatValue;
+
+    //     return true;
+    // }
+
+    // return false;
+    uint16_t words[2];
+    bool result;
+
+    // 根据协议，X轴(Yaw)速度地址为0x0007，Y轴(Pitch)速度地址为0x0009
+    // 功能码0x04，读取2个寄存器
     if (Yaw == axis)
-        result = read_input_registers(0x0007, 2, speed.words);
+        result = read_input_registers(0x0007, 2, words);
     else
-        result = read_input_registers(0x0009, 2, speed.words);
+        result = read_input_registers(0x0009, 2, words);
 
     if (result) {
-        /* 交换高两字节和低两字节 */
-        uint16_t temp   = speed.words[0];
-        speed.words[0]  = speed.words[1];
-        speed.words[1]  = temp;   
-        *readedSpeed    = speed.floatValue;
+        // 使用3412字节顺序转换
+        *readedSpeed = floatFrom3412(words);
+
+        // 调试输出
+        std::cout << "读取速度成功: ";
+        std::cout << "原始数据: 0x" << std::hex << words[0] << " " << words[1] << std::dec;
+        std::cout << " 转换后: " << *readedSpeed << " °/sec" << std::endl;
 
         return true;
+    } else {
+        std::cerr << "读取速度失败" << std::endl;
+        return false;
     }
-
-    return false;
 }
 
 /**
@@ -386,23 +419,23 @@ bool TurntableController::read_axis_speed(enum YawOrPitch_t axis, float * readed
  */
 bool TurntableController::set_axis_angle(enum YawOrPitch_t axis, float goalAngle)
 {
-    union FloatToBytes_t angle;
+    uint16_t words[2];
 
     /* Pitch 轴才有限位 */
-    if (Pitch == axis)
-        if (goalAngle > MAX_AXIS_PITCH_ANGLE)
-            angle.floatValue = MAX_AXIS_PITCH_ANGLE;
-        else 
-            angle.floatValue = goalAngle;
+    if (Pitch == axis && goalAngle > MAX_AXIS_PITCH_ANGLE)
+        goalAngle = MAX_AXIS_PITCH_ANGLE;
 
-    /* 交换高两字节和低两字节 */
-    // uint16_t temp = angle.words[0];
-    // angle.words[0] = angle.words[1];
-    // angle.words[1] = temp;
-    
+    // 转换为3412字节顺序
+    floatTo3412(goalAngle, words);
+
+    // 调试输出
+    std::cout << "设置角度: " << goalAngle << " °, ";
+    std::cout << "转换后数据: 0x" << std::hex << words[0] << " " << words[1] << std::dec << std::endl;
+
     if (Yaw == axis)
-        return write_multiple_registers(0x0016, 2, angle.words);
-    return write_multiple_registers(0x0018, 2, angle.words);     
+        return write_multiple_registers(0x0016, 2, words);
+    else
+        return write_multiple_registers(0x0018, 2, words);
 }
 
 /**
@@ -413,25 +446,49 @@ bool TurntableController::set_axis_angle(enum YawOrPitch_t axis, float goalAngle
  */
 bool TurntableController::read_axis_angle(enum YawOrPitch_t axis, float * readedAngle)
 {
-    union FloatToBytes_t angle;
-    bool result;
+    // union FloatToBytes_t angle;
+    // bool result;
     
+    // if (Yaw == axis)
+    //     result = read_input_registers(0x0016, 2, angle.words);
+    // else
+    //     result = read_input_registers(0x0018, 2, angle.words);
+
+    // if (result) {
+    //     /* 交换高两字节和低两字节 */
+    //     uint16_t temp   = angle.words[0];
+    //     angle.words[0]  = angle.words[1];
+    //     angle.words[1]  = temp;
+    //     *readedAngle    = angle.floatValue;
+
+    //     return true;
+    // }
+
+    // return false;
+    uint16_t words[2];
+    bool result;
+
+    // 根据协议，X轴(Yaw)坐标地址为0x0016，Y轴(Pitch)坐标地址为0x0018
+    // 功能码0x04，读取2个寄存器
     if (Yaw == axis)
-        result = read_input_registers(0x0016, 2, angle.words);
-    else 
-        result = read_input_registers(0x0018, 2, angle.words);
+        result = read_input_registers(0x0016, 2, words);
+    else
+        result = read_input_registers(0x0018, 2, words);
 
     if (result) {
-        /* 交换高两字节和低两字节 */
-        uint16_t temp   = angle.words[0];
-        angle.words[0]  = angle.words[1];
-        angle.words[1]  = temp;   
-        *readedAngle    = angle.floatValue;
+        // 使用3412字节顺序转换
+        *readedAngle = floatFrom3412(words);
+
+        // 调试输出
+        std::cout << "读取角度成功: ";
+        std::cout << "原始数据: 0x" << std::hex << words[0] << " " << words[1] << std::dec;
+        std::cout << " 转换后: " << *readedAngle << " °" << std::endl;
 
         return true;
+    } else {
+        std::cerr << "读取角度失败" << std::endl;
+        return false;
     }
-
-    return false;
 }
 
 /**
@@ -485,4 +542,61 @@ void TurntableController::set_slave_id(int slaveId)
     m_slaveId = slaveId;
     if (m_ctx)
         modbus_set_slave(m_ctx, m_slaveId);
+}
+/**
+ * @brief 将浮点数转换为协议要求的3412字节顺序
+ * @param value 原始浮点数
+ * @param words 存储转换后的2个16位字
+ */
+void TurntableController::floatTo3412(float value, uint16_t words[2])
+{
+    // 将浮点数转换为字节数组
+    union {
+        float f;
+        uint8_t bytes[4];
+    } u;
+    u.f = value;
+
+    // 3412字节顺序转换
+    // 原始: B1 B2 B3 B4
+    // 目标: B3 B4 B1 B2
+    uint8_t temp[4];
+    temp[0] = u.bytes[2];  // B3
+    temp[1] = u.bytes[3];  // B4
+    temp[2] = u.bytes[0];  // B1
+    temp[3] = u.bytes[1];  // B2
+
+    // 转换为两个16位字
+    words[0] = (temp[0] << 8) | temp[1];  // 高16位
+    words[1] = (temp[2] << 8) | temp[3];  // 低16位
+}
+
+/**
+ * @brief 将协议要求的3412字节顺序转换为浮点数
+ * @param words 2个16位字（3412顺序）
+ * @return 转换后的浮点数
+ */
+float TurntableController::floatFrom3412(const uint16_t words[2])
+{
+    uint8_t bytes[4];
+
+    // 从两个16位字提取字节
+    bytes[0] = (words[0] >> 8) & 0xFF;  // 第一个字的高字节
+    bytes[1] = words[0] & 0xFF;         // 第一个字的低字节
+    bytes[2] = (words[1] >> 8) & 0xFF;  // 第二个字的高字节
+    bytes[3] = words[1] & 0xFF;         // 第二个字的低字节
+
+    // 3412字节顺序转换回原始顺序
+    // 输入: B3 B4 B1 B2
+    // 输出: B1 B2 B3 B4
+    union {
+        float f;
+        uint8_t bytes[4];
+    } u;
+    u.bytes[0] = bytes[2];  // B1
+    u.bytes[1] = bytes[3];  // B2
+    u.bytes[2] = bytes[0];  // B3
+    u.bytes[3] = bytes[1];  // B4
+
+    return u.f;
 }

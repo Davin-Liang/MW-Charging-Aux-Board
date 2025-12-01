@@ -6,15 +6,7 @@ CONFIG += c++17
 
 # 包含第三方库路径
 INCLUDEPATH += $$PWD/thirdparty
-# 添加JSON库支持（需要安装nlohmann/json）
-# 如果使用vcpkg: win32: CONFIG += vcpkg
-# 或者手动指定包含路径: INCLUDEPATH += /path/to/json/include
-# INCLUDEPATH += $$PWD/libmodbus-master/libmodbus-master/src/.libs
-# INCLUDEPATH += $$PWD/libmodbus-master/libmodbus-master/src
-# win32: LIBS += -lws2_32 -lwsock32
-# 包含头文件路径
 INCLUDEPATH += /usr/include/modbus
-# 或者如果头文件在标准路径中，可能不需要指定
 
 # 链接libmodbus库
 LIBS += -lmodbus
