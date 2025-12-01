@@ -1,4 +1,7 @@
 #include "turntable_controller.h"
+#include <cstdio>
+#include <limits>  // 对于 std::numeric_limits
+#include <cmath>   // 对于 std::pow
 
 /**
  * @brief 构造函数
@@ -353,9 +356,10 @@ bool TurntableController::set_axis_speed(enum YawOrPitch_t axis, float goalSpeed
     // 调试输出
     std::cout << "设置速度: " << goalSpeed << " °/sec, ";
     std::cout << "转换后数据: 0x" << std::hex << words[0] << " " << words[1] << std::dec << std::endl;
+
     if (Yaw == axis)
-        return write_multiple_registers(0x0007, 2, speed.words);
-    return write_multiple_registers(0x0009, 2, speed.words);     
+        return write_multiple_registers(0x0007, 2, words);
+    return write_multiple_registers(0x0009, 2, words);     
 }
 
 /**
@@ -550,26 +554,48 @@ void TurntableController::set_slave_id(int slaveId)
  */
 void TurntableController::floatTo3412(float value, uint16_t words[2])
 {
-    // 将浮点数转换为字节数组
-    union {
-        float f;
-        uint8_t bytes[4];
-    } u;
-    u.f = value;
+    // 使用memcpy获取浮点数的原始字节表示
+    uint32_t float_bits;
+    std::memcpy(&float_bits, &value, sizeof(float));
+    
+    // 提取4个字节（大端序）
+    uint8_t bytes[4];
+    bytes[0] = (float_bits >> 24) & 0xFF;  // 最高字节（符号位+指数高7位）
+    bytes[1] = (float_bits >> 16) & 0xFF;  // 指数低1位+尾数高7位
+    bytes[2] = (float_bits >> 8) & 0xFF;   // 尾数中间8位
+    bytes[3] = float_bits & 0xFF;          // 尾数低8位
 
-    // 3412字节顺序转换
-    // 原始: B1 B2 B3 B4
-    // 目标: B3 B4 B1 B2
-    uint8_t temp[4];
-    temp[0] = u.bytes[2];  // B3
-    temp[1] = u.bytes[3];  // B4
-    temp[2] = u.bytes[0];  // B1
-    temp[3] = u.bytes[1];  // B2
+    printf("bytes: 0x%02X 0x%02X 0x%02X 0x%02X\n", 
+       bytes[0], bytes[1], bytes[2], bytes[3]);
+    
+    // 3412顺序转换：B1 B2 B3 B4 -> B3 B4 B1 B2
+    words[0] = (bytes[2] << 8) | bytes[3];  // B3B4
+    words[1] = (bytes[0] << 8) | bytes[1];  // B1B2
 
-    // 转换为两个16位字
-    words[0] = (temp[0] << 8) | temp[1];  // 高16位
-    words[1] = (temp[2] << 8) | temp[3];  // 低16位
+    printf("words: 0x%04X 0x%04X", (unsigned int)words[0], (unsigned int)words[1]); 
 }
+// void TurntableController::floatTo3412(float value, uint16_t words[2])
+// {
+//     // 将浮点数转换为字节数组
+//     union {
+//         float f;
+//         uint8_t bytes[4];
+//     } u;
+//     u.f = value;
+
+//     // 3412字节顺序转换
+//     // 原始: B1 B2 B3 B4
+//     // 目标: B3 B4 B1 B2
+//     uint8_t temp[4];
+//     temp[0] = u.bytes[2];  // B3
+//     temp[1] = u.bytes[3];  // B4
+//     temp[2] = u.bytes[0];  // B1
+//     temp[3] = u.bytes[1];  // B2
+
+//     // 转换为两个16位字
+//     words[0] = (temp[0] << 8) | temp[1];  // 高16位
+//     words[1] = (temp[2] << 8) | temp[3];  // 低16位
+// }
 
 /**
  * @brief 将协议要求的3412字节顺序转换为浮点数
@@ -579,24 +605,64 @@ void TurntableController::floatTo3412(float value, uint16_t words[2])
 float TurntableController::floatFrom3412(const uint16_t words[2])
 {
     uint8_t bytes[4];
+    uint8_t temp[4];
 
     // 从两个16位字提取字节
     bytes[0] = (words[0] >> 8) & 0xFF;  // 第一个字的高字节
-    bytes[1] = words[0] & 0xFF;         // 第一个字的低字节
+    bytes[1] = words[0];         // 第一个字的低字节
     bytes[2] = (words[1] >> 8) & 0xFF;  // 第二个字的高字节
-    bytes[3] = words[1] & 0xFF;         // 第二个字的低字节
+    bytes[3] = words[1];         // 第二个字的低字节
+
+    // std::cout << "bytes:"<< bytes[0] << bytes[1] << bytes[2] << bytes[3] <<std::endl;
+    printf("bytes: 0x%02X 0x%02X 0x%02X 0x%02X\n", 
+       bytes[0], bytes[1], bytes[2], bytes[3]);
 
     // 3412字节顺序转换回原始顺序
     // 输入: B3 B4 B1 B2
     // 输出: B1 B2 B3 B4
-    union {
-        float f;
-        uint8_t bytes[4];
-    } u;
-    u.bytes[0] = bytes[2];  // B1
-    u.bytes[1] = bytes[3];  // B2
-    u.bytes[2] = bytes[0];  // B3
-    u.bytes[3] = bytes[1];  // B4
+    // union {
+    //     float f;
+    //     uint8_t bytes[4];
+    // } u;
+    // u.bytes[0] = bytes[2];  // B1
+    // u.bytes[1] = bytes[3];  // B2
+    // u.bytes[2] = bytes[0];  // B3
+    // u.bytes[3] = bytes[1];  // B4
+    temp[0] = bytes[2];  // B1
+    temp[1] = bytes[3];  // B2
+    temp[2] = bytes[0];  // B3
+    temp[3] = bytes[1];  // B4
+    // float result;
+    // printf("float size = %ld", sizeof(float));
+    // std::memcpy(&result, temp, sizeof(float));
+    // std::cout << "Converted float: " << result << std::endl;
 
-    return u.f;
+    // 手动解析IEEE 754单精度浮点数（32位）
+    uint32_t bits = (static_cast<uint32_t>(temp[0]) << 24) |
+                    (static_cast<uint32_t>(temp[1]) << 16) |
+                    (static_cast<uint32_t>(temp[2]) << 8) |
+                    static_cast<uint32_t>(temp[3]);
+
+    // 提取符号位、指数和尾数
+    int sign = (bits >> 31) ? -1 : 1;
+    int exponent = ((bits >> 23) & 0xFF) - 127;
+    uint32_t mantissa = bits & 0x7FFFFF;
+
+    // 计算浮点数值
+    float float_value;
+    if (exponent == -127 && mantissa == 0) {
+        float_value = 0.0f * sign;  // 零
+    } else if (exponent == 128) {
+        float_value = (mantissa == 0) ? 
+                    (sign * std::numeric_limits<float>::infinity()) : 
+                    std::numeric_limits<float>::quiet_NaN();
+    } else {
+        // 正常数
+        float_value = sign * (1.0f + static_cast<float>(mantissa) / (1 << 23)) * 
+                    std::pow(2.0f, exponent);
+    }
+
+    std::cout << "Float value: " << std::dec << float_value << std::endl;
+
+    return float_value;
 }

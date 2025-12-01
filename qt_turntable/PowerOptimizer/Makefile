@@ -550,11 +550,7 @@ main.o: main.cpp mainwindow.h \
 		logindialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
-mainwindow.o: mainwindow.cpp mainwindow.h \
-		command_transmitter.h \
-		command_struct.h \
-		turntable_controller.h \
-		ui_mainwindow.h
+mainwindow.o: mainwindow.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o mainwindow.cpp
 
 qrc_qmake_qmake_qm_files.o: qrc_qmake_qmake_qm_files.cpp 
