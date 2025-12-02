@@ -34,6 +34,7 @@ static struct TaskHandleNode *g_taskNode = NULL;
 static void command_task(void * param)
 {	
   /* 注册command，使其可以在command_task.c中使用该command */
+  command.commandType = noDemand;
   register_command_for_power_supply(&command);
   register_command_for_attenuator(&command);
   register_command_for_dm542(&command);
@@ -53,6 +54,8 @@ static void command_task(void * param)
   xQueueSend(g_commandQueue, &fuckCommand, 10);
   #endif
 	
+  vTaskDelay(6000);
+  
 	while (1)
   {
 		if (pdPASS == xQueueReceive(g_commandQueue, &command, portMAX_DELAY))

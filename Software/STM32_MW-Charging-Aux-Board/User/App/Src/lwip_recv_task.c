@@ -65,6 +65,8 @@ lwip_start:
         vTaskDelay(1000);
         goto lwip_start;
     }
+	
+	printf("Connection succeeded.\r\n");
 		
 		vTaskResume(find_task_node_by_name("data_sum")->taskHandle);
     

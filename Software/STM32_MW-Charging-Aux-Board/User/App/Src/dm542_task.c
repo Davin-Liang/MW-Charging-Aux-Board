@@ -39,9 +39,9 @@ static void dm542_Task(void * param)
           {
             if (findOptCmd.whichThaj == SQU_TRAJ)
             {
-              for (float x = (-(findOptCmd.squThajLen*100)/2); x <= (findOptCmd.squThajLen*100)/2; x = x + findOptCmd.squThajStepLen)
+              for (float x = (-(findOptCmd.squThajLen)/2); x <= (findOptCmd.squThajLen)/2; x = x + findOptCmd.squThajStepLen)
               {
-                for (float y = (-(findOptCmd.squThajLen*100)/2); y <= (findOptCmd.squThajLen*100)/2; y = y + findOptCmd.squThajStepLen)
+                for (float y = (-(findOptCmd.squThajLen)/2); y <= (findOptCmd.squThajLen)/2; y = y + findOptCmd.squThajStepLen)
                 {
                     xSemaphoreTake(dm542_USART3_Mutex, portMAX_DELAY);
                     /* 每次移动位置执行一次寻优 */

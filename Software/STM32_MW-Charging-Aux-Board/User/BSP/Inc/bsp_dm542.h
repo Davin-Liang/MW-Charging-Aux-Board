@@ -37,7 +37,7 @@
 #define HOR_DM542_TIM                   TIM3
 
 #define HOR_DM542_DIR_GPIO_CLK          RCC_AHB1Periph_GPIOA
-#define HOR_DM542_DIR_PIN               GPIO_Pin_7
+#define HOR_DM542_DIR_PIN               GPIO_Pin_8
 #define HOR_DM542_DIR_GPIO_PORT         GPIOA
 
 #define HOR_DM542_SLAVE_TIMER_CLK 	    RCC_APB1Periph_TIM2

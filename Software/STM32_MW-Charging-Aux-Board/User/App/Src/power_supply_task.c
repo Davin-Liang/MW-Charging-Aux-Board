@@ -125,6 +125,7 @@ static void power_supply_task(void * param)
 				for (int i = 0; (i < 4) && (Seek_Max_Power_Flag == 1); i ++)
 				{
 					// while(currentVoltage < MAX_VAL)
+					printf("findOptCmd.maxVol = %f", findOptCmd.maxVol);
 					while (currentVoltage < findOptCmd.maxVol)
 					{
 						/* 发送电压 */
@@ -143,8 +144,8 @@ static void power_supply_task(void * param)
 								s_bestVoltages[i] = currentVoltage;
 								s_bestPowers[i] = currentPower;
 							}
-//							mutual_printf("channel=%d, P=%.3fW, V=%.2fV, Best(P,V)=(%.3f, %.2f)\r\n",
-//													i, currentPower, currentVoltage, s_bestPowers[i], s_bestVoltages[i]);	
+							mutual_printf("channel=%d, P=%.3fW, V=%.2fV, Best(P,V)=(%.3f, %.2f)\r\n",
+													i, currentPower, currentVoltage, s_bestPowers[i], s_bestVoltages[i]);	
 						}
 						
 						/* 未得到发送的电压对应的功率值 */
