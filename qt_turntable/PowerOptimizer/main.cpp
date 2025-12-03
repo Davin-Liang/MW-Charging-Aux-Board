@@ -7,7 +7,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     // 设置应用程序信息
-    QApplication::setApplicationName("电源优化控制器");
+    QApplication::setApplicationName("转台控制中心");
     QApplication::setApplicationVersion("1.0");
     QApplication::setOrganizationName("YourCompany");
 

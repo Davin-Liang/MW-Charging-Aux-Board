@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>663</width>
-    <height>553</height>
+    <width>750</width>
+    <height>620</height>
    </rect>
   </property>
   <property name="font">
@@ -23,9 +23,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>40</y>
-      <width>641</width>
-      <height>501</height>
+      <y>30</y>
+      <width>731</width>
+      <height>571</height>
      </rect>
     </property>
     <property name="font">
@@ -35,7 +35,7 @@
      </font>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>4</number>
     </property>
     <property name="iconSize">
      <size>
@@ -55,8 +55,8 @@
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>311</width>
-        <height>231</height>
+        <width>341</width>
+        <height>241</height>
        </rect>
       </property>
       <property name="font">
@@ -183,10 +183,10 @@
      <widget class="QGroupBox" name="turntable_connection">
       <property name="geometry">
        <rect>
-        <x>320</x>
+        <x>350</x>
         <y>10</y>
-        <width>311</width>
-        <height>231</height>
+        <width>361</width>
+        <height>241</height>
        </rect>
       </property>
       <property name="font">
@@ -372,9 +372,9 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>80</y>
-        <width>601</width>
-        <height>111</height>
+        <y>110</y>
+        <width>711</width>
+        <height>161</height>
        </rect>
       </property>
       <property name="font">
@@ -386,127 +386,107 @@
       <property name="title">
        <string>功率寻优指令设置</string>
       </property>
-      <widget class="QPushButton" name="pushButton_find_optimal">
-       <property name="geometry">
-        <rect>
-         <x>470</x>
-         <y>60</y>
-         <width>121</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>宋体</family>
-         <pointsize>12</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>发送寻优指令</string>
-       </property>
-      </widget>
-      <widget class="QWidget" name="layoutWidget">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>60</y>
-         <width>441</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_6">
-        <item>
-         <widget class="QLabel" name="label_11">
-          <property name="text">
-           <string>方形边长</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="lineEdit_square_step_2"/>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_8">
-          <property name="text">
-           <string>方形步长</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="lineEdit_square_step"/>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_7">
-          <property name="text">
-           <string>圆形半径</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="lineEdit_circle_radius"/>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="layoutWidget">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>20</y>
-         <width>581</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_5">
-        <item>
-         <widget class="QLabel" name="label_16">
-          <property name="text">
-           <string>轨迹设定</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="comboBox_traj_type"/>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_10">
-          <property name="text">
-           <string>最大电压</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="lineEdit_max_voltage"/>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_9">
-          <property name="text">
-           <string>电压步长</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="lineEdit_voltage_step"/>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_26">
-          <property name="text">
-           <string>初始电压</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="lineEdit_initial_voltage"/>
-        </item>
-       </layout>
-      </widget>
+      <layout class="QVBoxLayout" name="verticalLayout_14">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item>
+          <widget class="QLabel" name="label_16">
+           <property name="text">
+            <string>轨迹设定</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboBox_traj_type"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_10">
+           <property name="text">
+            <string>最大电压</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_max_voltage"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_9">
+           <property name="text">
+            <string>电压步长</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_voltage_step"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_26">
+           <property name="text">
+            <string>初始电压</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_initial_voltage"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <item>
+          <widget class="QLabel" name="label_11">
+           <property name="text">
+            <string>方形边长</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_square_step_2"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_8">
+           <property name="text">
+            <string>方形步长</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_square_step"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_7">
+           <property name="text">
+            <string>圆形半径</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_circle_radius"/>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_find_optimal">
+           <property name="font">
+            <font>
+             <family>宋体</family>
+             <pointsize>12</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>发送寻优指令</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
      </widget>
      <widget class="QGroupBox" name="groupBox">
       <property name="geometry">
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>601</width>
-        <height>61</height>
+        <width>711</width>
+        <height>101</height>
        </rect>
       </property>
       <property name="font">
@@ -518,166 +498,64 @@
       <property name="title">
        <string>电机控制指令设置</string>
       </property>
-      <widget class="QPushButton" name="pushButton_motor_control">
-       <property name="geometry">
-        <rect>
-         <x>470</x>
-         <y>20</y>
-         <width>121</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>宋体</family>
-         <pointsize>12</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>发送电机指令</string>
-       </property>
-      </widget>
-      <widget class="QWidget" name="layoutWidget">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>20</y>
-         <width>451</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_4">
-        <item>
-         <widget class="QLabel" name="label_13">
-          <property name="text">
-           <string>X坐标</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="lineEdit_motor_x"/>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_14">
-          <property name="text">
-           <string>Y坐标</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="lineEdit_motor_y"/>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_15">
-          <property name="text">
-           <string>速度</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="lineEdit_motor_speed"/>
-        </item>
-       </layout>
-      </widget>
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <item>
+        <widget class="QLabel" name="label_13">
+         <property name="text">
+          <string>X坐标</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEdit_motor_x"/>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_14">
+         <property name="text">
+          <string>Y坐标</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEdit_motor_y"/>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_15">
+         <property name="text">
+          <string>速度</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEdit_motor_speed"/>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_motor_control">
+         <property name="font">
+          <font>
+           <family>宋体</family>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>发送电机指令</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_4">
      <attribute name="title">
       <string>接收STM32数据</string>
      </attribute>
-     <widget class="QGroupBox" name="groupBox_5">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>10</y>
-        <width>171</width>
-        <height>171</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>宋体</family>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
-      <property name="title">
-       <string>电机当前状态读取</string>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_7">
-       <item>
-        <layout class="QVBoxLayout" name="verticalLayout_6">
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_12">
-           <item>
-            <widget class="QLabel" name="label_6">
-             <property name="font">
-              <font>
-               <family>宋体</family>
-               <pointsize>12</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>x坐标</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="lineEdit_read_motor_x"/>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_13">
-           <item>
-            <widget class="QLabel" name="label_12">
-             <property name="font">
-              <font>
-               <family>宋体</family>
-               <pointsize>12</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>y坐标</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="lineEdit_read_motor_y"/>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_19">
-           <item>
-            <widget class="QLabel" name="label_17">
-             <property name="font">
-              <font>
-               <family>宋体</family>
-               <pointsize>12</pointsize>
-               <bold>false</bold>
-              </font>
-             </property>
-             <property name="text">
-              <string>速度</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="lineEdit_read_motor_speed"/>
-           </item>
-          </layout>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </widget>
      <widget class="QGroupBox" name="groupBox_chart">
       <property name="geometry">
        <rect>
-        <x>180</x>
+        <x>240</x>
         <y>10</y>
-        <width>441</width>
-        <height>341</height>
+        <width>481</width>
+        <height>371</height>
        </rect>
       </property>
       <property name="font">
@@ -699,9 +577,9 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>360</y>
-        <width>611</width>
-        <height>111</height>
+        <y>380</y>
+        <width>711</width>
+        <height>121</height>
        </rect>
       </property>
       <property name="font">
@@ -808,31 +686,52 @@
        </item>
       </layout>
      </widget>
-     <widget class="QGroupBox" name="groupBox_7">
+     <widget class="QWidget" name="">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>180</y>
-        <width>171</width>
-        <height>171</height>
+        <x>11</x>
+        <y>11</y>
+        <width>221</width>
+        <height>371</height>
        </rect>
       </property>
-      <property name="font">
-       <font>
-        <family>宋体</family>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
-      <property name="title">
-       <string>寻优过程数据显示</string>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
+      <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout">
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <widget class="QGroupBox" name="groupBox_5">
+         <property name="font">
+          <font>
+           <family>宋体</family>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="title">
+          <string>电机当前状态读取</string>
+         </property>
+         <widget class="QWidget" name="">
+          <layout class="QHBoxLayout" name="horizontalLayout_19">
            <item>
-            <widget class="QLabel" name="label_18">
+            <widget class="QLabel" name="label_17">
+             <property name="font">
+              <font>
+               <family>宋体</family>
+               <pointsize>12</pointsize>
+               <bold>false</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>速度</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit_read_motor_speed"/>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="">
+          <layout class="QHBoxLayout" name="horizontalLayout_13">
+           <item>
+            <widget class="QLabel" name="label_12">
              <property name="font">
               <font>
                <family>宋体</family>
@@ -840,19 +739,27 @@
               </font>
              </property>
              <property name="text">
-              <string>当前通道</string>
+              <string>y坐标</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="lineEdit_read_currentchannel"/>
+            <widget class="QLineEdit" name="lineEdit_read_motor_y"/>
            </item>
           </layout>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_3">
+         </widget>
+         <widget class="QWidget" name="">
+          <property name="geometry">
+           <rect>
+            <x>12</x>
+            <y>28</y>
+            <width>181</width>
+            <height>31</height>
+           </rect>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_12">
            <item>
-            <widget class="QLabel" name="label_19">
+            <widget class="QLabel" name="label_6">
              <property name="font">
               <font>
                <family>宋体</family>
@@ -860,16 +767,29 @@
               </font>
              </property>
              <property name="text">
-              <string>当前电压</string>
+              <string>x坐标</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="lineEdit_read_currentvoltage"/>
+            <widget class="QLineEdit" name="lineEdit_read_motor_x"/>
            </item>
           </layout>
-         </item>
-         <item>
+         </widget>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_7">
+         <property name="font">
+          <font>
+           <family>宋体</family>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="title">
+          <string>寻优过程数据显示</string>
+         </property>
+         <widget class="QWidget" name="">
           <layout class="QHBoxLayout" name="horizontalLayout_14">
            <item>
             <widget class="QLabel" name="label_20">
@@ -888,8 +808,48 @@
             <widget class="QLineEdit" name="lineEdit_read_currentpower"/>
            </item>
           </layout>
-         </item>
-        </layout>
+         </widget>
+         <widget class="QWidget" name="">
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
+            <widget class="QLabel" name="label_19">
+             <property name="font">
+              <font>
+               <family>宋体</family>
+               <pointsize>12</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>当前电压</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit_read_currentvoltage"/>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="">
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <item>
+            <widget class="QLabel" name="label_18">
+             <property name="font">
+              <font>
+               <family>宋体</family>
+               <pointsize>12</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>当前通道</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit_read_currentchannel"/>
+           </item>
+          </layout>
+         </widget>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -903,8 +863,8 @@
        <rect>
         <x>22</x>
         <y>12</y>
-        <width>591</width>
-        <height>451</height>
+        <width>691</width>
+        <height>481</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -972,225 +932,211 @@
      <widget class="QGroupBox" name="group_box_turntable_shape">
       <property name="geometry">
        <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>251</width>
-        <height>171</height>
+        <x>1</x>
+        <y>1</y>
+        <width>301</width>
+        <height>221</height>
        </rect>
       </property>
       <property name="title">
        <string>转台型号</string>
       </property>
-      <widget class="QLabel" name="label_turntable_img">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>20</y>
-         <width>231</width>
-         <height>141</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="pixmap">
-        <pixmap resource="../../../qt_sever _1102(1)/qt_sever _1102/qt_sever _1102/PowerOptimizer/build/Desktop_Qt_6_9_2_MinGW_64_bit-Debug/debug/qmake_qmake_qm_files.qrc">:/i18n/PowerOptimizer_zh_CN.qm</pixmap>
-       </property>
-      </widget>
+      <layout class="QVBoxLayout" name="verticalLayout_7">
+       <item>
+        <widget class="QLabel" name="label_turntable_img">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="pixmap">
+          <pixmap>:/i18n/PowerOptimizer_zh_CN.qm</pixmap>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
      <widget class="QGroupBox" name="open_group_box_turntable_control">
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>170</y>
-        <width>251</width>
-        <height>301</height>
+        <y>220</y>
+        <width>301</width>
+        <height>321</height>
        </rect>
       </property>
       <property name="title">
        <string>开环测试</string>
       </property>
-      <widget class="QGroupBox" name="groupBox_4">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>170</y>
-         <width>231</width>
-         <height>131</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>宋体</family>
-         <pointsize>12</pointsize>
-        </font>
-       </property>
-       <property name="title">
-        <string/>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout_10">
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_20">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QGroupBox" name="groupBox_3">
+         <property name="font">
+          <font>
+           <family>宋体</family>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="title">
+          <string/>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_6">
           <item>
-           <widget class="QLabel" name="label_33">
-            <property name="font">
-             <font>
-              <family>宋体</family>
-              <pointsize>12</pointsize>
-             </font>
-            </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_11">
+            <item>
+             <widget class="QLabel" name="label_36">
+              <property name="text">
+               <string>X轴速度</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="line_edit_x_speed_cmd"/>
+            </item>
+            <item>
+             <widget class="QComboBox" name="combo_box_x_speed_cmd"/>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_18">
+            <item>
+             <widget class="QLabel" name="label_35">
+              <property name="text">
+               <string>Y轴速度</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="line_edit_y_speed_cmd"/>
+            </item>
+            <item>
+             <widget class="QComboBox" name="combo_box_y_speed_cmd"/>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_27">
+            <item>
+             <widget class="QPushButton" name="btn_stop_x_turntable_run">
+              <property name="text">
+               <string>x轴停止</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_stop_y_turntable_run">
+              <property name="text">
+               <string>y轴停止</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btn_set_speed">
             <property name="text">
-             <string>X轴位置</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="line_edit_x_pos"/>
-          </item>
-          <item>
-           <widget class="QPushButton" name="btn_set_x_pos">
-            <property name="text">
-             <string>位置设定</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_21">
-          <item>
-           <widget class="QLabel" name="label_34">
-            <property name="text">
-             <string>Y轴位置</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="line_edit_y_pos"/>
-          </item>
-          <item>
-           <widget class="QPushButton" name="btn_set_y_pos">
-            <property name="text">
-             <string>位置设定</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_28">
-          <item>
-           <widget class="QPushButton" name="btn_x_zero">
-            <property name="text">
-             <string>X轴清零</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="btn_y_zero">
-            <property name="text">
-             <string>Y轴清零</string>
+             <string>设定速度</string>
             </property>
            </widget>
           </item>
          </layout>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QGroupBox" name="groupBox_3">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>20</y>
-         <width>231</width>
-         <height>161</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>宋体</family>
-         <pointsize>12</pointsize>
-        </font>
-       </property>
-       <property name="title">
-        <string/>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout_8">
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_11">
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_4">
+         <property name="font">
+          <font>
+           <family>宋体</family>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="title">
+          <string/>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_10">
           <item>
-           <widget class="QLabel" name="label_36">
-            <property name="text">
-             <string>X轴速度</string>
-            </property>
-           </widget>
+           <layout class="QHBoxLayout" name="horizontalLayout_20">
+            <item>
+             <widget class="QLabel" name="label_33">
+              <property name="font">
+               <font>
+                <family>宋体</family>
+                <pointsize>12</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>X轴位置</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="line_edit_x_pos"/>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_set_x_pos">
+              <property name="text">
+               <string>位置设定</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
           <item>
-           <widget class="QLineEdit" name="line_edit_x_speed_cmd"/>
+           <layout class="QHBoxLayout" name="horizontalLayout_21">
+            <item>
+             <widget class="QLabel" name="label_34">
+              <property name="text">
+               <string>Y轴位置</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="line_edit_y_pos"/>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_set_y_pos">
+              <property name="text">
+               <string>位置设定</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
           <item>
-           <widget class="QComboBox" name="combo_box_x_speed_cmd"/>
+           <layout class="QHBoxLayout" name="horizontalLayout_28">
+            <item>
+             <widget class="QPushButton" name="btn_x_zero">
+              <property name="text">
+               <string>X轴清零</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_y_zero">
+              <property name="text">
+               <string>Y轴清零</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
          </layout>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_18">
-          <item>
-           <widget class="QLabel" name="label_35">
-            <property name="text">
-             <string>Y轴速度</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="line_edit_y_speed_cmd"/>
-          </item>
-          <item>
-           <widget class="QComboBox" name="combo_box_y_speed_cmd"/>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_27">
-          <item>
-           <widget class="QPushButton" name="btn_stop_x_turntable_run">
-            <property name="text">
-             <string>x轴停止</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="btn_stop_y_turntable_run">
-            <property name="text">
-             <string>y轴停止</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <widget class="QPushButton" name="btn_set_speed">
-          <property name="text">
-           <string>设定速度</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
+        </widget>
+       </item>
+      </layout>
      </widget>
      <widget class="QGroupBox" name="groupBox_8">
       <property name="geometry">
        <rect>
-        <x>260</x>
-        <y>160</y>
-        <width>361</width>
+        <x>300</x>
+        <y>130</y>
+        <width>421</width>
         <height>101</height>
        </rect>
       </property>
       <property name="title">
        <string>数据监控区域</string>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout_12">
+      <layout class="QVBoxLayout" name="verticalLayout_8">
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_25">
          <item>
@@ -1244,10 +1190,10 @@
      <widget class="QGroupBox" name="groupBox_9">
       <property name="geometry">
        <rect>
-        <x>260</x>
-        <y>10</y>
-        <width>361</width>
-        <height>151</height>
+        <x>301</x>
+        <y>1</y>
+        <width>421</width>
+        <height>131</height>
        </rect>
       </property>
       <property name="title">
@@ -1312,7 +1258,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="label_41">
+          <widget class="QLabel" name="control_status">
            <property name="text">
             <string>未进入闭环测试</string>
            </property>
@@ -1322,25 +1268,134 @@
        </item>
       </layout>
      </widget>
+     <widget class="QGroupBox" name="groupBox_10">
+      <property name="geometry">
+       <rect>
+        <x>300</x>
+        <y>230</y>
+        <width>421</width>
+        <height>101</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>控制算法及参数设定</string>
+      </property>
+      <widget class="QComboBox" name="combo_box_controller_selection">
+       <property name="geometry">
+        <rect>
+         <x>110</x>
+         <y>30</y>
+         <width>121</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_45">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>101</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>控制算法设置</string>
+       </property>
+      </widget>
+      <widget class="QWidget" name="">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>60</y>
+         <width>411</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_38">
+        <item>
+         <widget class="QLabel" name="label_46">
+          <property name="text">
+           <string>KP</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="line_edit_kp_parameter"/>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_47">
+          <property name="text">
+           <string>KI</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="line_edit_ki_parameter"/>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_48">
+          <property name="text">
+           <string>KD</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="line_edit_kd_parameter"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btn_set_pidcontroller_parameter">
+          <property name="text">
+           <string>参数设定</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_chart_2">
+      <property name="geometry">
+       <rect>
+        <x>310</x>
+        <y>330</y>
+        <width>421</width>
+        <height>211</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>宋体</family>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="title">
+       <string>转台位置轨迹图</string>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_12">
+       <item>
+        <widget class="QWidget" name="turntable_position_chart" native="true"/>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </widget>
    <widget class="QLabel" name="label_39">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>0</y>
-      <width>591</width>
-      <height>31</height>
+      <x>10</x>
+      <y>10</y>
+      <width>161</width>
+      <height>21</height>
      </rect>
     </property>
     <property name="font">
      <font>
       <family>Times New Roman</family>
-      <pointsize>22</pointsize>
+      <pointsize>16</pointsize>
      </font>
     </property>
     <property name="text">
-     <string>MY   WEB</string>
+     <string>转台控制中心</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -1348,8 +1403,6 @@
    </widget>
   </widget>
  </widget>
- <resources>
-  <include location="../../../qt_sever _1102(1)/qt_sever _1102/qt_sever _1102/PowerOptimizer/build/Desktop_Qt_6_9_2_MinGW_64_bit-Debug/debug/qmake_qmake_qm_files.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

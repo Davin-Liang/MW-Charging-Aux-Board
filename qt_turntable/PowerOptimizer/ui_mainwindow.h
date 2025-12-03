@@ -212,7 +212,7 @@ public:
     QComboBox *combo_box_y_track_ref;
     QHBoxLayout *horizontalLayout_24;
     QPushButton *btn_set_target_pos;
-    QLabel *label_41;
+    QLabel *control_status;
     QLabel *label_39;
 
     void setupUi(QMainWindow *MainWindow)
@@ -1099,10 +1099,10 @@ public:
 
         horizontalLayout_24->addWidget(btn_set_target_pos);
 
-        label_41 = new QLabel(groupBox_9);
-        label_41->setObjectName(QString::fromUtf8("label_41"));
+        control_status = new QLabel(groupBox_9);
+        control_status->setObjectName(QString::fromUtf8("label_41"));
 
-        horizontalLayout_24->addWidget(label_41);
+        horizontalLayout_24->addWidget(control_status);
 
 
         verticalLayout_11->addLayout(horizontalLayout_24);
@@ -1209,7 +1209,7 @@ public:
         label_30->setText(QCoreApplication::translate("MainWindow", "Y\350\275\264\344\275\215\347\275\256", nullptr));
         label_32->setText(QCoreApplication::translate("MainWindow", "\345\217\202\350\200\203\350\275\250\350\277\271", nullptr));
         btn_set_target_pos->setText(QCoreApplication::translate("MainWindow", "\350\256\276\345\256\232\347\233\256\346\240\207\344\275\215\347\275\256", nullptr));
-        label_41->setText(QCoreApplication::translate("MainWindow", "\346\234\252\350\277\233\345\205\245\351\227\255\347\216\257\346\265\213\350\257\225", nullptr));
+        control_status->setText(QCoreApplication::translate("MainWindow", "\346\234\252\350\277\233\345\205\245\351\227\255\347\216\257\346\265\213\350\257\225", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tab), QCoreApplication::translate("MainWindow", "\345\244\251\347\272\277\350\275\254\345\217\260\346\216\247\345\210\266", nullptr));
         label_39->setText(QCoreApplication::translate("MainWindow", "MY   WEB", nullptr));
     } // retranslateUi

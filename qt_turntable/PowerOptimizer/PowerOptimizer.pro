@@ -11,6 +11,7 @@ INCLUDEPATH += /usr/include/modbus
 # 链接libmodbus库
 LIBS += -lmodbus
 SOURCES += \
+    PIDController.cpp \
     command_transmitter.cpp \
     turntable_controller.cpp\
     logindialog.cpp \
@@ -18,6 +19,7 @@ SOURCES += \
     mainwindow.cpp
 
 HEADERS += \
+    PIDController.h \
     command_struct.h \
     command_transmitter.h \
     turntable_controller.h\

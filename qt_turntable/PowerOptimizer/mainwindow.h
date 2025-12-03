@@ -17,7 +17,7 @@
 #include <QPixmap>
 #include <QTimer>
 #include "turntable_controller.h"
-
+#include "PIDController.h"
 
 QT_USE_NAMESPACE  // 使用Qt Charts命名空间
 
@@ -39,9 +39,9 @@ private slots:
     void on_pushButton_connect_clicked();      // 连接按钮点击
     void on_pushButton_disconnect_clicked();   // 断开按钮点击
 
-    void onSocketConnected();                  // 连接成功
-    void onSocketDisconnected();               // 连接断开
-    void onSocketReadyRead();                  // 数据接收
+    // void onSocketConnected();                  // 连接成功
+    // void onSocketDisconnected();               // 连接断开
+    // void onSocketReadyRead();                  // 数据接收
     void onSocketError(QAbstractSocket::SocketError error); // 连接错误
 
     // 新增的按钮槽函数
@@ -49,12 +49,7 @@ private slots:
     void on_pushButton_find_optimal_clicked();     // 寻优控制
 
 
-
-    // void on_textEdit_message_copyAvailable(bool b);
-    // void on_textEdit_sd_data_copyAvailable(bool b);
-
     void initializeUIWithConfig();
-    // void on_traj_type_changed(int index);
     void trajTypeChanged(int index);
 
 
@@ -80,11 +75,16 @@ private slots:
     void on_btn_x_zero_clicked();
     void on_btn_y_zero_clicked();
 
-    // 转台连接相关
+    // 转台控制相关
     void on_pushButton_connection_clicked();    // 连接转台
     void on_pushButton_disconnection_clicked(); // 断开转台
     void updateTurntableData();                 // 定时刷新转台数据
 
+    void on_btn_set_target_pos_clicked();              // 设置参考位置
+    void on_btn_set_pidcontroller_parameter_clicked(); // 设置PID参数并启动控制
+    void controlLoop();                                // 控制循环（闭环控制）
+
+    void on_controller_selection_changed(int index);//转台控制选择
 
 private:
     Ui::MainWindow *ui;
@@ -95,7 +95,9 @@ private:
 
     CommandTransmitter *commandTransmitter;
     QTimer *turntableMonitorTimer;             // 定时器用于数据监控
+    QTimer *closedLoopTimer;
     TurntableController *turntable_controller; // 转台控制对象
+
 
     // 图表相关成员变量
     QChart *motorChart;
@@ -105,6 +107,7 @@ private:
     QValueAxis *axisY;
     QChartView *chartView;
     QVector<QPointF> positionHistory;          // 历史轨迹数据
+
 
     // 文件读取相关变量
     QString m_currentSelectedFile;             // 当前选中的文件路径
@@ -129,6 +132,14 @@ private:
     void displayFileContent(const QString &filePath); // 显示文件内容（表格形式）
     void setupTableWidget();                   // 初始化表格控件
     void loadCsvToTable(const QString &filePath); // 加载CSV到表格
+
+
+    //转台PID控制器参数
+    PIDController *pid_x;
+    PIDController *pid_y;
+
+
 };
+
 
 #endif // MAINWINDOW_H
