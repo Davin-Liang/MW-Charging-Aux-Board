@@ -1280,7 +1280,7 @@
       <property name="title">
        <string>控制算法及参数设定</string>
       </property>
-      <widget class="QComboBox" name="combo_box_controller_selection">
+      <widget class="QComboBox" name="controller_selection">
        <property name="geometry">
         <rect>
          <x>110</x>

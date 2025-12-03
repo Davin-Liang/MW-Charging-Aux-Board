@@ -17,7 +17,7 @@
 #include <QPixmap>
 #include <QTimer>
 #include "turntable_controller.h"
-#include "PIDController.h"
+#include "PID_Controller.h"
 
 QT_USE_NAMESPACE  // 使用Qt Charts命名空间
 
@@ -79,12 +79,14 @@ private slots:
     void on_pushButton_connection_clicked();    // 连接转台
     void on_pushButton_disconnection_clicked(); // 断开转台
     void updateTurntableData();                 // 定时刷新转台数据
+    
 
     void on_btn_set_target_pos_clicked();              // 设置参考位置
     void on_btn_set_pidcontroller_parameter_clicked(); // 设置PID参数并启动控制
-    void controlLoop();                                // 控制循环（闭环控制）
+    void closedLoopTick();        // 定时执行 PID.controlLoop()
 
     void on_controller_selection_changed(int index);//转台控制选择
+
 
 private:
     Ui::MainWindow *ui;
@@ -96,8 +98,12 @@ private:
     CommandTransmitter *commandTransmitter;
     QTimer *turntableMonitorTimer;             // 定时器用于数据监控
     QTimer *closedLoopTimer;
-    TurntableController *turntable_controller; // 转台控制对象
 
+    TurntableController *turntable_controller; // 转台控制对象
+    PIDController *pid_x;  //转台PID控制器参数
+    PIDController *pid_y;
+    double target_x;
+    double target_y;
 
     // 图表相关成员变量
     QChart *motorChart;
@@ -134,9 +140,7 @@ private:
     void loadCsvToTable(const QString &filePath); // 加载CSV到表格
 
 
-    //转台PID控制器参数
-    PIDController *pid_x;
-    PIDController *pid_y;
+
 
 
 };

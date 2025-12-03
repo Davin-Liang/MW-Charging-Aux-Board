@@ -66,11 +66,16 @@ MainWindow::MainWindow(QWidget *parent)
                 QString filePath = item->data(Qt::UserRole).toString();
                 displayFileContent(filePath);
             });
-    connect(ui->combo_box_controller_selection,
-            &QComboBox::currentIndexChanged,
-            this,
-            &MainWindow::on_controller_selection_changed);
+    connect(ui->btn_set_target_pos, &QPushButton::clicked, this, &MainWindow::on_btn_set_target_pos_clicked);
+    connect(ui->btn_set_pidcontroller_parameter, &QPushButton::clicked, this, &MainWindow::on_btn_set_pidcontroller_parameter_clicked);
+    connect(ui->controller_selection,
+        QOverload<int>::of(&QComboBox::currentIndexChanged),
+        this,
+        &MainWindow::on_controller_selection_changed);
 
+    //连接转台
+    connect(ui->pushButton_connection, &QPushButton::clicked, this, &MainWindow::on_pushButton_connection_clicked);
+    connect(ui->pushButton_disconnection, &QPushButton::clicked, this, &MainWindow::on_pushButton_disconnection_clicked);    
     update_turntable_image();
 
     turntableMonitorTimer = new QTimer(this);
@@ -110,12 +115,12 @@ MainWindow::MainWindow(QWidget *parent)
     pid_y = new PIDController(Pitch, turntable_controller);
 
     closedLoopTimer = new QTimer(this);
-    connect(closedLoopTimer, &QTimer::timeout, this, &MainWindow::updateClosedLoopControl);
+    connect(closedLoopTimer, &QTimer::timeout, this, &MainWindow::closedLoopTick);
 
 
     //转台控制器选择设置
-    ui->combo_box_controller_selection->addItem("PID 控制器");
-    ui->combo_box_controller_selection->setCurrentIndex(0);
+    ui->controller_selection->addItem("PID 控制器");
+    ui->controller_selection->setCurrentIndex(0);
 
     ui->combo_box_x_speed_cmd->addItem("正转");
     ui->combo_box_x_speed_cmd->addItem("反转");
@@ -124,6 +129,12 @@ MainWindow::MainWindow(QWidget *parent)
     ui->combo_box_y_speed_cmd->addItem("正转");
     ui->combo_box_y_speed_cmd->addItem("反转");
     ui->combo_box_y_speed_cmd->setCurrentIndex(0);
+
+    //需要改进的单位：QFormLayout
+    // ui->monitorForm->addRow("X 角度 (°):", ui->line_edit_monitor_x_pos);
+    // ui->monitorForm->addRow("Y 角度 (°):", ui->line_edit_monitor_y_pos);
+    // ui->monitorForm->addRow("X 速度 (°/s):", ui->line_edit_monitor_x_speed);
+    // ui->monitorForm->addRow("Y 速度 (°/s):", ui->line_edit_monitor_y_speed);
 
 
 
@@ -142,7 +153,7 @@ void MainWindow::setupCommandTransmitter()
 // 初始化转台图片显示
 void MainWindow::update_turntable_image()
 {
-    QString imgPath = "./image/turntable.png";  /
+    QString imgPath = "./image/turntable.png";  
     QPixmap pix(imgPath);
 
     if (!pix.isNull()) {
@@ -450,6 +461,8 @@ MainWindow::~MainWindow()
         delete chartView;
     }
     delete ui;
+    delete pid_x;
+    delete pid_y;
 }
 
 // 电机控制按钮点击事件
@@ -1185,28 +1198,26 @@ void MainWindow::updateTurntableData()
 
     float xPos = 0.0f, yPos = 0.0f, xSpeed = 0.0f, ySpeed = 0.0f;
 
-    bool ok1 = turntable_controller->read_axis_angle(Yaw, &xPos);
-    bool ok2 = turntable_controller->read_axis_angle(Pitch, &yPos);
-    bool ok3 = turntable_controller->read_axis_speed(Yaw, &xSpeed);
-    bool ok4 = turntable_controller->read_axis_speed(Pitch, &ySpeed);
+//    bool ok1 = turntable_controller->read_axis_angle(Yaw, &xPos);
+//    bool ok2 = turntable_controller->read_axis_angle(Pitch, &yPos);
+//    bool ok3 = turntable_controller->read_axis_speed(Yaw, &xSpeed);
+//    bool ok4 = turntable_controller->read_axis_speed(Pitch, &ySpeed);
 
-    if (ok1 && ok2 && ok3 && ok4) {
-         ui->line_edit_monitor_x_pos->setText(QString::number(xPos, 'f', 2));
-         ui->line_edit_monitor_y_pos->setText(QString::number(yPos, 'f', 2));
-         ui->line_edit_monitor_x_speed->setText(QString::number(xSpeed, 'f', 2));
-         ui->line_edit_monitor_y_speed->setText(QString::number(ySpeed, 'f', 2));
-     }
+//    if (ok1 && ok2 && ok3 && ok4) {
+//         ui->line_edit_monitor_x_pos->setText(QString::number(xPos, 'f', 2));
+//         ui->line_edit_monitor_y_pos->setText(QString::number(yPos, 'f', 2));
+//         ui->line_edit_monitor_x_speed->setText(QString::number(xSpeed, 'f', 2));
+//         ui->line_edit_monitor_y_speed->setText(QString::number(ySpeed, 'f', 2));
+//     }
 }
 //可以增加多种控制器
 void MainWindow::on_controller_selection_changed(int index)
 {
-    QString selected = ui->combo_box_controller_selection->currentText();
+    QString selected = ui->controller_selection->currentText();
 
     if (selected == "PID 控制器") {
-        ui->groupBox_pid_param->setEnabled(true);
-    }
-    else {
-        ui->groupBox_pid_param->setEnabled(false);
+        ui->control_status->setText("已选择PID控制算法");
+        ui->control_status->setStyleSheet("color: green;");
     }
 }
 
@@ -1223,37 +1234,47 @@ void MainWindow::on_btn_set_target_pos_clicked()
 //设置 PID 参数并开启闭环
 void MainWindow::on_btn_set_pidcontroller_parameter_clicked()
 {
-    if (ui->combo_box_controller_selection->currentText() != "PID 控制器") {
+    if (ui->controller_selection->currentText() != "PID 控制器") {
         QMessageBox::warning(this, "错误", "请选择 PID 控制器");
         return;
     }
 
-    double kp = ui->line_edit_kp_parameter->text().toDouble();
-    double ki = ui->line_edit_ki_parameter->text().toDouble();
-    double kd = ui->line_edit_kd_parameter->text().toDouble();
-    pid_x->setParameters(kp, ki, kd);
-    pid_y->setParameters(kp, ki, kd);
+    PIDController::Gains g;
+    g.kp = ui->line_edit_kp_parameter->text().toDouble();
+    g.ki = ui->line_edit_ki_parameter->text().toDouble();
+    g.kd = ui->line_edit_kd_parameter->text().toDouble();
+    pid_x->setGains(g);
+    pid_y->setGains(g);
+
+    pid_x->reset();
+    pid_y->reset();
+
 
     QMessageBox::information(this, "PID 启动", "PID 参数已设置，闭环控制开始");
     ui->control_status->setText("闭环控制：开启");
     ui->control_status->setStyleSheet("color: green;");
+
+    pid_x->setController(turntable_controller);
+    pid_y->setController(turntable_controller);
+     // 启动闭环控制计时器（50ms 周期）
+     closedLoopTimer->start(50);
+
+     QMessageBox::information(this, "PID 启动", "PID 参数已设置，闭环控制开始");
     closedLoopTimer->start(50);
+
 }
-void MainWindow::updateClosedLoopControl()
+void MainWindow::closedLoopTick()
 {
     if (!turntable_controller) return;
 
-    float x, y;
-    turntable_controller->read_axis_angle(Yaw, &x);
-    turntable_controller->read_axis_angle(Pitch, &y);
+    // X 轴 PID 控制
+    bool doneX = pid_x->controlLoop(target_x, 0.01, 0.05);
+    bool doneY = pid_y->controlLoop(target_y, 0.01, 0.05);
 
-    bool done_x = pid_x->controlLoop(target_x, x);
-    bool done_y = pid_y->controlLoop(target_y, y);
-
-    if (done_x && done_y)
-    {
+    if (doneX && doneY) {
         closedLoopTimer->stop();
         ui->control_status->setText("闭环控制：完成");
         ui->control_status->setStyleSheet("color: blue;");
+        QMessageBox::information(this, "完成", "转台已到达目标点（误差 ≤ 0.01）");
     }
 }
