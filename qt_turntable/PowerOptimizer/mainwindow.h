@@ -108,8 +108,6 @@ private:
     PIDController *pid_y;
     double target_x;
     double target_y;
-    QtCharts::QChart *turntableChart;
-    QtCharts::QChartView *turntableChartView;
 
     // 电机位置显示图表相关成员变量
     QChart *motorChart;
@@ -122,10 +120,13 @@ private:
 
     //转台位置显示图表相关成员变量
 
+    QtCharts::QChart *turntableChart;
+    QtCharts::QChartView *turntableChartView;
     QtCharts::QLineSeries *series_target_x;
     QtCharts::QLineSeries *series_target_y;
     QtCharts::QLineSeries *series_current_x;
     QtCharts::QLineSeries *series_current_y;
+    
     double chart_time = 0.0;   // 曲线横轴时间
 
     // 文件读取相关变量
@@ -153,7 +154,7 @@ private:
     void loadCsvToTable(const QString &filePath); // 加载CSV到表格
 
     //初始化转台的图
-    void initializeTurntablePositionChart()
+    void initializeTurntablePositionChart();
 
 
 

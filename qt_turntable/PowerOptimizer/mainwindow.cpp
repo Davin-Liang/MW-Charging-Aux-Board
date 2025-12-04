@@ -19,6 +19,12 @@ MainWindow::MainWindow(QWidget *parent)
     , axisY(nullptr)
     , chartView(nullptr)
     , turntable_controller(nullptr)
+    , turntableChart(nullptr)
+    , turntableChartView(nullptr)
+    , series_target_x(nullptr)
+    , series_target_y(nullptr)
+    , series_current_x(nullptr)
+    , series_current_y(nullptr)
 {
     ui->setupUi(this);
 
@@ -1059,69 +1065,8 @@ void MainWindow::on_pushButton_read_file_clicked()
     qDebug() << "查看文件内容：" << m_currentSelectedFile;
     displayFileContent(m_currentSelectedFile);
 }
-
+bool connected=false;
 /**********************转台开环测试部分*****************************/
-//按钮：btn_set_speed
-void MainWindow::on_btn_set_speed_clicked()
-{
-    // ---- 1. 读取 UI 输入 ----
-    float x_speed = ui->line_edit_x_speed_cmd->text().toFloat();
-    float y_speed = ui->line_edit_y_speed_cmd->text().toFloat();
-
-    QString x_dir = ui->combo_box_x_speed_cmd->currentText();
-    QString y_dir = ui->combo_box_y_speed_cmd->currentText();
-
-    // ---- 2. 设置 X 轴速度 ----
-    turntable_controller->set_axis_speed(Yaw, x_speed);
-
-    // ----  设置 X 轴方向 ----
-    if (x_dir == "正转")
-    turntable_controller->set_manual_rotation(Yaw, Left);
-    else
-        turntable_controller->set_manual_rotation(Yaw, Right);
-
-    // ---- 3. 设置 Y 轴速度 ----
-    turntable_controller->set_axis_speed(Pitch, y_speed);
-
-    // ---- 设置 Y 轴方向  ----
-    if (y_dir == "正转")
-        turntable_controller->set_manual_rotation(Pitch, Left);
-    else
-        turntable_controller->set_manual_rotation(Pitch, Right);
-}
-//停止 X：
-void MainWindow::on_btn_stop_x_turntable_run_clicked()
-{
-    turntable_controller->stop_manual_rotation(Yaw);
-}
-//停止 Y：
-void MainWindow::on_btn_stop_y_turntable_run_clicked()
-{
-    turntable_controller->stop_manual_rotation(Pitch);
-}
-//设置 X 轴位置
-void MainWindow::on_btn_set_x_pos_clicked()
-{
-    float x_pos = ui->line_edit_x_pos->text().toFloat();
-    turntable_controller->set_axis_angle(Yaw, x_pos);
-}
-//设置 Y 轴位置
-void MainWindow::on_btn_set_y_pos_clicked()
-{
-    float y_pos = ui->line_edit_y_pos->text().toFloat();
-    turntable_controller->set_axis_angle(Pitch, y_pos);
-}
-//x坐标清零功能
-void MainWindow::on_btn_x_zero_clicked()
-{
-    turntable_controller->reset_axis_coord(Yaw);
-}
-//y坐标清零功能
-void MainWindow::on_btn_y_zero_clicked()
-{
-    turntable_controller->reset_axis_coord(Pitch);
-}
-
 //连接转台按钮的槽函数
 void MainWindow::on_pushButton_connection_clicked()
 {
@@ -1147,10 +1092,12 @@ void MainWindow::on_pushButton_connection_clicked()
     // 尝试连接
     bool ok = turntable_controller->connect(baudrate, parity, dataBit, stopBit);
     if (ok) {
+        connected=true;
         setTurntableConnectionStatus(true);
         turntableMonitorTimer->start(200); // 每200ms刷新数据
         QMessageBox::information(this, "成功", "转台连接成功");
     } else {
+        connected=false;
         setTurntableConnectionStatus(false);
         QMessageBox::critical(this, "失败", "转台连接失败");
         // 连接失败，清理对象
@@ -1190,9 +1137,89 @@ void MainWindow::setTurntableConnectionStatus(bool connected)
         ui->pushButton_disconnection->setEnabled(false);
     }
 }
+//按钮：btn_set_speed
+void MainWindow::on_btn_set_speed_clicked()
+{
+    if (connected){
+    // ---- 1. 读取 UI 输入 ----
+    float x_speed = ui->line_edit_x_speed_cmd->text().toFloat();
+    float y_speed = ui->line_edit_y_speed_cmd->text().toFloat();
+
+    QString x_dir = ui->combo_box_x_speed_cmd->currentText();
+    QString y_dir = ui->combo_box_y_speed_cmd->currentText();
+
+    // ---- 2. 设置 X 轴速度 ----
+    turntable_controller->set_axis_speed(Yaw, x_speed);
+
+    // ----  设置 X 轴方向 ----
+    if (x_dir == "正转")
+    turntable_controller->set_manual_rotation(Yaw, Left);
+    else
+        turntable_controller->set_manual_rotation(Yaw, Right);
+
+    // ---- 3. 设置 Y 轴速度 ----
+    turntable_controller->set_axis_speed(Pitch, y_speed);
+
+    // ---- 设置 Y 轴方向  ----
+    if (y_dir == "正转")
+        turntable_controller->set_manual_rotation(Pitch, Left);
+    else
+        turntable_controller->set_manual_rotation(Pitch, Right);
+    }
+   
+}
+//停止 X：
+void MainWindow::on_btn_stop_x_turntable_run_clicked()
+{
+    if(connected){
+    turntable_controller->stop_manual_rotation(Yaw);
+}
+}
+//停止 Y：
+void MainWindow::on_btn_stop_y_turntable_run_clicked()
+{
+    if(connected){
+    turntable_controller->stop_manual_rotation(Pitch);
+}
+}
+//设置 X 轴位置
+void MainWindow::on_btn_set_x_pos_clicked()
+{
+    std::cout<<"connected:"<<connected<<std::endl;
+    if(connected){
+    float x_pos = ui->line_edit_x_pos->text().toFloat();
+    turntable_controller->set_axis_angle(Yaw, x_pos);
+}else{
+    QMessageBox::information(this, "提示","NO");
+}
+}
+//设置 Y 轴位置
+void MainWindow::on_btn_set_y_pos_clicked()
+{
+    if(connected){
+    float y_pos = ui->line_edit_y_pos->text().toFloat();
+    turntable_controller->set_axis_angle(Pitch, y_pos);
+}
+}
+//x坐标清零功能
+void MainWindow::on_btn_x_zero_clicked()
+{
+    if(connected){
+    turntable_controller->reset_axis_coord(Yaw);
+}
+}
+//y坐标清零功能
+void MainWindow::on_btn_y_zero_clicked()
+{
+    if(connected){
+    turntable_controller->reset_axis_coord(Pitch);
+}
+}
+
 //更新转台状态显示函数
 void MainWindow::updateTurntableData()
 {
+    
     if (!turntable_controller) return;
 
     float xPos = 0.0f, yPos = 0.0f, xSpeed = 0.0f, ySpeed = 0.0f;
@@ -1223,22 +1250,25 @@ void MainWindow::updateTurntableData()
    if (chart_time > 10.0) {
        turntableChart->axisX()->setRange(chart_time - 10.0, chart_time);
    }
-
+    
 }
 //可以增加多种控制器
 void MainWindow::on_controller_selection_changed(int index)
 {
+    
     QString selected = ui->controller_selection->currentText();
 
     if (selected == "PID 控制器") {
         ui->control_status->setText("已选择PID控制算法");
         ui->control_status->setStyleSheet("color: green;");
     }
+
 }
 
 //参考点设置按钮
 void MainWindow::on_btn_set_target_pos_clicked()
 {
+    if(connected){
     target_x = ui->line_edit_x_pos_ref->text().toDouble();
     target_y = ui->line_edit_y_pos_ref->text().toDouble();
 
@@ -1246,9 +1276,11 @@ void MainWindow::on_btn_set_target_pos_clicked()
                              QString("已设置参考坐标：X=%1, Y=%2")
                                  .arg(target_x).arg(target_y));
 }
+}
 //设置 PID 参数并开启闭环
 void MainWindow::on_btn_set_pidcontroller_parameter_clicked()
 {
+    if(connected){
     if (ui->controller_selection->currentText() != "PID 控制器") {
         QMessageBox::warning(this, "错误", "请选择 PID 控制器");
         return;
@@ -1276,10 +1308,11 @@ void MainWindow::on_btn_set_pidcontroller_parameter_clicked()
 
      QMessageBox::information(this, "PID 启动", "PID 参数已设置，闭环控制开始");
     closedLoopTimer->start(50);
-
+}
 }
 void MainWindow::closedLoopTick()
 {
+   
     if (!turntable_controller) return;
 
     // X 轴 PID 控制
@@ -1293,58 +1326,62 @@ void MainWindow::closedLoopTick()
         QMessageBox::information(this, "完成", "转台已到达目标点（误差 ≤ 0.01）");
     }
 }
+
 void MainWindow::initializeTurntablePositionChart()
 {
-    turntableChart = new QChart();
-    turntableChart->setTitle("转台实时位置跟踪");
 
-    // 创建四条曲线
-    series_target_x = new QLineSeries();
-    series_target_y = new QLineSeries();
-    series_current_x = new QLineSeries();
-    series_current_y = new QLineSeries();
+        turntableChart = new QChart();
+        turntableChart->setTitle("转台实时位置跟踪");
+    
+        // 创建四条曲线
+        series_target_x = new QLineSeries();
+        series_target_y = new QLineSeries();
+        series_current_x = new QLineSeries();
+        series_current_y = new QLineSeries();
+    
+        series_target_x->setName("target_x");
+        series_target_y->setName("target_y");
+        series_current_x->setName("current_x");
+        series_current_y->setName("current_y");
+    
+        turntableChart->addSeries(series_target_x);
+        turntableChart->addSeries(series_target_y);
+        turntableChart->addSeries(series_current_x);
+        turntableChart->addSeries(series_current_y);
+    
+        // 坐标轴
+        QValueAxis *axisX = new QValueAxis();
+        QValueAxis *axisY = new QValueAxis();
+    
+        axisX->setTitleText("时间 (s)");
+        axisY->setTitleText("角度 (°)");
+    
+        axisX->setRange(0, 10);  // 显示最近 10 秒
+        axisY->setRange(-180, 180);
+    
+        turntableChart->addAxis(axisX, Qt::AlignBottom);
+        turntableChart->addAxis(axisY, Qt::AlignLeft);
+    
+        // 绑定轴
+        series_target_x->attachAxis(axisX);
+        series_target_x->attachAxis(axisY);
+    
+        series_target_y->attachAxis(axisX);
+        series_target_y->attachAxis(axisY);
+    
+        series_current_x->attachAxis(axisX);
+        series_current_x->attachAxis(axisY);
+    
+        series_current_y->attachAxis(axisX);
+        series_current_y->attachAxis(axisY);
+    
+        // ChartView 放入 UI
+        turntableChartView = new QChartView(turntableChart);
+        turntableChartView->setRenderHint(QPainter::Antialiasing);
+    
+        // 将 turntable_position_chart（QWidget）替换为 ChartView
+        QVBoxLayout *layout = new QVBoxLayout(ui->turntable_position_chart);
+        layout->addWidget(turntableChartView);
+    
 
-    series_target_x->setName("target_x");
-    series_target_y->setName("target_y");
-    series_current_x->setName("current_x");
-    series_current_y->setName("current_y");
-
-    turntableChart->addSeries(series_target_x);
-    turntableChart->addSeries(series_target_y);
-    turntableChart->addSeries(series_current_x);
-    turntableChart->addSeries(series_current_y);
-
-    // 坐标轴
-    QValueAxis *axisX = new QValueAxis();
-    QValueAxis *axisY = new QValueAxis();
-
-    axisX->setTitleText("时间 (s)");
-    axisY->setTitleText("角度 (°)");
-
-    axisX->setRange(0, 10);  // 显示最近 10 秒
-    axisY->setRange(-180, 180);
-
-    turntableChart->addAxis(axisX, Qt::AlignBottom);
-    turntableChart->addAxis(axisY, Qt::AlignLeft);
-
-    // 绑定轴
-    series_target_x->attachAxis(axisX);
-    series_target_x->attachAxis(axisY);
-
-    series_target_y->attachAxis(axisX);
-    series_target_y->attachAxis(axisY);
-
-    series_current_x->attachAxis(axisX);
-    series_current_x->attachAxis(axisY);
-
-    series_current_y->attachAxis(axisX);
-    series_current_y->attachAxis(axisY);
-
-    // ChartView 放入 UI
-    turntableChartView = new QChartView(turntableChart);
-    turntableChartView->setRenderHint(QPainter::Antialiasing);
-
-    // 将 turntable_position_chart（QWidget）替换为 ChartView
-    QVBoxLayout *layout = new QVBoxLayout(ui->turntable_position_chart);
-    layout->addWidget(turntableChartView);
 }

@@ -231,7 +231,6 @@ public:
     QPushButton *btn_set_pidcontroller_parameter;
     QGroupBox *groupBox_chart_2;
     QVBoxLayout *verticalLayout_12;
-    QWidget *turntable_position_chart;
     QLabel *label_39;
 
     void setupUi(QMainWindow *MainWindow)

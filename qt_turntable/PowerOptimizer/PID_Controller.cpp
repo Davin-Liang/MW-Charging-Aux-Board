@@ -67,12 +67,12 @@ bool PIDController::controlLoop(double target, double threshold, double controlP
         double u = gains_.kp * error + gains_.ki * state_.integral + gains_.kd * derivative;
 
         // 限制输出幅度（避免发送过大速度）
-        const double maxSpeed = 50.0; // deg/s，演示值
+        const double maxSpeed = 15.0; // deg/s，演示值
         if (u > maxSpeed) u = maxSpeed;
         if (u < -maxSpeed) u = -maxSpeed;
 
         // 将控制量转换为速度 + 方向并下发给转台
-        double speed = fabs(u);
+        double speed = u;
 
         if (axis_ == YawOrPitch_t::Yaw) {
             controller_->set_axis_speed(Yaw, static_cast<float>(speed));
