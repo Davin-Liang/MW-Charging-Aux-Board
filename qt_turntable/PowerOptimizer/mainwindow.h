@@ -6,6 +6,10 @@
 #include <QTimer>
 #include <QComboBox>
 #include <QtCharts>
+#include <QtCharts/QChart>
+#include <QtCharts/QChartView>
+#include <QtCharts/QLineSeries>
+#include <QtCharts/QValueAxis>
 #include <QListWidget>
 #include <QTableWidget>      // 新增
 #include <QTableWidgetItem>  // 新增
@@ -104,8 +108,10 @@ private:
     PIDController *pid_y;
     double target_x;
     double target_y;
+    QtCharts::QChart *turntableChart;
+    QtCharts::QChartView *turntableChartView;
 
-    // 图表相关成员变量
+    // 电机位置显示图表相关成员变量
     QChart *motorChart;
     QLineSeries *motorTrajectorySeries;
     QScatterSeries *currentPositionSeries;
@@ -114,6 +120,13 @@ private:
     QChartView *chartView;
     QVector<QPointF> positionHistory;          // 历史轨迹数据
 
+    //转台位置显示图表相关成员变量
+
+    QtCharts::QLineSeries *series_target_x;
+    QtCharts::QLineSeries *series_target_y;
+    QtCharts::QLineSeries *series_current_x;
+    QtCharts::QLineSeries *series_current_y;
+    double chart_time = 0.0;   // 曲线横轴时间
 
     // 文件读取相关变量
     QString m_currentSelectedFile;             // 当前选中的文件路径
@@ -133,13 +146,14 @@ private:
 
     void setupReadOnlyDataMonitoring();
 
-    // 新增：文件读取相关函数
+    // 文件读取相关函数
     void scanDataFiles();                      // 扫描数据文件
     void displayFileContent(const QString &filePath); // 显示文件内容（表格形式）
     void setupTableWidget();                   // 初始化表格控件
     void loadCsvToTable(const QString &filePath); // 加载CSV到表格
 
-
+    //初始化转台的图
+    void initializeTurntablePositionChart()
 
 
 

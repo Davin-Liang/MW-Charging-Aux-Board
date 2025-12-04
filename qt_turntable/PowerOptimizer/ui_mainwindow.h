@@ -120,7 +120,7 @@ public:
     QHBoxLayout *horizontalLayout_17;
     QLabel *label_25;
     QLineEdit *lineEdit_read_powermax;
-    QWidget *widget;
+    QWidget *turntable_position_chart;
     QVBoxLayout *verticalLayout;
     QGroupBox *groupBox_5;
     QWidget *widget1;
@@ -690,13 +690,13 @@ public:
 
         verticalLayout_3->addLayout(horizontalLayout_17);
 
-        widget = new QWidget(tab_4);
-        widget->setObjectName(QString::fromUtf8("widget"));
-        widget->setGeometry(QRect(11, 11, 221, 371));
-        verticalLayout = new QVBoxLayout(widget);
+        turntable_position_chart = new QWidget(tab_4);
+        turntable_position_chart->setObjectName(QString::fromUtf8("widget"));
+        turntable_position_chart->setGeometry(QRect(11, 11, 221, 371));
+        verticalLayout = new QVBoxLayout(turntable_position_chart);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         verticalLayout->setContentsMargins(0, 0, 0, 0);
-        groupBox_5 = new QGroupBox(widget);
+        groupBox_5 = new QGroupBox(turntable_position_chart);
         groupBox_5->setObjectName(QString::fromUtf8("groupBox_5"));
         groupBox_5->setFont(font1);
         widget1 = new QWidget(groupBox_5);
@@ -755,7 +755,7 @@ public:
 
         verticalLayout->addWidget(groupBox_5);
 
-        groupBox_7 = new QGroupBox(widget);
+        groupBox_7 = new QGroupBox(turntable_position_chart);
         groupBox_7->setObjectName(QString::fromUtf8("groupBox_7"));
         groupBox_7->setFont(font1);
         widget4 = new QWidget(groupBox_7);
