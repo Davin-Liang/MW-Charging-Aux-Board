@@ -1,12 +1,16 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
+
 #include <QMessageBox>
 #include <QDebug>
 #include <QNetworkProxy>
 #include <QDataStream>
 #include <QDateTime>
 
-
+/**
+ * @brief 构造函数
+ * @param parent 父窗口指针
+ */
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -25,106 +29,78 @@ MainWindow::MainWindow(QWidget *parent)
     , series_target_y(nullptr)
     , series_current_x(nullptr)
     , series_current_y(nullptr)
+    ,turntableMonitorTimer(new QTimer(this))
+    ,closedLoopTimer(new QTimer(this))
+    ,pid_x(nullptr)
+    ,pid_y(nullptr)
+
 {
     ui->setupUi(this);
-
-
-    ui->tabWidget->setCurrentIndex(0);   //显示第0页
-
-    // 设置窗口属性
-    setWindowTitle("各类设备控制中心");
-    applyModernStyle();
-    ui->label_status->setObjectName("statusLabel");
-
-    // 设置数据监控区域为只读
-    setupReadOnlyDataMonitoring();
-
-    // 添加网络代理设置
-    QNetworkProxyFactory::setUseSystemConfiguration(false);
-    QNetworkProxy::setApplicationProxy(QNetworkProxy::NoProxy);
-    // 不再初始化原来的TCP客户端，因为CommandTransmitter是服务器
+    //初始化界面设置
+    setupUI();
+    //初始化连接信号
+    setupSignals();
+    //初始化以太网连接服务器 不再初始化原来的TCP客户端，因为CommandTransmitter是服务器
     setupCommandTransmitter();
-
     // 初始化电机状态图表
     initializeMotorChart();
-    // 初始化表格控件
+    // 初始化文件读取表格控件
     setupTableWidget();
-
-
-    // 连接槽函数
-    connect(ui->pushButton_motor_control, &QPushButton::clicked, this, &MainWindow::on_pushButton_motor_control_clicked);
-    connect(ui->pushButton_find_optimal, &QPushButton::clicked, this, &MainWindow::on_pushButton_find_optimal_clicked);
-     // 确保轨迹类型变化信号正确连接
-    connect(ui->comboBox_traj_type, QOverload<int>::of(&QComboBox::currentIndexChanged),
-        this, &MainWindow::trajTypeChanged);
-    // connect(ui->comboBox_traj_type, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            // this, &MainWindow::on_traj_type_changed);
-    // 连接文件读取相关信号槽
-    connect(ui->pushButton_filenamedisplay, &QPushButton::clicked,
-            this, &MainWindow::on_pushButton_filenamedisplay_clicked);
-    connect(ui->pushButton_read_file, &QPushButton::clicked,
-            this, &MainWindow::on_pushButton_read_file_clicked);
-    connect(ui->listWidget_files, &QListWidget::itemSelectionChanged,
-            this, &MainWindow::on_listWidget_files_itemSelectionChanged);
-    // 在构造函数中添加连接  双击直接查看文件内容
-    connect(ui->listWidget_files, &QListWidget::itemDoubleClicked,
-            this, [this](QListWidgetItem *item) {
-                QString filePath = item->data(Qt::UserRole).toString();
-                displayFileContent(filePath);
-            });
-    connect(ui->btn_set_target_pos, &QPushButton::clicked, this, &MainWindow::on_btn_set_target_pos_clicked);
-    connect(ui->btn_set_pidcontroller_parameter, &QPushButton::clicked, this, &MainWindow::on_btn_set_pidcontroller_parameter_clicked);
-    connect(ui->controller_selection,
-        QOverload<int>::of(&QComboBox::currentIndexChanged),
-        this,
-        &MainWindow::on_controller_selection_changed);
-
-    //连接转台
-    connect(ui->pushButton_connection, &QPushButton::clicked, this, &MainWindow::on_pushButton_connection_clicked);
-    connect(ui->pushButton_disconnection, &QPushButton::clicked, this, &MainWindow::on_pushButton_disconnection_clicked);    
-    update_turntable_image();
-
-    turntableMonitorTimer = new QTimer(this);
-    connect(turntableMonitorTimer, &QTimer::timeout, this, &MainWindow::updateTurntableData);
+    //初始化转台位置跟踪控制图
+    initializeTurntablePositionChart();
+    // 监控转台
     turntableMonitorTimer->start(500);
+}
+/**
+ * @brief 初始化 UI 的通用设置
+ */
+void MainWindow::setupUI()
+{
+    ui->tabWidget->setCurrentIndex(0);   //显示第0页
+    setWindowTitle("各类设备控制中心");
+    applyModernStyle();
 
+    ui->label_status->setObjectName("statusLabel");
+
+    setupReadOnlyDataMonitoring();
+
+    // 禁用系统代理
+    QNetworkProxyFactory::setUseSystemConfiguration(false);
+    QNetworkProxy::setApplicationProxy(QNetworkProxy::NoProxy);
+
+    //更新转台状态
+    update_turntable_image();
     setTurntableConnectionStatus(false);
 
-    // 设置界面初始状态
+    //数据采集系统的单片机连接状态设置
     ui->pushButton_disconnect->setEnabled(false);
     ui->label_status->setText("未连接");
     ui->label_status->setStyleSheet("color: red;");
 
-    // 初始化轨迹类型下拉框
+    // 默认轨迹类型
     ui->comboBox_traj_type->addItem("方形轨迹");
     ui->comboBox_traj_type->addItem("圆形轨迹");
     ui->comboBox_traj_type->setCurrentIndex(0);
-    
 
+    // 串口参数（只读）
     ui->lineEdit_baudrate->setText("115200");
     ui->lineEdit_parity->setText("N");
     ui->lineEdit_dataBit->setText("8");
     ui->lineEdit_stopBit->setText("1");
     ui->lineEdit_port->setText("/dev/ttyUSB0");
-    // 设置为只读（让它一直显示，但用户不能修改）
     ui->lineEdit_baudrate->setReadOnly(true);
     ui->lineEdit_parity->setReadOnly(true);
     ui->lineEdit_dataBit->setReadOnly(true);
     ui->lineEdit_stopBit->setReadOnly(true);
 
-    // 设置默认服务器端口（可选）
-    // ui->lineEdit_local_port->setText("8080");
-    // 初始化UI显示配置值
+    // UI 配置
     initializeUIWithConfig();
-    //转台控制参数
+
+    // 转台 PID
     pid_x = new PIDController(Yaw, turntable_controller);
     pid_y = new PIDController(Pitch, turntable_controller);
 
-    closedLoopTimer = new QTimer(this);
-    connect(closedLoopTimer, &QTimer::timeout, this, &MainWindow::closedLoopTick);
-
-
-    //转台控制器选择设置
+    // 转台控制器选择
     ui->controller_selection->addItem("PID 控制器");
     ui->controller_selection->setCurrentIndex(0);
 
@@ -141,9 +117,66 @@ MainWindow::MainWindow(QWidget *parent)
     // ui->monitorForm->addRow("Y 角度 (°):", ui->line_edit_monitor_y_pos);
     // ui->monitorForm->addRow("X 速度 (°/s):", ui->line_edit_monitor_x_speed);
     // ui->monitorForm->addRow("Y 速度 (°/s):", ui->line_edit_monitor_y_speed);
-    initializeTurntablePositionChart();
-
 }
+/**
+ * @brief 连接所有信号槽
+ */
+void MainWindow::setupSignals()
+{   //电机控制指令
+    connect(ui->pushButton_motor_control, &QPushButton::clicked,
+            this, &MainWindow::on_pushButton_motor_control_clicked);
+    //寻优按钮
+    connect(ui->pushButton_find_optimal, &QPushButton::clicked,
+            this, &MainWindow::on_pushButton_find_optimal_clicked);
+    // 确保轨迹类型变化信号正确连接
+    connect(ui->comboBox_traj_type,
+            QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &MainWindow::trajTypeChanged);
+    // connect(ui->comboBox_traj_type, QOverload<int>::of(&QComboBox::currentIndexChanged),
+    // this, &MainWindow::on_traj_type_changed);
+    // 连接文件读取相关信号槽
+    connect(ui->pushButton_filenamedisplay, &QPushButton::clicked,
+            this, &MainWindow::on_pushButton_filenamedisplay_clicked);
+
+    connect(ui->pushButton_read_file, &QPushButton::clicked,
+            this, &MainWindow::on_pushButton_read_file_clicked);
+
+    connect(ui->listWidget_files, &QListWidget::itemSelectionChanged,
+            this, &MainWindow::on_listWidget_files_itemSelectionChanged);
+    // 双击直接查看文件内容
+    connect(ui->listWidget_files, &QListWidget::itemDoubleClicked,
+            this, [this](QListWidgetItem *item) {
+                displayFileContent(item->data(Qt::UserRole).toString());
+            });
+
+    connect(ui->btn_set_target_pos, &QPushButton::clicked,
+            this, &MainWindow::on_btn_set_target_pos_clicked);
+
+    connect(ui->btn_set_pidcontroller_parameter, &QPushButton::clicked,
+            this, &MainWindow::on_btn_set_pidcontroller_parameter_clicked);
+
+    connect(ui->controller_selection,
+            QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &MainWindow::on_controller_selection_changed);
+
+    // 转台连接
+    connect(ui->pushButton_connection, &QPushButton::clicked,
+            this, &MainWindow::on_pushButton_connection_clicked);
+
+    connect(ui->pushButton_disconnection, &QPushButton::clicked,
+            this, &MainWindow::on_pushButton_disconnection_clicked);
+
+    // 闭环控制
+    connect(closedLoopTimer, &QTimer::timeout,
+            this, &MainWindow::closedLoopTick);
+
+    // 转台实时监控
+    connect(turntableMonitorTimer, &QTimer::timeout,
+            this, &MainWindow::updateTurntableData);
+}
+/**
+ * @brief 初始化命令服务器（不再使用原先的 TCP 客户端）
+ */
 void MainWindow::setupCommandTransmitter()
 {
     commandTransmitter = new CommandTransmitter(this);
@@ -154,8 +187,12 @@ void MainWindow::setupCommandTransmitter()
             this, &MainWindow::onChannelDataReceived);
     connect(commandTransmitter, &CommandTransmitter::optResDataReceived,
             this, &MainWindow::onOptResDataReceived);
+    // 设置默认服务器端口（可选）
+    // ui->lineEdit_local_port->setText("8080");
 }
-// 初始化转台图片显示
+/**
+ * @brief 加载并显示转台图片
+ */
 void MainWindow::update_turntable_image()
 {
     QString imgPath = "./image/turntable.png";  
@@ -374,7 +411,7 @@ void MainWindow::onOptResDataReceived(const OptResData_t &data)
 }
 
 
-// 用配置值初始化UI
+// 寻优指令、电机初始初始化UI
 void MainWindow::initializeUIWithConfig()
 {
     if (!commandTransmitter) return;
@@ -394,7 +431,6 @@ void MainWindow::initializeUIWithConfig()
     } else if (findOptCmd.whichThaj == CIR_TRAJ) {
         ui->comboBox_traj_type->setCurrentIndex(1);
     }
-
 
     ui->lineEdit_square_step_2->setText(QString::number(findOptCmd.squThajLen, 'f', 2));
     ui->lineEdit_square_step->setText(QString::number(findOptCmd.squThajStepLen));
