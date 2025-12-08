@@ -15,10 +15,10 @@ int main(int argc, char *argv[])
     a.setStyle(QStyleFactory::create("Fusion"));
 
     // 显示登录对话框
-    LoginDialog loginDialog;
-    if (loginDialog.exec() != QDialog::Accepted) {
-        return 0; // 用户取消登录，退出程序
-    }
+    // LoginDialog loginDialog;
+    // if (loginDialog.exec() != QDialog::Accepted) {
+    //     return 0; // 用户取消登录，退出程序
+    // }
 
     MainWindow w;
     w.show();

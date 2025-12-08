@@ -135,7 +135,8 @@ private:
     void applyModernStyle();
     void parseEthernetData(const QByteArray &data);
     void updateSDCardDisplay(const QByteArray &sdData);
-
+    void setupUI();
+    void setupSignals();
     // 新增辅助函数
     void setupCommandTransmitter();
     void updateConnectionStatus(bool connected);

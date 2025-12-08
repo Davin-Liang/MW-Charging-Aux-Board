@@ -50,7 +50,7 @@ MainWindow::MainWindow(QWidget *parent)
     //初始化转台位置跟踪控制图
     initializeTurntablePositionChart();
     // 监控转台
-    turntableMonitorTimer->start(500);
+    turntableMonitorTimer->start(40);
 }
 /**
  * @brief 初始化 UI 的通用设置，例如状态栏、只读框、样式等
@@ -1195,7 +1195,7 @@ void MainWindow::on_pushButton_connection_clicked()
     if (ok) {
         connected=true;
         setTurntableConnectionStatus(true);
-        turntableMonitorTimer->start(500); // 每500ms刷新数据
+        turntableMonitorTimer->start(40); // 每500ms刷新数据
         QMessageBox::information(this, "成功", "转台连接成功");
     } else {
         connected=false;
@@ -1302,6 +1302,7 @@ void MainWindow::on_btn_set_speed_clicked()
 void MainWindow::on_btn_stop_x_turntable_run_clicked()
 {
     if (connected && turntable_controller) {
+        closedLoopTimer->stop();
         turntable_controller->stop_manual_rotation(Yaw);
     }
 }
@@ -1312,6 +1313,7 @@ void MainWindow::on_btn_stop_x_turntable_run_clicked()
 void MainWindow::on_btn_stop_y_turntable_run_clicked()
 {
     if (connected && turntable_controller) {
+        closedLoopTimer->stop();
         turntable_controller->stop_manual_rotation(Pitch);
     }
 }
@@ -1431,10 +1433,10 @@ void MainWindow::closedLoopTick()
     if (!turntable_controller) return;
 
     // X 轴 PID 控制
-    bool doneX = pid_x->controlLoop(target_x, 0.01, 0.05);
-    bool doneY = pid_y->controlLoop(target_y, 0.01, 0.05);
+    bool doneX = pid_x->controlLoop(target_x, 0.05, 0.05);
+    //bool doneY = pid_y->controlLoop(target_y, 0.0, 0.05);
 
-    if (doneX && doneY) {
+    if (doneX ) {//&& doneY
         closedLoopTimer->stop();
         ui->control_status->setText("闭环控制：完成");
         ui->control_status->setStyleSheet("color: blue;");
@@ -1448,7 +1450,7 @@ void MainWindow::initializeTurntablePositionChart()
 {
 
         turntableChart = new QChart();
-        turntableChart->setTitle("转台实时位置跟踪");
+        // turntableChart->setTitle("转台实时位置跟踪");
     
         // 创建四条曲线
         series_target_x = new QLineSeries();

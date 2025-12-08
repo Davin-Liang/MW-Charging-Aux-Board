@@ -1,6 +1,7 @@
 #include "PID_Controller.h"
 #include "turntable_controller.h"
 #include <cmath>
+#include <QMessageBox>
 
 PIDController::PIDController(YawOrPitch_t  axis, TurntableController *controller)
     : axis_(axis), controller_(controller)
@@ -67,25 +68,28 @@ bool PIDController::controlLoop(double target, double threshold, double controlP
         double u = gains_.kp * error + gains_.ki * state_.integral + gains_.kd * derivative;
 
         // 限制输出幅度（避免发送过大速度）
-        const double maxSpeed = 15.0; // deg/s，演示值
+        const double maxSpeed = 10.0; // deg/s，演示值
         if (u > maxSpeed) u = maxSpeed;
         if (u < -maxSpeed) u = -maxSpeed;
 
         // 将控制量转换为速度 + 方向并下发给转台
-        double speed = u;
+        double speed = -u;
 
         if (axis_ == YawOrPitch_t::Yaw) {
-            controller_->set_axis_speed(Yaw, static_cast<float>(speed));
-            if (u >= 0)
+            if ( speed>= 0){
+                controller_->set_axis_speed(Yaw, static_cast<float>(speed));
                 controller_->set_manual_rotation(Yaw, Left);
-            else
+            }    
+            else{
+                controller_->set_axis_speed(Yaw, static_cast<float>(-speed));
                 controller_->set_manual_rotation(Yaw, Right);
-        } else {
-            controller_->set_axis_speed(Pitch, static_cast<float>(speed));
-            if (u >= 0)
-                controller_->set_manual_rotation(Pitch, Left);
-            else
-                controller_->set_manual_rotation(Pitch, Right);
+            }             
+        // } else {
+            // controller_->set_axis_speed(Pitch, static_cast<float>(speed));
+            // if (u >= 0)
+            //     controller_->set_manual_rotation(Pitch, Left);
+            // else
+            //     controller_->set_manual_rotation(Pitch, Right);
         }
 
         state_.lastError = error;
@@ -102,3 +106,4 @@ bool PIDController::controlLoop(double target, double threshold, double controlP
 
     return false;
 }
+
