@@ -8,8 +8,8 @@
 #include <QDateTime>
 
 /**
- * @brief 构造函数
- * @param parent 父窗口指针
+ * @brief 构造函数，初始化主窗口与核心模块
+ * @param parent 父窗口对象指针
  */
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -36,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 {
     ui->setupUi(this);
+
     //初始化界面设置
     setupUI();
     //初始化连接信号
@@ -52,7 +53,7 @@ MainWindow::MainWindow(QWidget *parent)
     turntableMonitorTimer->start(500);
 }
 /**
- * @brief 初始化 UI 的通用设置
+ * @brief 初始化 UI 的通用设置，例如状态栏、只读框、样式等
  */
 void MainWindow::setupUI()
 {
@@ -64,11 +65,11 @@ void MainWindow::setupUI()
 
     setupReadOnlyDataMonitoring();
 
-    // 禁用系统代理
+    // 禁用系统代理，强制走直连
     QNetworkProxyFactory::setUseSystemConfiguration(false);
     QNetworkProxy::setApplicationProxy(QNetworkProxy::NoProxy);
 
-    //更新转台状态
+    // 初始化转台图像与状态
     update_turntable_image();
     setTurntableConnectionStatus(false);
 
@@ -96,7 +97,7 @@ void MainWindow::setupUI()
     // UI 配置
     initializeUIWithConfig();
 
-    // 转台 PID
+   // 初始化转台 PID 控制器
     pid_x = new PIDController(Yaw, turntable_controller);
     pid_y = new PIDController(Pitch, turntable_controller);
 
@@ -119,7 +120,7 @@ void MainWindow::setupUI()
     // ui->monitorForm->addRow("Y 速度 (°/s):", ui->line_edit_monitor_y_speed);
 }
 /**
- * @brief 连接所有信号槽
+ * @brief 统一连接所有 UI 信号与槽函数
  */
 void MainWindow::setupSignals()
 {   //电机控制指令
@@ -148,7 +149,7 @@ void MainWindow::setupSignals()
             this, [this](QListWidgetItem *item) {
                 displayFileContent(item->data(Qt::UserRole).toString());
             });
-
+    // 转台目标位置与参数设置
     connect(ui->btn_set_target_pos, &QPushButton::clicked,
             this, &MainWindow::on_btn_set_target_pos_clicked);
 
@@ -159,14 +160,14 @@ void MainWindow::setupSignals()
             QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &MainWindow::on_controller_selection_changed);
 
-    // 转台连接
+    // 转台连接/断开
     connect(ui->pushButton_connection, &QPushButton::clicked,
             this, &MainWindow::on_pushButton_connection_clicked);
 
     connect(ui->pushButton_disconnection, &QPushButton::clicked,
             this, &MainWindow::on_pushButton_disconnection_clicked);
 
-    // 闭环控制
+    // 转台定时器（闭环控制）
     connect(closedLoopTimer, &QTimer::timeout,
             this, &MainWindow::closedLoopTick);
 
@@ -197,46 +198,49 @@ void MainWindow::update_turntable_image()
 {
     QString imgPath = "./image/turntable.png";  
     QPixmap pix(imgPath);
-
-    if (!pix.isNull()) {
-        // 将图片按照控件大小等比缩放并显示
-        ui->label_turntable_img->setPixmap(
-            pix.scaled(ui->label_turntable_img->size(),
-                       Qt::KeepAspectRatio,
-                       Qt::SmoothTransformation));
-    } else {
-        // 如果图片加载失败，可显示默�?�文字提��?
+     // 如果图片加载失败，可显示默认文字提示
+    if (pix.isNull()) {
         ui->label_turntable_img->setText("转台图片未找到");
         ui->label_turntable_img->setAlignment(Qt::AlignCenter);
+        return;
     }
-}
 
-// 初始化电机状态图表
+    ui->label_turntable_img->setPixmap(
+        pix.scaled(ui->label_turntable_img->size(),
+                   Qt::KeepAspectRatio,
+                   Qt::SmoothTransformation));
+}
+/**
+ * @brief 初始化电机状态图表，包括轨迹曲线、当前位置标记和坐标轴样式
+ */
 void MainWindow::initializeMotorChart()
 {
     // 创建图表
     motorChart = new QChart();
-    motorChart->setTitle("");  // 设置为空字符串，不显示标题
+    motorChart->setTitle("");  // 不显示标题
     motorChart->setAnimationOptions(QChart::NoAnimation);
+    motorChart->legend()->setVisible(false);      // 隐藏图例
+    motorChart->setMargins(QMargins(0, 0, 0, 0)); // 去除图表边距
+    motorChart->setBackgroundRoundness(0);   // 设置图表边距为0，使其完全填充
 
-    // 创建轨迹序列
+    // 创建轨迹曲线（蓝色线条）
     motorTrajectorySeries = new QLineSeries();
     // 移除名称设置，不显示图例
     motorTrajectorySeries->setColor(Qt::blue);
     motorTrajectorySeries->setPointsVisible(false);  // 不显示轨迹上的点，只显示线条
 
-    // 创建当前位置序列
+    // 创建当前位置点（红色散点）
     currentPositionSeries = new QScatterSeries();
     // 移除名称设置，不显示图例
     currentPositionSeries->setColor(Qt::red);
-    currentPositionSeries->setMarkerSize(4);
     currentPositionSeries->setBorderColor(Qt::darkRed);
+    currentPositionSeries->setMarkerSize(4);
 
     // 添加到图表
     motorChart->addSeries(motorTrajectorySeries);
     motorChart->addSeries(currentPositionSeries);
 
-    // 创建坐标轴
+    // 坐标轴 X
     axisX = new QValueAxis();
     axisX->setTitleText("x (mm)");
     axisX->setTitleFont(QFont("宋体", 8));
@@ -244,6 +248,7 @@ void MainWindow::initializeMotorChart()
     axisX->setRange(-50, 50);  // 初始范围
     axisX->setTickCount(11);
 
+    // 坐标轴 Y
     axisY = new QValueAxis();
     axisY->setTitleText("y (mm)");
     axisY->setTitleFont(QFont("宋体", 8));
@@ -251,28 +256,19 @@ void MainWindow::initializeMotorChart()
     axisY->setRange(-50, 50);  // 初始范围
     axisY->setTickCount(11);
 
-    // 设置坐标轴
+    // 绑定坐标轴
     motorChart->addAxis(axisX, Qt::AlignBottom);
     motorChart->addAxis(axisY, Qt::AlignLeft);
-
     motorTrajectorySeries->attachAxis(axisX);
     motorTrajectorySeries->attachAxis(axisY);
     currentPositionSeries->attachAxis(axisX);
     currentPositionSeries->attachAxis(axisY);
 
-    // 隐藏图例
-    motorChart->legend()->setVisible(false);
-
-    // 设置图表边距为0，使其完全填充
-    motorChart->setMargins(QMargins(0, 0, 0, 0));
-    motorChart->setBackgroundRoundness(0);
 
     // 创建图表视图
     chartView = new QChartView(motorChart);
     chartView->setRenderHint(QPainter::Antialiasing);
-
-    // 设置图表视图的边距为0
-    chartView->setContentsMargins(0, 0, 0, 0);
+    chartView->setContentsMargins(0, 0, 0, 0);  // 设置图表视图的边距为0
 
     // 将图表添加到UI中的widget_chart
     QVBoxLayout *chartLayout = new QVBoxLayout(ui->widget_chart);
@@ -285,7 +281,41 @@ void MainWindow::initializeMotorChart()
 
     qDebug()<<"电机位置轨迹图初始化完成";
 }
-// 初始化表格控件
+/**
+ * @brief 初始化 UI 中的电机参数与寻优参数
+ */
+void MainWindow::initializeUIWithConfig()
+{
+    if (!commandTransmitter) return;
+
+    // 获取电机配置
+    MotorCmd_t motorCmd = commandTransmitter->getMotorCmd();
+    ui->lineEdit_motor_x->setText(QString::number(motorCmd.x, 'f', 2));
+    ui->lineEdit_motor_y->setText(QString::number(motorCmd.y, 'f', 2));
+    ui->lineEdit_motor_speed->setText(QString::number(motorCmd.speed));
+
+    // 获取寻优配置
+    FindOptimalCmd_t findOptCmd = commandTransmitter->getFindOptCmd();
+
+    // 设置轨迹类型
+    if (findOptCmd.whichThaj == SQU_TRAJ) {
+        ui->comboBox_traj_type->setCurrentIndex(0);
+    } else if (findOptCmd.whichThaj == CIR_TRAJ) {
+        ui->comboBox_traj_type->setCurrentIndex(1);
+    }
+
+    ui->lineEdit_square_step_2->setText(QString::number(findOptCmd.squThajLen, 'f', 2));
+    ui->lineEdit_square_step->setText(QString::number(findOptCmd.squThajStepLen));
+    ui->lineEdit_circle_radius->setText(QString::number(findOptCmd.cirTrajRad, 'f', 2));
+    ui->lineEdit_max_voltage->setText(QString::number(findOptCmd.maxVol, 'f', 2));
+    ui->lineEdit_initial_voltage->setText(QString::number(findOptCmd.initialVol, 'f', 2));
+    ui->lineEdit_voltage_step->setText(QString::number(findOptCmd.volStepLen, 'f', 2));
+    // 根据轨迹模式更新 UI
+    trajTypeChanged(ui->comboBox_traj_type->currentIndex());
+}
+/**
+ * @brief 初始化文件内容显示表格，包括样式、不可编辑性与行列调整策略
+ */
 void MainWindow::setupTableWidget()
 {
     // 设置表格属性
@@ -319,7 +349,10 @@ void MainWindow::setupTableWidget()
         "}"
         );
 }
-// 新增：处理电机数据接收
+/**
+ * @brief 接收电机数据并更新界面与图表
+ * @param data 解析后的电机数据结构体
+ */
 void MainWindow::onMotorDataReceived(const MotorData_t &data)
 {
     // 更新电机状态读取区域
@@ -334,15 +367,16 @@ void MainWindow::onMotorDataReceived(const MotorData_t &data)
                           .arg(data.motorX).arg(data.motorY).arg(data.motorSpeed);
     qDebug()<<message;
 }
-// 更新电机状态图表
+/**
+ * @brief 更新电机图表：轨迹曲线 + 实时位置点 + 自适应坐标轴
+ */
 void MainWindow::updateMotorChart(double x, double y)
 {
     QPointF newPosition(x, y);
-
     // 添加到历史轨迹
     positionHistory.append(newPosition);
 
-    // 限制历史数据数量，避免内存过度增长
+    // 限制历史数据数量，避免内存过度增长 // 限制缓存大小
     if (positionHistory.size() > 1000) {
         positionHistory.removeFirst();
     }
@@ -368,17 +402,16 @@ void MainWindow::updateMotorChart(double x, double y)
         }
 
         // 添加一些边距
-        double marginX = (maxX - minX) * 0.1;
-        double marginY = (maxY - minY) * 0.1;
-
-        if (marginX < 10) marginX = 10;
-        if (marginY < 10) marginY = 10;
+        double marginX = qMax(10.0, (maxX - minX) * 0.1);
+        double marginY = qMax(10.0, (maxY - minY) * 0.1);
 
         axisX->setRange(minX - marginX, maxX + marginX);
         axisY->setRange(minY - marginY, maxY + marginY);
     }
 }
-// 新增：处理通道数据接收
+/**
+ * @brief 接收并更新当前通道、电压与功率信息
+ */
 void MainWindow::onChannelDataReceived(const CurrentVPCh_t &data)
 {
     // 更新寻优过程数据显示区域
@@ -392,8 +425,9 @@ void MainWindow::onChannelDataReceived(const CurrentVPCh_t &data)
     qDebug()<<message;
 }
 
-
-// 新增：处理优化结果数据接收
+/**
+ * @brief 接收寻优结果并更新显示区域
+ */
 void MainWindow::onOptResDataReceived(const OptResData_t &data)
 {
     // 更新寻优结果显示区域
@@ -409,111 +443,82 @@ void MainWindow::onOptResDataReceived(const OptResData_t &data)
                           .arg(data.optimalVs[2]).arg(data.optimalVs[3]);
     qDebug()<<message;
 }
-
-
-// 寻优指令、电机初始初始化UI
-void MainWindow::initializeUIWithConfig()
-{
-    if (!commandTransmitter) return;
-
-    // 获取电机配置
-    MotorCmd_t motorCmd = commandTransmitter->getMotorCmd();
-    ui->lineEdit_motor_x->setText(QString::number(motorCmd.x, 'f', 2));
-    ui->lineEdit_motor_y->setText(QString::number(motorCmd.y, 'f', 2));
-    ui->lineEdit_motor_speed->setText(QString::number(motorCmd.speed));
-
-    // 获取寻优配置
-    FindOptimalCmd_t findOptCmd = commandTransmitter->getFindOptCmd();
-
-    // 设置轨迹类型
-    if (findOptCmd.whichThaj == SQU_TRAJ) {
-        ui->comboBox_traj_type->setCurrentIndex(0);
-    } else if (findOptCmd.whichThaj == CIR_TRAJ) {
-        ui->comboBox_traj_type->setCurrentIndex(1);
-    }
-
-    ui->lineEdit_square_step_2->setText(QString::number(findOptCmd.squThajLen, 'f', 2));
-    ui->lineEdit_square_step->setText(QString::number(findOptCmd.squThajStepLen));
-    ui->lineEdit_circle_radius->setText(QString::number(findOptCmd.cirTrajRad, 'f', 2));
-    ui->lineEdit_max_voltage->setText(QString::number(findOptCmd.maxVol, 'f', 2));
-    ui->lineEdit_initial_voltage->setText(QString::number(findOptCmd.initialVol, 'f', 2));
-    ui->lineEdit_voltage_step->setText(QString::number(findOptCmd.volStepLen, 'f', 2));
-
-    // 初始化工况状态 - 确保UI状态正确
-    trajTypeChanged(ui->comboBox_traj_type->currentIndex());
-
-}
-
-// 新增：轨迹类型变化处理
+/**
+ * @brief 当轨迹类型切换时，调整 UI 使对应输入框可用/禁用
+ */
 void MainWindow::trajTypeChanged(int index)
 {
-    if (index == 0) { // 方形轨迹
-        ui->lineEdit_square_step_2->setEnabled(true); // 方形边长
-        ui->lineEdit_square_step->setEnabled(true);
-        ui->lineEdit_circle_radius->setEnabled(false);
-        ui->label_11->setEnabled(true);  // 方形边长标签
-        ui->label_8->setEnabled(true);  // 方形步长标签
-        ui->label_7->setEnabled(false); // 圆形半径标签
+    //保留下面的接口，index不一定只有两个值
+    // if (index == 0) { // 方形轨迹
+    //     ui->lineEdit_square_step_2->setEnabled(true); // 方形边长
+    //     ui->lineEdit_square_step->setEnabled(true);
+    //     ui->lineEdit_circle_radius->setEnabled(false);
+    //     ui->label_11->setEnabled(true);  // 方形边长标签
+    //     ui->label_8->setEnabled(true);  // 方形步长标签
+    //     ui->label_7->setEnabled(false); // 圆形半径标签
 
-        // 使用更明确的样式设置
-        ui->lineEdit_square_step_2->setStyleSheet("QLineEdit { background-color: white; color: black; }");
-        ui->lineEdit_square_step->setStyleSheet("QLineEdit { background-color: white; color: black; }");
-        ui->lineEdit_circle_radius->setStyleSheet("QLineEdit { background-color: #f0f0f0; color: #999999; border: 1px solid #cccccc; }");
+    //     // 使用更明确的样式设置
+    //     ui->lineEdit_square_step_2->setStyleSheet("QLineEdit { background-color: white; color: black; }");
+    //     ui->lineEdit_square_step->setStyleSheet("QLineEdit { background-color: white; color: black; }");
+    //     ui->lineEdit_circle_radius->setStyleSheet("QLineEdit { background-color: #f0f0f0; color: #999999; border: 1px solid #cccccc; }");
 
-        // 强制更新
-        ui->lineEdit_square_step_2->update();
-        ui->lineEdit_square_step->update();
-        ui->lineEdit_circle_radius->update();
+    //     // 强制更新
+    //     ui->lineEdit_square_step_2->update();
+    //     ui->lineEdit_square_step->update();
+    //     ui->lineEdit_circle_radius->update();
 
-        qDebug()<<"已切换到方形轨迹模式";
-    } else { // 圆形轨迹
-        ui->lineEdit_square_step_2->setEnabled(false); // 方形边长
-        ui->lineEdit_square_step->setEnabled(false);
-        ui->lineEdit_circle_radius->setEnabled(true);
-        ui->label_11->setEnabled(false); // 方形边长标签
-        ui->label_8->setEnabled(false); // 方形步长标签
-        ui->label_7->setEnabled(true);  // 圆形半径标签
+    //     qDebug()<<"已切换到方形轨迹模式";
+    // } else { // 圆形轨迹
+    //     ui->lineEdit_square_step_2->setEnabled(false); // 方形边长
+    //     ui->lineEdit_square_step->setEnabled(false);
+    //     ui->lineEdit_circle_radius->setEnabled(true);
+    //     ui->label_11->setEnabled(false); // 方形边长标签
+    //     ui->label_8->setEnabled(false); // 方形步长标签
+    //     ui->label_7->setEnabled(true);  // 圆形半径标签
 
-        // 使用更明确的样式设置
-        ui->lineEdit_square_step_2->setStyleSheet("QLineEdit { background-color: #f0f0f0; color: #999999; border: 1px solid #cccccc; }");
-        ui->lineEdit_square_step->setStyleSheet("QLineEdit { background-color: #f0f0f0; color: #999999; border: 1px solid #cccccc; }");
-        ui->lineEdit_circle_radius->setStyleSheet("QLineEdit { background-color: white; color: black; }");
+    //     // 使用更明确的样式设置
+    //     ui->lineEdit_square_step_2->setStyleSheet("QLineEdit { background-color: #f0f0f0; color: #999999; border: 1px solid #cccccc; }");
+    //     ui->lineEdit_square_step->setStyleSheet("QLineEdit { background-color: #f0f0f0; color: #999999; border: 1px solid #cccccc; }");
+    //     ui->lineEdit_circle_radius->setStyleSheet("QLineEdit { background-color: white; color: black; }");
 
-        // 强制更新
-        ui->lineEdit_square_step_2->update();
-        ui->lineEdit_square_step->update();
-        ui->lineEdit_circle_radius->update();
+    //     // 强制更新
+    //     ui->lineEdit_square_step_2->update();
+    //     ui->lineEdit_square_step->update();
+    //     ui->lineEdit_circle_radius->update();
 
-        qDebug()<<"已切换到圆形轨迹模式";
-    }
+    //     qDebug()<<"已切换到圆形轨迹模式";
+    // }
+    const bool isSquare = (index == 0);
+
+    ui->lineEdit_square_step_2->setEnabled(isSquare);
+    ui->lineEdit_square_step->setEnabled(isSquare);
+    ui->lineEdit_circle_radius->setEnabled(!isSquare);
+
+    ui->label_11->setEnabled(isSquare);
+    ui->label_8->setEnabled(isSquare);
+    ui->label_7->setEnabled(!isSquare);
+
+    // 样式切换
+    ui->lineEdit_square_step_2->setStyleSheet(isSquare ? "QLineEdit{ background:white; color:black; }"
+                                                       : "QLineEdit{ background:#f0f0f0; color:#999; border:1px solid #ccc;}");
+
+    ui->lineEdit_square_step->setStyleSheet(isSquare ? "QLineEdit{ background:white; color:black; }"
+                                                     : "QLineEdit{ background:#f0f0f0; color:#999; border:1px solid #ccc;}");
+
+    ui->lineEdit_circle_radius->setStyleSheet(!isSquare ? "QLineEdit{ background:white; color:black; }"
+                                                        : "QLineEdit{ background:#f0f0f0; color:#999; border:1px solid #ccc;}");
+
+    qDebug() << (isSquare ? "已切换到方形轨迹模式" : "已切换到圆形轨迹模式");
 }
-
-
-
-MainWindow::~MainWindow()
-{
-    if (commandTransmitter) {
-        commandTransmitter->stop_server();
-    }
-    // 清理图表资源
-    // 注意：由于Qt的对象父子关系，大部分资源会自动清理
-    // 但为了安全，可以显式删除主要对象
-    if (chartView) {
-        delete chartView;
-    }
-    delete ui;
-    delete pid_x;
-    delete pid_y;
-}
-
-// 电机控制按钮点击事件
+/**
+ * @brief “电机控制”按钮点击事件。 读取界面输入的电机控制参数并发送给下位机。
+ */
 void MainWindow::on_pushButton_motor_control_clicked()
 {
-    if (!commandTransmitter || !commandTransmitter->m_clientSocket) {
-        QMessageBox::warning(this, "错误", "请先启动服务器并等待STM32连接");
+    if (commandTransmitter == nullptr || commandTransmitter->m_clientSocket == nullptr) {
+        QMessageBox::warning(this, "错误", "请先启动服务器并等待 STM32 连接");
         return;
     }
-
     // 获取电机控制参数并更新到commandTransmitter
     MotorCmd_t motorCmd;
     motorCmd.x = ui->lineEdit_motor_x->text().toFloat();
@@ -530,18 +535,18 @@ void MainWindow::on_pushButton_motor_control_clicked()
         qDebug() << "电机控制命令发送失败，错误码:" <<result ;
     }
 }
-
-// 寻优控制按钮点击事件
+/**
+ * @brief “寻优控制”按钮点击事件。根据用户选择的轨迹类型读取参数并发送寻优控制命令。
+ */
 void MainWindow::on_pushButton_find_optimal_clicked()
 {
-    if (!commandTransmitter || !commandTransmitter->m_clientSocket) {
-        QMessageBox::warning(this, "错误", "请先启动服务器并等待STM32连接");
+    if (commandTransmitter == nullptr || commandTransmitter->m_clientSocket == nullptr) {
+        QMessageBox::warning(this, "错误", "请先启动服务器并等待 STM32 连接");
         return;
     }
-
     // 获取轨迹类型
     int trajTypeIndex = ui->comboBox_traj_type->currentIndex();
-    ThajType_t whichThaj = (trajTypeIndex == 0) ? SQU_TRAJ : CIR_TRAJ;
+    ThajType_t whichThaj = (trajTypeIndex == 0) ? SQU_TRAJ : CIR_TRAJ;//只有两个index的情况下
 
     // 根据轨迹类型获取正确的参数
     float cirTrajRad = 0.0f;
@@ -594,7 +599,7 @@ void MainWindow::on_pushButton_find_optimal_clicked()
         QMessageBox::warning(this, "参数错误", "最大电压和电压步长必须大于0");
         return;
     }
-    // 第一步：先发送时间命令
+    // 发送时间同步命令
     int timeResult = commandTransmitter->send_time_command();
     if (timeResult == 0) {
         qDebug()<<"时间命令发送成功";
@@ -602,8 +607,8 @@ void MainWindow::on_pushButton_find_optimal_clicked()
         qDebug() << "时间命令发送失败，错误码:" << timeResult;
         // 即使时间命令失败，也继续发送寻优命令
     }
-
-    int result = commandTransmitter->send_find_opt_command(whichThaj, cirTrajRad, squThajLen, squThajStepLen, maxVol, volStepLen,initialVol);
+    // 发送寻优任务命令
+    const int result = commandTransmitter->send_find_opt_command(whichThaj, cirTrajRad, squThajLen, squThajStepLen, maxVol, volStepLen,initialVol);
     if (result == 0) {
         qDebug()<<"寻优控制命令发送成功";
 
@@ -611,7 +616,7 @@ void MainWindow::on_pushButton_find_optimal_clicked()
         FindOptimalCmd_t findOptCmd = commandTransmitter->getFindOptCmd();
         findOptCmd.whichThaj = whichThaj;
         findOptCmd.cirTrajRad = cirTrajRad;
-        findOptCmd.squThajLen = squThajLen;   // 新增：保存方形边长
+        findOptCmd.squThajLen = squThajLen;
         findOptCmd.squThajStepLen = squThajStepLen;
         findOptCmd.maxVol = maxVol;
         findOptCmd.volStepLen = volStepLen;
@@ -632,9 +637,10 @@ void MainWindow::on_pushButton_find_optimal_clicked()
         qDebug() << "寻优控制命令发送失败，错误码:" << result;
     }
 }
-
-
-// 网络连接按钮点击事件
+/**
+ * @brief “连接”按钮点击事件。
+ *        启动服务器并等待 STM32 客户端连接。
+ */
 void MainWindow::on_pushButton_connect_clicked()
 {
     // 获取用户输入的IP地址和端口
@@ -647,13 +653,13 @@ void MainWindow::on_pushButton_connect_clicked()
         return;
     }
 
-    quint16 serverPort = portText.toUShort();
+    const quint16 serverPort = portText.toUShort();
     if (serverPort == 0) {
         QMessageBox::warning(this, "输入错误", "请输入正确的服务器端口");
         return;
     }
 
-    QHostAddress serverAddress(ipText);
+    const QHostAddress serverAddress(ipText);
     if (serverAddress.isNull()) {
         QMessageBox::warning(this, "输入错误", "请输入正确的IP地址格式");
         return;
@@ -675,8 +681,9 @@ void MainWindow::on_pushButton_connect_clicked()
         qDebug() << "服务器启动失败";
     }
 }
-
-// 断开连接按钮点击事件
+/**
+ * @brief “断开连接”按钮点击事件。
+ */
 void MainWindow::on_pushButton_disconnect_clicked()
 {
     if (commandTransmitter) {
@@ -686,9 +693,10 @@ void MainWindow::on_pushButton_disconnect_clicked()
     updateConnectionStatus(false);
     qDebug() << "服务器已停止";
 }
-
-
-// 更新网络连接状态
+/**
+ * @brief 更新网络连接状态的 UI 显示。
+ * @param connected 连接状态：true 表示已连接，false 表示未连接。
+ */
 void MainWindow::updateConnectionStatus(bool connected)
 {
     if (connected) {
@@ -703,45 +711,73 @@ void MainWindow::updateConnectionStatus(bool connected)
         ui->label_status->setStyleSheet("color: red;");
     }
 }
-// 设置数据监控区域为只读
+/**
+ * @brief 设置监控区域的 LineEdit 为只读并统一样式。
+ */
 void MainWindow::setupReadOnlyDataMonitoring()
 {
-    // 电机当前状态读取区域
-    ui->lineEdit_read_motor_x->setReadOnly(true);
-    ui->lineEdit_read_motor_y->setReadOnly(true);
-    ui->lineEdit_read_motor_speed->setReadOnly(true);
+    static const QString readOnlyStyle =
+        "QLineEdit:read-only {"
+        " background-color: #f0f0f0;"
+        " color: #666666;"
+        " border: 1px solid #cccccc;"
+        "}";
+    auto setRO = [&](QLineEdit *edit) {
+        edit->setReadOnly(true);
+        edit->setStyleSheet(readOnlyStyle);
+    };
 
-    // 寻优过程数据显示区域
-    ui->lineEdit_read_currentchannel->setReadOnly(true);
-    ui->lineEdit_read_currentvoltage->setReadOnly(true);
-    ui->lineEdit_read_currentpower->setReadOnly(true);
+    // 电机读数
+    setRO(ui->lineEdit_read_motor_x);
+    setRO(ui->lineEdit_read_motor_y);
+    setRO(ui->lineEdit_read_motor_speed);
 
-    // 寻优结果显示区域
-    ui->lineEdit_read_channel1voltagemax->setReadOnly(true);
-    ui->lineEdit_read_channel2voltagemax->setReadOnly(true);
-    ui->lineEdit_read_channel3voltagemax->setReadOnly(true);
-    ui->lineEdit_read_channel4voltagemax->setReadOnly(true);
-    ui->lineEdit_read_powermax->setReadOnly(true);
+    // 寻优实时数据
+    setRO(ui->lineEdit_read_currentchannel);
+    setRO(ui->lineEdit_read_currentvoltage);
+    setRO(ui->lineEdit_read_currentpower);
 
-    // 设置只读状态下的样式，使其看起来更明显
-    QString readOnlyStyle = "QLineEdit:read-only { background-color: #f0f0f0; color: #666666; border: 1px solid #cccccc; }";
+    // 寻优结果
+    setRO(ui->lineEdit_read_channel1voltagemax);
+    setRO(ui->lineEdit_read_channel2voltagemax);
+    setRO(ui->lineEdit_read_channel3voltagemax);
+    setRO(ui->lineEdit_read_channel4voltagemax);
+    setRO(ui->lineEdit_read_powermax);
 
-    ui->lineEdit_read_motor_x->setStyleSheet(readOnlyStyle);
-    ui->lineEdit_read_motor_y->setStyleSheet(readOnlyStyle);
-    ui->lineEdit_read_motor_speed->setStyleSheet(readOnlyStyle);
-    ui->lineEdit_read_currentchannel->setStyleSheet(readOnlyStyle);
-    ui->lineEdit_read_currentvoltage->setStyleSheet(readOnlyStyle);
-    ui->lineEdit_read_currentpower->setStyleSheet(readOnlyStyle);
-    ui->lineEdit_read_channel1voltagemax->setStyleSheet(readOnlyStyle);
-    ui->lineEdit_read_channel2voltagemax->setStyleSheet(readOnlyStyle);
-    ui->lineEdit_read_channel3voltagemax->setStyleSheet(readOnlyStyle);
-    ui->lineEdit_read_channel4voltagemax->setStyleSheet(readOnlyStyle);
-    ui->lineEdit_read_powermax->setStyleSheet(readOnlyStyle);
+    // // 电机当前状态读取区域
+    // ui->lineEdit_read_motor_x->setReadOnly(true);
+    // ui->lineEdit_read_motor_y->setReadOnly(true);
+    // ui->lineEdit_read_motor_speed->setReadOnly(true);
+
+    // // 寻优过程数据显示区域
+    // ui->lineEdit_read_currentchannel->setReadOnly(true);
+    // ui->lineEdit_read_currentvoltage->setReadOnly(true);
+    // ui->lineEdit_read_currentpower->setReadOnly(true);
+
+    // // 寻优结果显示区域
+    // ui->lineEdit_read_channel1voltagemax->setReadOnly(true);
+    // ui->lineEdit_read_channel2voltagemax->setReadOnly(true);
+    // ui->lineEdit_read_channel3voltagemax->setReadOnly(true);
+    // ui->lineEdit_read_channel4voltagemax->setReadOnly(true);
+    // ui->lineEdit_read_powermax->setReadOnly(true);
+
+
+
+    // ui->lineEdit_read_motor_x->setStyleSheet(readOnlyStyle);
+    // ui->lineEdit_read_motor_y->setStyleSheet(readOnlyStyle);
+    // ui->lineEdit_read_motor_speed->setStyleSheet(readOnlyStyle);
+    // ui->lineEdit_read_currentchannel->setStyleSheet(readOnlyStyle);
+    // ui->lineEdit_read_currentvoltage->setStyleSheet(readOnlyStyle);
+    // ui->lineEdit_read_currentpower->setStyleSheet(readOnlyStyle);
+    // ui->lineEdit_read_channel1voltagemax->setStyleSheet(readOnlyStyle);
+    // ui->lineEdit_read_channel2voltagemax->setStyleSheet(readOnlyStyle);
+    // ui->lineEdit_read_channel3voltagemax->setStyleSheet(readOnlyStyle);
+    // ui->lineEdit_read_channel4voltagemax->setStyleSheet(readOnlyStyle);
+    // ui->lineEdit_read_powermax->setStyleSheet(readOnlyStyle);
 }
 
 
 // ========== 网络通信处理 ==========
-
 // // TCP连接成功 - 现在不需要这个函数，因为CommandTransmitter是服务器
 // void MainWindow::onSocketConnected()
 // {
@@ -759,8 +795,13 @@ void MainWindow::setupReadOnlyDataMonitoring()
 // {
 //     // 空实现，因为CommandTransmitter处理数据接收
 // }
-
-// TCP错误处理
+/**
+ * @brief TCP Socket 错误处理回调
+ * @param error 套接字错误类型（QAbstractSocket::SocketError）
+ *
+ * 根据 Qt 提供的错误类型，生成对应的错误提示并弹出提示框，
+ * 同时更新连接状态为断开状态。
+ */
 void MainWindow::onSocketError(QAbstractSocket::SocketError error)
 {
     QString errorMsg;
@@ -784,8 +825,15 @@ void MainWindow::onSocketError(QAbstractSocket::SocketError error)
     QMessageBox::critical(this, "连接错误", errorMsg);
     updateConnectionStatus(false);
 }
-
-// 解析以太网数据
+/**
+ * @brief 解析以太网接收到的数据
+ * @param data 原始字节数组
+ *
+ * 示例格式：
+ *      TYPE:DATA
+ *
+ * 若格式合法则按类型与内容解析，否则打印原始数据。
+ */
 void MainWindow::parseEthernetData(const QByteArray &data)
 {
     QString receivedData = QString::fromUtf8(data);
@@ -808,19 +856,22 @@ void MainWindow::parseEthernetData(const QByteArray &data)
 
     qDebug() << "解析以太网数据:" << data;
 }
-
-// 现代化样式
+/**
+ * @brief 应用现代化 UI 样式
+ *
+ * 设置窗口、按钮、文本框等控件的整体视觉风格，
+ * 增加统一性与美观度，同时保留图表等控件的自定义样式空间。
+ */
 void MainWindow::applyModernStyle()
 {
-    // 设置基本样式，但不覆盖轨迹相关的特殊样式
-    QString style = R"(
+    const QString styleSheet = R"(
         QMainWindow {
             background: #f0f0f0;
             font-family: 'Microsoft YaHei';
         }
 
         QGroupBox {
-            background-color: white;
+            background-color: #ffffff;
             border: 1px solid #cccccc;
             border-radius: 5px;
             margin-top: 10px;
@@ -831,7 +882,7 @@ void MainWindow::applyModernStyle()
         QGroupBox::title {
             subcontrol-origin: margin;
             left: 10px;
-            padding: 0 5px 0 5px;
+            padding: 0 5px;
         }
 
         QPushButton {
@@ -840,17 +891,13 @@ void MainWindow::applyModernStyle()
             border: none;
             border-radius: 4px;
             padding: 6px 12px;
-            font-weight: normal;
         }
-
         QPushButton:hover {
             background-color: #45a049;
         }
-
         QPushButton:pressed {
             background-color: #3d8b40;
         }
-
         QPushButton:disabled {
             background-color: #cccccc;
             color: #666666;
@@ -862,25 +909,27 @@ void MainWindow::applyModernStyle()
             padding: 4px 8px;
             background-color: white;
         }
-
         QLineEdit:focus {
             border-color: #4CAF50;
+        }
+        QLineEdit:disabled {
+            background-color: #f0f0f0;
+            color: #999999;
         }
 
         QLabel {
             color: #333333;
         }
-
-        /* 禁用的输入框样式 - 会被更具体的样式覆盖 */
-        QLineEdit:disabled {
-            background-color: #f0f0f0;
-            color: #999999;
-        }
     )";
 
-    setStyleSheet(style);
+    setStyleSheet(styleSheet);
 }
-// 扫描数据文件
+/**
+ * @brief 扫描当前目录中的 CSV 数据文件并更新列表显示
+ *
+ * 会清空现有文件列表，扫描工作目录下所有 .csv 文件，
+ * 以修改时间排序，并更新 listWidget_files。
+ */
 void MainWindow::scanDataFiles()
 {
     // 清空当前文件列表
@@ -928,7 +977,11 @@ void MainWindow::scanDataFiles()
 
     qDebug() << "找到" << fileList.size() << "个数据文件";
 }
-// 文件选择变化处理
+/**
+ * @brief 处理文件列表选中项变化事件
+ *
+ * 记录当前选中文件，并更新右侧文件名称显示。
+ */
 void MainWindow::on_listWidget_files_itemSelectionChanged()
 {
     QList<QListWidgetItem*> selectedItems = ui->listWidget_files->selectedItems();
@@ -947,8 +1000,11 @@ void MainWindow::on_listWidget_files_itemSelectionChanged()
 
     qDebug() << "选中文件：" << m_currentSelectedFile;
 }
-
-// 显示文件内容
+/**
+ * @brief 处理文件列表选中项变化事件
+ *
+ * 记录当前选中文件，并更新右侧文件名称显示。
+ */
 void MainWindow::displayFileContent(const QString &filePath)
 {
     if (filePath.isEmpty()) {
@@ -984,7 +1040,12 @@ QStringList parseCsvLine(const QString &line)
 
     return result;
 }*/
-// 加载CSV文件到表格
+/**
+ * @brief 将 CSV 文件加载到 tableWidget_file_content 中显示
+ * @param filePath 目标 CSV 文件路径
+ *
+ * 支持简单的 CSV 格式解析，不解析引号内部逗号。
+ */
 void MainWindow::loadCsvToTable(const QString &filePath)
 {
     QFile file(filePath);
@@ -1048,7 +1109,6 @@ void MainWindow::loadCsvToTable(const QString &filePath)
     // 设置表格列数和表头
     ui->tableWidget_file_content->setColumnCount(headers.size());
     ui->tableWidget_file_content->setHorizontalHeaderLabels(headers);
-
     // 设置行数
     ui->tableWidget_file_content->setRowCount(data.size());
 
@@ -1083,14 +1143,17 @@ void MainWindow::loadCsvToTable(const QString &filePath)
 
     qDebug() << "已加载CSV文件到表格:" << filePath << "行数:" << data.size() << "列数:" << headers.size();
 }
-// 文件存储情况显示按钮点击
+/**
+ * @brief “显示文件存储情况”按钮点击处理
+ */
 void MainWindow::on_pushButton_filenamedisplay_clicked()
 {
     qDebug() << "开始扫描数据文件...";
     scanDataFiles();
 }
-
-// 文件内容查看按钮点击
+/**
+ * @brief “查看文件内容”按钮点击处理
+ */
 void MainWindow::on_pushButton_read_file_clicked()
 {
     if (m_currentSelectedFile.isEmpty()) {
@@ -1101,9 +1164,11 @@ void MainWindow::on_pushButton_read_file_clicked()
     qDebug() << "查看文件内容：" << m_currentSelectedFile;
     displayFileContent(m_currentSelectedFile);
 }
+/**********************转台测试部分*****************************/
 bool connected=false;
-/**********************转台开环测试部分*****************************/
-//连接转台按钮的槽函数
+/**
+ * @brief 连接转台按钮槽函数。负责创建转台控制器，并尝试进行串口连接。
+ */
 void MainWindow::on_pushButton_connection_clicked()
 {
     QString port = ui->lineEdit_port->text().trimmed();
@@ -1116,7 +1181,7 @@ void MainWindow::on_pushButton_connection_clicked()
         QMessageBox::warning(this, "错误", "请填写串口路径");
         return;
     }
-    // 如果已经存在控制器，先断开并清理
+    // 清理旧控制器
     if (turntable_controller) {
         turntable_controller->disconnect();
         delete turntable_controller;
@@ -1130,7 +1195,7 @@ void MainWindow::on_pushButton_connection_clicked()
     if (ok) {
         connected=true;
         setTurntableConnectionStatus(true);
-        turntableMonitorTimer->start(200); // 每200ms刷新数据
+        turntableMonitorTimer->start(500); // 每500ms刷新数据
         QMessageBox::information(this, "成功", "转台连接成功");
     } else {
         connected=false;
@@ -1141,158 +1206,164 @@ void MainWindow::on_pushButton_connection_clicked()
         turntable_controller = nullptr;
     }
 }
-// 断开转台按钮槽函数
+/**
+ * @brief 断开转台按钮槽函数。释放控制器并停止监控。
+ */
 void MainWindow::on_pushButton_disconnection_clicked()
 {
-    if (turntable_controller) {
-        turntable_controller->disconnect();
-        // 停止定时器
-        if (turntableMonitorTimer) {
-            turntableMonitorTimer->stop();
-        }
-        // 清理对象
-        delete turntable_controller;
-        turntable_controller = nullptr;
+    if (!turntable_controller) return;
 
-        setTurntableConnectionStatus(false);
-        QMessageBox::information(this, "提示", "转台已断开连接");
+    turntable_controller->disconnect();
+
+    if (turntableMonitorTimer) {
+        turntableMonitorTimer->stop();
     }
+
+    delete turntable_controller;
+    turntable_controller = nullptr;
+
+    setTurntableConnectionStatus(false);
+    QMessageBox::information(this, tr("提示"), tr("转台已断开连接"));
 }
-// 更新连接状态辅助函数
+/**
+ * @brief 更新 UI 中的连接状态相关组件。
+ * @param isConnected 当前是否已连接
+ */
 void MainWindow::setTurntableConnectionStatus(bool connected)
 {
-    if (connected) {
-        ui->connection_status->setText("已连接");
-        ui->connection_status->setStyleSheet("color: green;");
-        ui->pushButton_connection->setEnabled(false);
-        ui->pushButton_disconnection->setEnabled(true);
-    } else {
-        ui->connection_status->setText("未连接");
-        ui->connection_status->setStyleSheet("color: red;");
-        ui->pushButton_connection->setEnabled(true);
-        ui->pushButton_disconnection->setEnabled(false);
-    }
+    ui->connection_status->setText(isConnected ? "已连接" : "未连接");
+    ui->connection_status->setStyleSheet(isConnected ? "color: green;" : "color: red;");
+    ui->pushButton_connection->setEnabled(!isConnected);
+    ui->pushButton_disconnection->setEnabled(isConnected);
 }
-//按钮：btn_set_speed
-void MainWindow::on_btn_set_speed_clicked()
-{
-    if (connected){
-    // ---- 1. 读取 UI 输入 ----
-    float x_speed = ui->line_edit_x_speed_cmd->text().toFloat();
-    float y_speed = ui->line_edit_y_speed_cmd->text().toFloat();
-
-    QString x_dir = ui->combo_box_x_speed_cmd->currentText();
-    QString y_dir = ui->combo_box_y_speed_cmd->currentText();
-
-    // ---- 2. 设置 X 轴速度 ----
-    turntable_controller->set_axis_speed(Yaw, x_speed);
-
-    // ----  设置 X 轴方向 ----
-    if (x_dir == "正转")
-    turntable_controller->set_manual_rotation(Yaw, Left);
-    else
-        turntable_controller->set_manual_rotation(Yaw, Right);
-
-    // ---- 3. 设置 Y 轴速度 ----
-    turntable_controller->set_axis_speed(Pitch, y_speed);
-
-    // ---- 设置 Y 轴方向  ----
-    if (y_dir == "正转")
-        turntable_controller->set_manual_rotation(Pitch, Left);
-    else
-        turntable_controller->set_manual_rotation(Pitch, Right);
-    }
-   
-}
-//停止 X：
-void MainWindow::on_btn_stop_x_turntable_run_clicked()
-{
-    if(connected){
-    turntable_controller->stop_manual_rotation(Yaw);
-}
-}
-//停止 Y：
-void MainWindow::on_btn_stop_y_turntable_run_clicked()
-{
-    if(connected){
-    turntable_controller->stop_manual_rotation(Pitch);
-}
-}
-//设置 X 轴位置
-void MainWindow::on_btn_set_x_pos_clicked()
-{
-    std::cout<<"connected:"<<connected<<std::endl;
-    if(connected){
-    float x_pos = ui->line_edit_x_pos->text().toFloat();
-    turntable_controller->set_axis_angle(Yaw, x_pos);
-}else{
-    QMessageBox::information(this, "提示","NO");
-}
-}
-//设置 Y 轴位置
-void MainWindow::on_btn_set_y_pos_clicked()
-{
-    if(connected){
-    float y_pos = ui->line_edit_y_pos->text().toFloat();
-    turntable_controller->set_axis_angle(Pitch, y_pos);
-}
-}
-//x坐标清零功能
-void MainWindow::on_btn_x_zero_clicked()
-{
-    if(connected){
-    turntable_controller->reset_axis_coord(Yaw);
-}
-}
-//y坐标清零功能
-void MainWindow::on_btn_y_zero_clicked()
-{
-    if(connected){
-    turntable_controller->reset_axis_coord(Pitch);
-}
-}
-
-//更新转台状态显示函数
+/**
+ * @brief 实时更新转台角度、速度，并更新实时曲线。
+ */
 void MainWindow::updateTurntableData()
 {
-    
+
     if (!turntable_controller) return;
 
     float xPos = 0.0f, yPos = 0.0f, xSpeed = 0.0f, ySpeed = 0.0f;
 
-   bool ok1 = turntable_controller->read_axis_angle(Yaw, &xPos);
-   bool ok2 = turntable_controller->read_axis_angle(Pitch, &yPos);
-   bool ok3 = turntable_controller->read_axis_speed(Yaw, &xSpeed);
-   bool ok4 = turntable_controller->read_axis_speed(Pitch, &ySpeed);
+    bool ok1 = turntable_controller->read_axis_angle(Yaw, &xPos);
+    bool ok2 = turntable_controller->read_axis_angle(Pitch, &yPos);
+    bool ok3 = turntable_controller->read_axis_speed(Yaw, &xSpeed);
+    bool ok4 = turntable_controller->read_axis_speed(Pitch, &ySpeed);
 
-   if (ok1 && ok2 && ok3 && ok4) {
+    if (ok1 && ok2 && ok3 && ok4) {
         ui->line_edit_monitor_x_pos->setText(QString::number(xPos, 'f', 2));
         ui->line_edit_monitor_y_pos->setText(QString::number(yPos, 'f', 2));
         ui->line_edit_monitor_x_speed->setText(QString::number(xSpeed, 'f', 2));
         ui->line_edit_monitor_y_speed->setText(QString::number(ySpeed, 'f', 2));
     }
 
-   //===================  更新实时曲线 ===================//
-   chart_time += 0.2;  // update interval = 200ms
+    //===================  更新实时曲线 ===================//
+    chart_time += 0.5;  // update interval = 200ms
 
-   series_current_x->append(chart_time, xPos);
-   series_current_y->append(chart_time, yPos);
+    series_current_x->append(chart_time, xPos);
+    series_current_y->append(chart_time, yPos);
 
-   // target_x, target_y 来自 UI 设置
-   series_target_x->append(chart_time, target_x);
-   series_target_y->append(chart_time, target_y);
+    // target_x, target_y 来自 UI 设置
+    series_target_x->append(chart_time, target_x);
+    series_target_y->append(chart_time, target_y);
 
-   // 维持最多 10 秒数据
-   if (chart_time > 10.0) {
-       turntableChart->axisX()->setRange(chart_time - 10.0, chart_time);
-   }
-    
+    // 维持最多 10 秒数据
+    if (chart_time > 10.0) {
+        turntableChart->axisX()->setRange(chart_time - 10.0, chart_time);
+    }
+
 }
-//可以增加多种控制器
+/**
+ * @brief 设置转台两个轴的速度与方向。
+ */
+void MainWindow::on_btn_set_speed_clicked()
+{
+    if (!connected) return;
+
+    const float x_speed = ui->line_edit_x_speed_cmd->text().toFloat();
+    const float y_speed = ui->line_edit_y_speed_cmd->text().toFloat();
+
+    const QString x_dir = ui->combo_box_x_speed_cmd->currentText();
+    const QString y_dir = ui->combo_box_y_speed_cmd->currentText();
+
+    turntable_controller->set_axis_speed(Yaw, x_speed);
+    turntable_controller->set_manual_rotation(Yaw,
+                                              (x_dir == "正转") ? Left : Right);
+
+    turntable_controller->set_axis_speed(Pitch, y_speed);
+    turntable_controller->set_manual_rotation(Pitch,
+                                              (y_dir == "正转") ? Left : Right);
+   
+}
+/**
+ * @brief 停止 X 轴手动旋转（Yaw）
+ */
+void MainWindow::on_btn_stop_x_turntable_run_clicked()
+{
+    if (connected && turntable_controller) {
+        turntable_controller->stop_manual_rotation(Yaw);
+    }
+}
+
+/**
+ * @brief 停止 Y 轴手动旋转（Pitch）
+ */
+void MainWindow::on_btn_stop_y_turntable_run_clicked()
+{
+    if (connected && turntable_controller) {
+        turntable_controller->stop_manual_rotation(Pitch);
+    }
+}
+/**
+ * @brief 设置 X 轴（Yaw）角度
+ */
+void MainWindow::on_btn_set_x_pos_clicked()
+{
+    if (!connected || !turntable_controller) {
+        QMessageBox::information(this, "提示", "转台未连接");
+        return;
+    }
+    const float xPos = ui->line_edit_x_pos->text().toFloat();
+    turntable_controller->set_axis_angle(Yaw, xPos);
+}
+/**
+ * @brief 设置 Y 轴（Pitch）角度
+ */
+void MainWindow::on_btn_set_y_pos_clicked()
+{
+    if (connected && turntable_controller) {
+        const float yPos = ui->line_edit_y_pos->text().toFloat();
+        turntable_controller->set_axis_angle(Pitch, yPos);
+    }
+}
+
+/**
+ * @brief X 轴（Yaw）归零
+ */
+void MainWindow::on_btn_x_zero_clicked()
+{
+    if (connected && turntable_controller) {
+        turntable_controller->reset_axis_coord(Yaw);
+    }
+}
+/**
+ * @brief Y 轴（Pitch）归零
+ */
+void MainWindow::on_btn_y_zero_clicked()
+{
+    if (connected && turntable_controller) {
+        turntable_controller->reset_axis_coord(Pitch);
+    }
+}
+/**
+ * @brief 控制器选择下拉框变化时触发
+ * @param index 选项索引
+ */
 void MainWindow::on_controller_selection_changed(int index)
 {
-    
-    QString selected = ui->controller_selection->currentText();
+    Q_UNUSED(index);
+    const QString selected = ui->controller_selection->currentText();
 
     if (selected == "PID 控制器") {
         ui->control_status->setText("已选择PID控制算法");
@@ -1300,32 +1371,37 @@ void MainWindow::on_controller_selection_changed(int index)
     }
 
 }
-
-//参考点设置按钮
+/**
+ * @brief 设置闭环控制的参考点
+ */
 void MainWindow::on_btn_set_target_pos_clicked()
 {
-    if(connected){
+    if (!connected) return;
+
     target_x = ui->line_edit_x_pos_ref->text().toDouble();
     target_y = ui->line_edit_y_pos_ref->text().toDouble();
 
     QMessageBox::information(this, "成功",
                              QString("已设置参考坐标：X=%1, Y=%2")
                                  .arg(target_x).arg(target_y));
+
 }
-}
-//设置 PID 参数并开启闭环
+/**
+ * @brief 设置 PID 参数并开启闭环控制
+ */
 void MainWindow::on_btn_set_pidcontroller_parameter_clicked()
 {
-    if(connected){
+    if (!connected) return;
+
     if (ui->controller_selection->currentText() != "PID 控制器") {
         QMessageBox::warning(this, "错误", "请选择 PID 控制器");
         return;
     }
-
     PIDController::Gains g;
     g.kp = ui->line_edit_kp_parameter->text().toDouble();
     g.ki = ui->line_edit_ki_parameter->text().toDouble();
     g.kd = ui->line_edit_kd_parameter->text().toDouble();
+
     pid_x->setGains(g);
     pid_y->setGains(g);
 
@@ -1339,13 +1415,16 @@ void MainWindow::on_btn_set_pidcontroller_parameter_clicked()
 
     pid_x->setController(turntable_controller);
     pid_y->setController(turntable_controller);
-     // 启动闭环控制计时器（50ms 周期）
-     closedLoopTimer->start(50);
+    // 定时器启动
+    closedLoopTimer->start(50);
 
      QMessageBox::information(this, "PID 启动", "PID 参数已设置，闭环控制开始");
-    closedLoopTimer->start(50);
+
 }
-}
+
+/**
+ * @brief 闭环 PID 控制定时器回调（周期性执行）
+ */
 void MainWindow::closedLoopTick()
 {
    
@@ -1362,7 +1441,9 @@ void MainWindow::closedLoopTick()
         QMessageBox::information(this, "完成", "转台已到达目标点（误差 ≤ 0.01）");
     }
 }
-
+/**
+ * @brief 初始化转台位置实时曲线图表
+ */
 void MainWindow::initializeTurntablePositionChart()
 {
 
@@ -1412,12 +1493,39 @@ void MainWindow::initializeTurntablePositionChart()
         series_current_y->attachAxis(axisY);
     
         // ChartView 放入 UI
-        turntableChartView = new QChartView(turntableChart);
+        turntableChartView = new QChartView(turntableChart, ui->turntable_position_chart);
         turntableChartView->setRenderHint(QPainter::Antialiasing);
     
         // 将 turntable_position_chart（QWidget）替换为 ChartView
-        QVBoxLayout *layout = new QVBoxLayout(ui->turntable_position_chart);
+        // QVBoxLayout *layout = new QVBoxLayout(ui->turntable_position_chart);
+        // layout->addWidget(turntableChartView);
+        auto *layout = new QVBoxLayout(ui->turntable_position_chart);
         layout->addWidget(turntableChartView);
-    
+        layout->setContentsMargins(0, 0, 0, 0);
 
+}
+/**
+ * @brief 析构函数，负责释放 MainWindow 使用的资源。
+ *        Qt 的对象会根据父子对象自动析构，但对于手动 new 的对象仍需显式释放。
+ */
+MainWindow::~MainWindow()
+{
+    if (commandTransmitter != nullptr) {
+        commandTransmitter->stop_server();
+    }
+    // 主图表视图资源显式释放（其父对象未托管）
+    delete chartView;
+    chartView = nullptr;
+
+    // PID 控制器资源释放
+    delete pid_x;
+    delete pid_y;
+    pid_x = nullptr;
+    pid_y = nullptr;
+
+    delete turntable_controller;
+    turntable_controller = nullptr;
+    // ui 最后释放
+    delete ui;
+    ui = nullptr;
 }
