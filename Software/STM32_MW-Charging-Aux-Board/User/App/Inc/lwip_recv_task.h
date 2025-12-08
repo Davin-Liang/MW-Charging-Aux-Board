@@ -5,7 +5,7 @@
 #include "queue.h"
 
 #define LWIP_DEMO_PORT          8080 // 本地端口号
-#define IP_ADDR                 "192.168.1.100" // 远程 IP 地址
+#define IP_ADDR                 "192.168.1.101" // 远程 IP 地址
 #define LWIP_RX_BUFSIZE    128 // 最大接收数据长度
 #define MOTOR_CMD_QUEUE_LEN 10
 #define COMMAND_QUEUE_LEN 10

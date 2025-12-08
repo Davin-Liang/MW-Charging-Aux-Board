@@ -41,16 +41,14 @@ static void data_sum_Task(void * param)
   
     while (1)
     {
-      if (pdPASS == xQueueReceive(g_motorDataQueue, &currentMotorData, 10))
-      {
+      if (pdPASS == xQueueReceive(g_motorDataQueue, &currentMotorData, 10)) {
         /* 打印电机数据 */
         mutual_printf("Position:(%.2f,%.2f)\r\n", currentMotorData.x, currentMotorData.y);
         /* 通过以太网上传电机数据 */
         send_motor_data_command(1, currentMotorData.x, currentMotorData.y, 0); // TODO:
       }
 
-      if (pdPASS == xQueueReceive(g_timeDataQueue, &g_currentDateTime, 10))
-      {
+      if (pdPASS == xQueueReceive(g_timeDataQueue, &g_currentDateTime, 10)) {
         /* 打印日期时间数据 */
         printf("获取时间: %04u-%02u-%02u %02u:%02u\n",
               g_currentDateTime.year, g_currentDateTime.month, g_currentDateTime.day,
@@ -58,8 +56,7 @@ static void data_sum_Task(void * param)
       }
 
         
-      if (pdPASS == xQueueReceive(g_optimalVPDataQueue, &currentOptimalVP, 10))
-      {
+      if (pdPASS == xQueueReceive(g_optimalVPDataQueue, &currentOptimalVP, 10)) {
         /* 打印电机数据、最优功率和四个通道的最优电压 */
         mutual_printf("(%.2f,%.2f): V1 = %.2fV, V2 = %.2fV, V3 = %.2fV, V4 = %.2fV, P = %.3fdBm\r\n",
               currentMotorData.x,
@@ -88,8 +85,7 @@ static void data_sum_Task(void * param)
                                       currentOptimalVP.optimalVs); // TODO:
       }
 
-      if (pdPASS == xQueueReceive(g_currentVPChQueue, &currentVPCh, 10))
-      {
+      if (pdPASS == xQueueReceive(g_currentVPChQueue, &currentVPCh, 10)) {
         /* 打印当前通道的电压、功率 */
         mutual_printf("channel: %d current V: %.2f current P: %.3f\r\n",
         currentVPCh.channel,

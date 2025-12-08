@@ -69,7 +69,7 @@ void lwip_comm_default_ip_set(__lwip_dev *lwipx)
     lwipx->remoteip[0] = 192;
     lwipx->remoteip[1] = 168;
     lwipx->remoteip[2] = 1;
-    lwipx->remoteip[3] = 100;
+    lwipx->remoteip[3] = 101;
     
     /* MACµØÖ·ÉèÖÃ */
     lwipx->mac[0] = 0xB8;

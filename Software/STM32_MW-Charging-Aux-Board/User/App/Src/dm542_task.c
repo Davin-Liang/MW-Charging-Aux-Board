@@ -14,7 +14,7 @@ static void dm542_Task(void * param); /* Test_Task任务实现 */
 static TaskHandle_t g_dm542TaskHandle = NULL;/* LED任务句柄 */
 static struct CommandInfo * command;
 static MotorCmd_t motorCmd;
-static FindOptimalCmd_t findOptCmd;
+static FindOptimalCmd_t g_findOptCmd;
 
 extern SemaphoreHandle_t dm542_USART3_Mutex;
 
@@ -29,41 +29,34 @@ static void dm542_Task(void * param)
 	insert_task_handle(g_dm542TaskHandle, "dm542");
   struct MotorData_t currentMotorData;
   
-  while (1)
-  {
-    // vTaskDelay(5000);
-    switch ((int)command->commandType)
-    {
+  while (1) {
+    switch ((int)command->commandType) {
         case demandMutiFindOpt:
-          if (pdPASS == xQueueReceive(g_findOptCmdQueue, &findOptCmd, portMAX_DELAY))
-          {
-            if (findOptCmd.whichThaj == SQU_TRAJ)
-            {
-              for (float x = (-(findOptCmd.squThajLen)/2); x <= (findOptCmd.squThajLen)/2; x = x + findOptCmd.squThajStepLen)
-              {
-                for (float y = (-(findOptCmd.squThajLen)/2); y <= (findOptCmd.squThajLen)/2; y = y + findOptCmd.squThajStepLen)
-                {
-                    xSemaphoreTake(dm542_USART3_Mutex, portMAX_DELAY);
-                    /* 每次移动位置执行一次寻优 */
-                    command->commandType = demandTwo;
-                    /* 唤醒功率计任务 */
-                    vTaskResume(find_task_node_by_name("power_supply")->taskHandle);
-                    /* 电机开始移动 */
-                    motor_position_ctrl(x, y);
-                    /* 上报数据 */
-                    currentMotorData.x = x;
-                    currentMotorData.y = y;
-                    xQueueSend(g_motorDataQueue, &currentMotorData, 10);
-                    xSemaphoreGive(dm542_USART3_Mutex);
-                    vTaskDelay(5000);
+          if (pdPASS == xQueueReceive(g_findOptCmdQueue, &g_findOptCmd, portMAX_DELAY)) {
+            if (g_findOptCmd.whichThaj == SQU_TRAJ) {
+              for (float x = (-(g_findOptCmd.squThajLen)/2); x <= (g_findOptCmd.squThajLen)/2; x = x + g_findOptCmd.squThajStepLen) {
+                for (float y = (-(g_findOptCmd.squThajLen)/2); y <= (g_findOptCmd.squThajLen)/2; y = y + g_findOptCmd.squThajStepLen) {
+                  xSemaphoreTake(dm542_USART3_Mutex, portMAX_DELAY);
+                  /* 每次移动位置执行一次寻优 */
+                  xQueueSend(g_findOptCmdQueue, &g_findOptCmd, 10);
+                  command->commandType = demandTwo;
+                  /* 唤醒功率计任务 */
+                  vTaskResume(find_task_node_by_name("power_supply")->taskHandle);
+                  /* 电机开始移动 */
+                  motor_position_ctrl(x, y);
+                  /* 上报数据 */
+                  currentMotorData.x = x;
+                  currentMotorData.y = y;
+                  xQueueSend(g_motorDataQueue, &currentMotorData, 10);
+                  xSemaphoreGive(dm542_USART3_Mutex);
+                  vTaskDelay(5000);
                 }
               }
-            }
-            else if (findOptCmd.whichThaj == CIR_TRAJ)
-            {
-
+            } else if (g_findOptCmd.whichThaj == CIR_TRAJ) {
+              // TODO: 
             }
 
+            /* 完成寻优任务 */
             command->commandType = noDemand;
           }
 

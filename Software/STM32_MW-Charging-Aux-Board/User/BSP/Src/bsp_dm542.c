@@ -310,11 +310,11 @@ int motor_position_ctrl(float horPosition, float verPosition)
         return 0;
 		
     horDistance = horPosition - horSM.currentPosition;
-	printf("horPosition = %f\n", horPosition);
-	printf("horSM.currentPosition = %f\n", horSM.currentPosition);	
+//	printf("horPosition = %f\n", horPosition);
+//	printf("horSM.currentPosition = %f\n", horSM.currentPosition);	
     verDistance = verPosition - verSM.currentPosition;
-	printf("verPosition = %f\n", verPosition);
-	printf("horSM.currentPosition = %f\n", verSM.currentPosition);
+//	printf("verPosition = %f\n", verPosition);
+//	printf("horSM.currentPosition = %f\n", verSM.currentPosition);
 		
     if (horDistance != 0)
         horSM.movingCompletionStatus = unfinished;
