@@ -1,5 +1,6 @@
 #ifndef TAB_STM32_H
 #define TAB_STM32_H
+#include "command_transmitter.h"  
 
 #include <QObject>
 #include <QVector>
@@ -44,12 +45,12 @@ private:
     CommandTransmitter *transmitter; // 只缓存指针（不拥有）
 
     // 电机轨迹显示图相关
-    QChart *motorChart;
-    QLineSeries *motorTrajectorySeries;
-    QScatterSeries *currentPositionSeries;
-    QValueAxis *axisX;
-    QValueAxis *axisY;
-    QChartView *chartView;
+    QtCharts::QChart *motorChart;
+    QtCharts::QLineSeries *motorTrajectorySeries;
+    QtCharts::QScatterSeries *currentPositionSeries;
+    QtCharts::QValueAxis *axisX;
+    QtCharts::QValueAxis *axisY;
+    QtCharts::QChartView *chartView;
     QVector<QPointF> positionHistory;
 
     // 图表相关函数

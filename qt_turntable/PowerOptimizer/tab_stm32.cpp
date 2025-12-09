@@ -1,11 +1,12 @@
 #include "tab_stm32.h"
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
-#include "CommandTransmitter.h"
+
 
 #include <QMessageBox>
 #include <QVBoxLayout>
 #include <QDebug>
+#include <QtCharts/QValueAxis>
 
 TabSTM32::TabSTM32(MainWindow *mw_)
     : QObject(mw_), mw(mw_)
@@ -150,7 +151,7 @@ void TabSTM32::initializeMotorChart()
     motorChart->addSeries(currentPositionSeries);
 
     // 坐标轴 X
-    axisX = new QValueAxis();
+    axisX = new QtCharts::QValueAxis();
     axisX->setTitleText("x (mm)");
     axisX->setTitleFont(QFont("宋体", 8));
     axisX->setLabelsFont(QFont("宋体", 8));
@@ -158,7 +159,7 @@ void TabSTM32::initializeMotorChart()
     axisX->setTickCount(11);
 
     // 坐标轴 Y
-    axisY = new QValueAxis();
+    axisY = new QtCharts::QValueAxis();
     axisY->setTitleText("y (mm)");
     axisY->setTitleFont(QFont("宋体", 8));
     axisY->setLabelsFont(QFont("宋体", 8));

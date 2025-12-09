@@ -37,7 +37,7 @@ MOVE          = mv -f
 TAR           = tar -cf
 COMPRESS      = gzip -9f
 DISTNAME      = PowerOptimizer1.0.0
-DISTDIR = /home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable/PowerOptimizer/.tmp/PowerOptimizer1.0.0
+DISTDIR = /home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_final/PowerOptimizer/.tmp/PowerOptimizer1.0.0
 LINK          = g++
 LFLAGS        = -Wl,-O1
 LIBS          = $(SUBLIBS) -lmodbus /usr/lib/aarch64-linux-gnu/libQt5Charts.so /usr/lib/aarch64-linux-gnu/libQt5Widgets.so /usr/lib/aarch64-linux-gnu/libQt5Gui.so /usr/lib/aarch64-linux-gnu/libQt5Network.so /usr/lib/aarch64-linux-gnu/libQt5Core.so -lGL -lpthread   
@@ -455,12 +455,12 @@ moc_command_transmitter.cpp: command_transmitter.h \
 		command_struct.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable/PowerOptimizer/moc_predefs.h -I/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable/PowerOptimizer -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable/PowerOptimizer/thirdparty -I/usr/include/modbus -I/usr/include/aarch64-linux-gnu/qt5 -I/usr/include/aarch64-linux-gnu/qt5/QtCharts -I/usr/include/aarch64-linux-gnu/qt5/QtWidgets -I/usr/include/aarch64-linux-gnu/qt5/QtGui -I/usr/include/aarch64-linux-gnu/qt5/QtNetwork -I/usr/include/aarch64-linux-gnu/qt5/QtCore -I/usr/include/c++/11 -I/usr/include/aarch64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/aarch64-linux-gnu/11/include -I/usr/local/include -I/usr/include/aarch64-linux-gnu -I/usr/include command_transmitter.h -o moc_command_transmitter.cpp
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_final/PowerOptimizer/moc_predefs.h -I/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_final/PowerOptimizer -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_final/PowerOptimizer/thirdparty -I/usr/include/modbus -I/usr/include/aarch64-linux-gnu/qt5 -I/usr/include/aarch64-linux-gnu/qt5/QtCharts -I/usr/include/aarch64-linux-gnu/qt5/QtWidgets -I/usr/include/aarch64-linux-gnu/qt5/QtGui -I/usr/include/aarch64-linux-gnu/qt5/QtNetwork -I/usr/include/aarch64-linux-gnu/qt5/QtCore -I/usr/include/c++/11 -I/usr/include/aarch64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/aarch64-linux-gnu/11/include -I/usr/local/include -I/usr/include/aarch64-linux-gnu -I/usr/include command_transmitter.h -o moc_command_transmitter.cpp
 
 moc_logindialog.cpp: logindialog.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable/PowerOptimizer/moc_predefs.h -I/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable/PowerOptimizer -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable/PowerOptimizer/thirdparty -I/usr/include/modbus -I/usr/include/aarch64-linux-gnu/qt5 -I/usr/include/aarch64-linux-gnu/qt5/QtCharts -I/usr/include/aarch64-linux-gnu/qt5/QtWidgets -I/usr/include/aarch64-linux-gnu/qt5/QtGui -I/usr/include/aarch64-linux-gnu/qt5/QtNetwork -I/usr/include/aarch64-linux-gnu/qt5/QtCore -I/usr/include/c++/11 -I/usr/include/aarch64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/aarch64-linux-gnu/11/include -I/usr/local/include -I/usr/include/aarch64-linux-gnu -I/usr/include logindialog.h -o moc_logindialog.cpp
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_final/PowerOptimizer/moc_predefs.h -I/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_final/PowerOptimizer -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_final/PowerOptimizer/thirdparty -I/usr/include/modbus -I/usr/include/aarch64-linux-gnu/qt5 -I/usr/include/aarch64-linux-gnu/qt5/QtCharts -I/usr/include/aarch64-linux-gnu/qt5/QtWidgets -I/usr/include/aarch64-linux-gnu/qt5/QtGui -I/usr/include/aarch64-linux-gnu/qt5/QtNetwork -I/usr/include/aarch64-linux-gnu/qt5/QtCore -I/usr/include/c++/11 -I/usr/include/aarch64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/aarch64-linux-gnu/11/include -I/usr/local/include -I/usr/include/aarch64-linux-gnu -I/usr/include logindialog.h -o moc_logindialog.cpp
 
 moc_mainwindow.cpp: mainwindow.h \
 		command_transmitter.h \
@@ -469,7 +469,7 @@ moc_mainwindow.cpp: mainwindow.h \
 		PID_Controller.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable/PowerOptimizer/moc_predefs.h -I/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable/PowerOptimizer -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable/PowerOptimizer/thirdparty -I/usr/include/modbus -I/usr/include/aarch64-linux-gnu/qt5 -I/usr/include/aarch64-linux-gnu/qt5/QtCharts -I/usr/include/aarch64-linux-gnu/qt5/QtWidgets -I/usr/include/aarch64-linux-gnu/qt5/QtGui -I/usr/include/aarch64-linux-gnu/qt5/QtNetwork -I/usr/include/aarch64-linux-gnu/qt5/QtCore -I/usr/include/c++/11 -I/usr/include/aarch64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/aarch64-linux-gnu/11/include -I/usr/local/include -I/usr/include/aarch64-linux-gnu -I/usr/include mainwindow.h -o moc_mainwindow.cpp
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_final/PowerOptimizer/moc_predefs.h -I/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_final/PowerOptimizer -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_final/PowerOptimizer/thirdparty -I/usr/include/modbus -I/usr/include/aarch64-linux-gnu/qt5 -I/usr/include/aarch64-linux-gnu/qt5/QtCharts -I/usr/include/aarch64-linux-gnu/qt5/QtWidgets -I/usr/include/aarch64-linux-gnu/qt5/QtGui -I/usr/include/aarch64-linux-gnu/qt5/QtNetwork -I/usr/include/aarch64-linux-gnu/qt5/QtCore -I/usr/include/c++/11 -I/usr/include/aarch64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/aarch64-linux-gnu/11/include -I/usr/local/include -I/usr/include/aarch64-linux-gnu -I/usr/include mainwindow.h -o moc_mainwindow.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:

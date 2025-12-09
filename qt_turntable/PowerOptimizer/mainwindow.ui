@@ -1308,7 +1308,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="btn_stop_pidcontroller">
+        <widget class="QPushButton" name="btn_stop_pidcontrol">
          <property name="text">
           <string>停止闭环</string>
          </property>

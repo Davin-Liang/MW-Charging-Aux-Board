@@ -27,6 +27,10 @@
 #include "tab_turntable_control.h"
 #include "tab_stm32.h"
 #include "tab_device_connect.h"
+class TabFileRead;
+class TabSTM32;
+class TabTurntable_Control;
+class TabDeviceConnect;
 QT_USE_NAMESPACE
 
 QT_BEGIN_NAMESPACE
@@ -38,7 +42,10 @@ QT_END_NAMESPACE
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
-
+    friend class TabFileRead;
+    friend class TabSTM32;
+    friend class TabTurntableControl;
+    friend class TabDeviceConnect;
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
@@ -110,8 +117,8 @@ private:
     TurntableController *turntable_controller; // 转台控制对象
     PIDController *pid_x;  //转台PID控制器参数
     PIDController *pid_y;
-    double target_x;
-    double target_y;
+    // double target_x;
+    // double target_y;
 
     TabDeviceConnect *tabDeviceConnect;
     TabSTM32 *tabSTM32;

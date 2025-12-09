@@ -1,6 +1,6 @@
 #include "tab_turntable_control.h"
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
+#include "./ui_mainwindow.h"
 #include "turntable_controller.h"
 #include "PID_Controller.h"
 
@@ -13,6 +13,12 @@ using namespace QtCharts;
 
 TabTurntableControl::TabTurntableControl(MainWindow *mw_)
     : QObject(mw_), mw(mw_)
+    , turntableChart(nullptr)
+    , turntableChartView(nullptr)
+    , series_target_x(nullptr)
+    , series_target_y(nullptr)
+    , series_current_x(nullptr)
+    , series_current_y(nullptr)
 {
     // 不 new 主资源；只引用 MainWindow 持有的对象
     if (mw) {
@@ -74,8 +80,8 @@ void TabTurntableControl::setupConnections()
     connect(mw->ui->btn_set_pidcontroller_parameter, &QPushButton::clicked,
             this, &TabTurntableControl::on_btn_set_pidcontroller_parameter_clicked, Qt::UniqueConnection);
 
-    connect(mw->ui->btn_stop_pidcontroller, &QPushButton::clicked,
-            this, &TabTurntableControl::on_btn_stop_pidcontroller_clicked, Qt::UniqueConnection);
+    connect(mw->ui->btn_stop_pidcontrol, &QPushButton::clicked,
+            this, &TabTurntableControl::on_btn_stop_pidcontrol_clicked, Qt::UniqueConnection);
 
     // 将监控定时器连接到本类的 updateTurntableData（如果存在）
     if (monitorTimer) {
@@ -169,13 +175,13 @@ void TabTurntableControl::initializeTurntablePositionChart()
     series_current_y->attachAxis(axisY);
 
     // ChartView 放入 UI
-    turntableChartView = new QChartView(turntableChart, ui->turntable_position_chart);
+    turntableChartView = new QChartView(turntableChart, mw->ui->turntable_position_chart);
     turntableChartView->setRenderHint(QPainter::Antialiasing);
 
     // 将 turntable_position_chart（QWidget）替换为 ChartView
     // QVBoxLayout *layout = new QVBoxLayout(ui->turntable_position_chart);
     // layout->addWidget(turntableChartView);
-    auto *layout = new QVBoxLayout(ui->turntable_position_chart);
+    auto *layout = new QVBoxLayout(mw->ui->turntable_position_chart);
     layout->addWidget(turntableChartView);
     layout->setContentsMargins(0, 0, 0, 0);
 
@@ -331,7 +337,7 @@ void TabTurntableControl::on_btn_set_pidcontroller_parameter_clicked()
  * @brief PID闭环停止
  */
 
-void TabTurntableControl::on_btn_stop_pidcontroller_clicked()
+void TabTurntableControl::on_btn_stop_pidcontrol_clicked()
 {
     if (closedLoopTimer) closedLoopTimer->stop();
     mw->ui->control_status->setText("闭环控制：停止");

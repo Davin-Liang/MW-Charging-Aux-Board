@@ -72,7 +72,16 @@ public:
     QHBoxLayout *horizontalLayout_34;
     QLabel *label_37;
     QLabel *connection_status;
-    QWidget *tab_3;
+    QWidget *tab_stm32;
+    QGroupBox *groupBox;
+    QHBoxLayout *horizontalLayout_4;
+    QLabel *label_13;
+    QLineEdit *lineEdit_motor_x;
+    QLabel *label_14;
+    QLineEdit *lineEdit_motor_y;
+    QLabel *label_15;
+    QLineEdit *lineEdit_motor_speed;
+    QPushButton *pushButton_motor_control;
     QGroupBox *groupBox_2;
     QVBoxLayout *verticalLayout_14;
     QHBoxLayout *horizontalLayout_5;
@@ -92,17 +101,19 @@ public:
     QLabel *label_7;
     QLineEdit *lineEdit_circle_radius;
     QPushButton *pushButton_find_optimal;
-    QGroupBox *groupBox;
-    QHBoxLayout *horizontalLayout_4;
-    QLabel *label_13;
-    QLineEdit *lineEdit_motor_x;
-    QLabel *label_14;
-    QLineEdit *lineEdit_motor_y;
-    QLabel *label_15;
-    QLineEdit *lineEdit_motor_speed;
-    QPushButton *pushButton_motor_control;
-    QWidget *tab_stm32;
+    QGroupBox *groupBox_7;
+    QVBoxLayout *verticalLayout_9;
+    QHBoxLayout *horizontalLayout_2;
+    QLabel *label_18;
+    QLineEdit *lineEdit_read_currentchannel;
+    QHBoxLayout *horizontalLayout_14;
+    QLabel *label_20;
+    QLineEdit *lineEdit_read_currentpower;
+    QHBoxLayout *horizontalLayout_3;
+    QLabel *label_19;
+    QLineEdit *lineEdit_read_currentvoltage;
     QGroupBox *groupBox_chart;
+    QHBoxLayout *horizontalLayout_26;
     QWidget *widget_chart;
     QGroupBox *groupBox_6;
     QVBoxLayout *verticalLayout_3;
@@ -119,17 +130,6 @@ public:
     QHBoxLayout *horizontalLayout_17;
     QLabel *label_25;
     QLineEdit *lineEdit_read_powermax;
-    QGroupBox *groupBox_7;
-    QVBoxLayout *verticalLayout_9;
-    QHBoxLayout *horizontalLayout_2;
-    QLabel *label_18;
-    QLineEdit *lineEdit_read_currentchannel;
-    QHBoxLayout *horizontalLayout_14;
-    QLabel *label_20;
-    QLineEdit *lineEdit_read_currentpower;
-    QHBoxLayout *horizontalLayout_3;
-    QLabel *label_19;
-    QLineEdit *lineEdit_read_currentvoltage;
     QGroupBox *groupBox_5;
     QVBoxLayout *verticalLayout;
     QHBoxLayout *horizontalLayout_12;
@@ -184,37 +184,33 @@ public:
     QPushButton *btn_x_zero;
     QPushButton *btn_y_zero;
     QGroupBox *groupBox_8;
-    QVBoxLayout *verticalLayout_8;
-    QHBoxLayout *horizontalLayout_25;
+    QHBoxLayout *horizontalLayout_22;
     QLabel *label;
     QLineEdit *line_edit_monitor_x_pos;
     QLabel *label_27;
     QLineEdit *line_edit_monitor_x_speed;
-    QHBoxLayout *horizontalLayout_26;
     QLabel *label_3;
     QLineEdit *line_edit_monitor_y_pos;
     QLabel *label_28;
     QLineEdit *line_edit_monitor_y_speed;
     QGroupBox *groupBox_9;
-    QVBoxLayout *verticalLayout_11;
-    QHBoxLayout *horizontalLayout_22;
+    QVBoxLayout *verticalLayout_8;
+    QHBoxLayout *horizontalLayout_25;
     QLabel *label_29;
     QLineEdit *line_edit_x_pos_ref;
     QLabel *label_31;
     QComboBox *combo_box_x_track_ref;
-    QHBoxLayout *horizontalLayout_23;
     QLabel *label_30;
     QLineEdit *line_edit_y_pos_ref;
     QLabel *label_32;
     QComboBox *combo_box_y_track_ref;
     QHBoxLayout *horizontalLayout_24;
     QPushButton *btn_set_target_pos;
+    QLabel *label_45;
+    QComboBox *controller_selection;
     QLabel *control_status;
     QGroupBox *groupBox_10;
-    QComboBox *controller_selection;
-    QLabel *label_45;
-    QWidget *layoutWidget1;
-    QHBoxLayout *horizontalLayout_38;
+    QHBoxLayout *horizontalLayout_23;
     QLabel *label_46;
     QLineEdit *line_edit_kp_parameter;
     QLabel *label_47;
@@ -222,8 +218,9 @@ public:
     QLabel *label_48;
     QLineEdit *line_edit_kd_parameter;
     QPushButton *btn_set_pidcontroller_parameter;
+    QPushButton *btn_stop_pidcontrol;
     QGroupBox *groupBox_chart_2;
-    QVBoxLayout *verticalLayout_12;
+    QHBoxLayout *horizontalLayout_38;
     QWidget *turntable_position_chart;
     QLabel *label_39;
 
@@ -231,7 +228,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(750, 620);
+        MainWindow->resize(1011, 770);
         QFont font;
         font.setFamily(QString::fromUtf8("\345\256\213\344\275\223"));
         MainWindow->setFont(font);
@@ -239,7 +236,7 @@ public:
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         tabWidget = new QTabWidget(centralwidget);
         tabWidget->setObjectName(QString::fromUtf8("tabWidget"));
-        tabWidget->setGeometry(QRect(10, 30, 731, 571));
+        tabWidget->setGeometry(QRect(10, 40, 991, 721));
         QFont font1;
         font1.setFamily(QString::fromUtf8("\345\256\213\344\275\223"));
         font1.setPointSize(12);
@@ -247,10 +244,10 @@ public:
         tabWidget->setIconSize(QSize(20, 20));
         tabWidget->setDocumentMode(false);
         tab_device_connect = new QWidget();
-        tab_device_connect->setObjectName(QString::fromUtf8("tab_2"));
+        tab_device_connect->setObjectName(QString::fromUtf8("tab_device_connect"));
         group_box_stm32_connection = new QGroupBox(tab_device_connect);
         group_box_stm32_connection->setObjectName(QString::fromUtf8("group_box_stm32_connection"));
-        group_box_stm32_connection->setGeometry(QRect(10, 10, 341, 241));
+        group_box_stm32_connection->setGeometry(QRect(10, 10, 451, 181));
         group_box_stm32_connection->setFont(font1);
         group_box_stm32_connection->setLayoutDirection(Qt::LayoutDirection::LeftToRight);
         verticalLayout_5 = new QVBoxLayout(group_box_stm32_connection);
@@ -328,7 +325,7 @@ public:
 
         turntable_connection = new QGroupBox(tab_device_connect);
         turntable_connection->setObjectName(QString::fromUtf8("turntable_connection"));
-        turntable_connection->setGeometry(QRect(350, 10, 361, 241));
+        turntable_connection->setGeometry(QRect(460, 10, 521, 181));
         turntable_connection->setFont(font1);
         turntable_connection->setLayoutDirection(Qt::LayoutDirection::LeftToRight);
         verticalLayout_13 = new QVBoxLayout(turntable_connection);
@@ -457,11 +454,53 @@ public:
         verticalLayout_13->addLayout(horizontalLayout_34);
 
         tabWidget->addTab(tab_device_connect, QString());
-        tab_3 = new QWidget();
-        tab_3->setObjectName(QString::fromUtf8("tab_3"));
-        groupBox_2 = new QGroupBox(tab_3);
+        tab_stm32 = new QWidget();
+        tab_stm32->setObjectName(QString::fromUtf8("tab_stm32"));
+        groupBox = new QGroupBox(tab_stm32);
+        groupBox->setObjectName(QString::fromUtf8("groupBox"));
+        groupBox->setGeometry(QRect(0, 10, 981, 61));
+        groupBox->setFont(font1);
+        horizontalLayout_4 = new QHBoxLayout(groupBox);
+        horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
+        label_13 = new QLabel(groupBox);
+        label_13->setObjectName(QString::fromUtf8("label_13"));
+
+        horizontalLayout_4->addWidget(label_13);
+
+        lineEdit_motor_x = new QLineEdit(groupBox);
+        lineEdit_motor_x->setObjectName(QString::fromUtf8("lineEdit_motor_x"));
+
+        horizontalLayout_4->addWidget(lineEdit_motor_x);
+
+        label_14 = new QLabel(groupBox);
+        label_14->setObjectName(QString::fromUtf8("label_14"));
+
+        horizontalLayout_4->addWidget(label_14);
+
+        lineEdit_motor_y = new QLineEdit(groupBox);
+        lineEdit_motor_y->setObjectName(QString::fromUtf8("lineEdit_motor_y"));
+
+        horizontalLayout_4->addWidget(lineEdit_motor_y);
+
+        label_15 = new QLabel(groupBox);
+        label_15->setObjectName(QString::fromUtf8("label_15"));
+
+        horizontalLayout_4->addWidget(label_15);
+
+        lineEdit_motor_speed = new QLineEdit(groupBox);
+        lineEdit_motor_speed->setObjectName(QString::fromUtf8("lineEdit_motor_speed"));
+
+        horizontalLayout_4->addWidget(lineEdit_motor_speed);
+
+        pushButton_motor_control = new QPushButton(groupBox);
+        pushButton_motor_control->setObjectName(QString::fromUtf8("pushButton_motor_control"));
+        pushButton_motor_control->setFont(font1);
+
+        horizontalLayout_4->addWidget(pushButton_motor_control);
+
+        groupBox_2 = new QGroupBox(tab_stm32);
         groupBox_2->setObjectName(QString::fromUtf8("groupBox_2"));
-        groupBox_2->setGeometry(QRect(10, 110, 711, 161));
+        groupBox_2->setGeometry(QRect(0, 70, 981, 111));
         groupBox_2->setFont(font1);
         verticalLayout_14 = new QVBoxLayout(groupBox_2);
         verticalLayout_14->setObjectName(QString::fromUtf8("verticalLayout_14"));
@@ -551,61 +590,74 @@ public:
 
         verticalLayout_14->addLayout(horizontalLayout_6);
 
-        groupBox = new QGroupBox(tab_3);
-        groupBox->setObjectName(QString::fromUtf8("groupBox"));
-        groupBox->setGeometry(QRect(10, 10, 711, 101));
-        groupBox->setFont(font1);
-        horizontalLayout_4 = new QHBoxLayout(groupBox);
-        horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
-        label_13 = new QLabel(groupBox);
-        label_13->setObjectName(QString::fromUtf8("label_13"));
+        groupBox_7 = new QGroupBox(tab_stm32);
+        groupBox_7->setObjectName(QString::fromUtf8("groupBox_7"));
+        groupBox_7->setGeometry(QRect(0, 360, 341, 191));
+        groupBox_7->setFont(font1);
+        verticalLayout_9 = new QVBoxLayout(groupBox_7);
+        verticalLayout_9->setObjectName(QString::fromUtf8("verticalLayout_9"));
+        horizontalLayout_2 = new QHBoxLayout();
+        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
+        label_18 = new QLabel(groupBox_7);
+        label_18->setObjectName(QString::fromUtf8("label_18"));
+        label_18->setFont(font1);
 
-        horizontalLayout_4->addWidget(label_13);
+        horizontalLayout_2->addWidget(label_18);
 
-        lineEdit_motor_x = new QLineEdit(groupBox);
-        lineEdit_motor_x->setObjectName(QString::fromUtf8("lineEdit_motor_x"));
+        lineEdit_read_currentchannel = new QLineEdit(groupBox_7);
+        lineEdit_read_currentchannel->setObjectName(QString::fromUtf8("lineEdit_read_currentchannel"));
 
-        horizontalLayout_4->addWidget(lineEdit_motor_x);
+        horizontalLayout_2->addWidget(lineEdit_read_currentchannel);
 
-        label_14 = new QLabel(groupBox);
-        label_14->setObjectName(QString::fromUtf8("label_14"));
 
-        horizontalLayout_4->addWidget(label_14);
+        verticalLayout_9->addLayout(horizontalLayout_2);
 
-        lineEdit_motor_y = new QLineEdit(groupBox);
-        lineEdit_motor_y->setObjectName(QString::fromUtf8("lineEdit_motor_y"));
+        horizontalLayout_14 = new QHBoxLayout();
+        horizontalLayout_14->setObjectName(QString::fromUtf8("horizontalLayout_14"));
+        label_20 = new QLabel(groupBox_7);
+        label_20->setObjectName(QString::fromUtf8("label_20"));
+        label_20->setFont(font1);
 
-        horizontalLayout_4->addWidget(lineEdit_motor_y);
+        horizontalLayout_14->addWidget(label_20);
 
-        label_15 = new QLabel(groupBox);
-        label_15->setObjectName(QString::fromUtf8("label_15"));
+        lineEdit_read_currentpower = new QLineEdit(groupBox_7);
+        lineEdit_read_currentpower->setObjectName(QString::fromUtf8("lineEdit_read_currentpower"));
 
-        horizontalLayout_4->addWidget(label_15);
+        horizontalLayout_14->addWidget(lineEdit_read_currentpower);
 
-        lineEdit_motor_speed = new QLineEdit(groupBox);
-        lineEdit_motor_speed->setObjectName(QString::fromUtf8("lineEdit_motor_speed"));
 
-        horizontalLayout_4->addWidget(lineEdit_motor_speed);
+        verticalLayout_9->addLayout(horizontalLayout_14);
 
-        pushButton_motor_control = new QPushButton(groupBox);
-        pushButton_motor_control->setObjectName(QString::fromUtf8("pushButton_motor_control"));
-        pushButton_motor_control->setFont(font1);
+        horizontalLayout_3 = new QHBoxLayout();
+        horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
+        label_19 = new QLabel(groupBox_7);
+        label_19->setObjectName(QString::fromUtf8("label_19"));
+        label_19->setFont(font1);
 
-        horizontalLayout_4->addWidget(pushButton_motor_control);
+        horizontalLayout_3->addWidget(label_19);
 
-        tabWidget->addTab(tab_3, QString());
-        tab_stm32 = new QWidget();
-        tab_stm32->setObjectName(QString::fromUtf8("tab_4"));
+        lineEdit_read_currentvoltage = new QLineEdit(groupBox_7);
+        lineEdit_read_currentvoltage->setObjectName(QString::fromUtf8("lineEdit_read_currentvoltage"));
+
+        horizontalLayout_3->addWidget(lineEdit_read_currentvoltage);
+
+
+        verticalLayout_9->addLayout(horizontalLayout_3);
+
         groupBox_chart = new QGroupBox(tab_stm32);
         groupBox_chart->setObjectName(QString::fromUtf8("groupBox_chart"));
-        groupBox_chart->setGeometry(QRect(240, 10, 481, 371));
+        groupBox_chart->setGeometry(QRect(340, 180, 641, 371));
         groupBox_chart->setFont(font1);
+        horizontalLayout_26 = new QHBoxLayout(groupBox_chart);
+        horizontalLayout_26->setObjectName(QString::fromUtf8("horizontalLayout_26"));
         widget_chart = new QWidget(groupBox_chart);
         widget_chart->setObjectName(QString::fromUtf8("widget_chart"));
-        widget_chart->setGeometry(QRect(10, 26, 461, 335));
+
+        horizontalLayout_26->addWidget(widget_chart);
+
         groupBox_6 = new QGroupBox(tab_stm32);
         groupBox_6->setObjectName(QString::fromUtf8("groupBox_6"));
-        groupBox_6->setGeometry(QRect(0, 380, 721, 121));
+        groupBox_6->setGeometry(QRect(0, 550, 981, 141));
         groupBox_6->setFont(font1);
         verticalLayout_3 = new QVBoxLayout(groupBox_6);
         verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
@@ -679,63 +731,9 @@ public:
 
         verticalLayout_3->addLayout(horizontalLayout_17);
 
-        groupBox_7 = new QGroupBox(tab_stm32);
-        groupBox_7->setObjectName(QString::fromUtf8("groupBox_7"));
-        groupBox_7->setGeometry(QRect(0, 190, 241, 191));
-        groupBox_7->setFont(font1);
-        verticalLayout_9 = new QVBoxLayout(groupBox_7);
-        verticalLayout_9->setObjectName(QString::fromUtf8("verticalLayout_9"));
-        horizontalLayout_2 = new QHBoxLayout();
-        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
-        label_18 = new QLabel(groupBox_7);
-        label_18->setObjectName(QString::fromUtf8("label_18"));
-        label_18->setFont(font1);
-
-        horizontalLayout_2->addWidget(label_18);
-
-        lineEdit_read_currentchannel = new QLineEdit(groupBox_7);
-        lineEdit_read_currentchannel->setObjectName(QString::fromUtf8("lineEdit_read_currentchannel"));
-
-        horizontalLayout_2->addWidget(lineEdit_read_currentchannel);
-
-
-        verticalLayout_9->addLayout(horizontalLayout_2);
-
-        horizontalLayout_14 = new QHBoxLayout();
-        horizontalLayout_14->setObjectName(QString::fromUtf8("horizontalLayout_14"));
-        label_20 = new QLabel(groupBox_7);
-        label_20->setObjectName(QString::fromUtf8("label_20"));
-        label_20->setFont(font1);
-
-        horizontalLayout_14->addWidget(label_20);
-
-        lineEdit_read_currentpower = new QLineEdit(groupBox_7);
-        lineEdit_read_currentpower->setObjectName(QString::fromUtf8("lineEdit_read_currentpower"));
-
-        horizontalLayout_14->addWidget(lineEdit_read_currentpower);
-
-
-        verticalLayout_9->addLayout(horizontalLayout_14);
-
-        horizontalLayout_3 = new QHBoxLayout();
-        horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
-        label_19 = new QLabel(groupBox_7);
-        label_19->setObjectName(QString::fromUtf8("label_19"));
-        label_19->setFont(font1);
-
-        horizontalLayout_3->addWidget(label_19);
-
-        lineEdit_read_currentvoltage = new QLineEdit(groupBox_7);
-        lineEdit_read_currentvoltage->setObjectName(QString::fromUtf8("lineEdit_read_currentvoltage"));
-
-        horizontalLayout_3->addWidget(lineEdit_read_currentvoltage);
-
-
-        verticalLayout_9->addLayout(horizontalLayout_3);
-
         groupBox_5 = new QGroupBox(tab_stm32);
         groupBox_5->setObjectName(QString::fromUtf8("groupBox_5"));
-        groupBox_5->setGeometry(QRect(0, 20, 241, 171));
+        groupBox_5->setGeometry(QRect(0, 180, 341, 181));
         groupBox_5->setFont(font1);
         verticalLayout = new QVBoxLayout(groupBox_5);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
@@ -796,7 +794,7 @@ public:
         tab_file_read->setObjectName(QString::fromUtf8("tab_file_read"));
         layoutWidget = new QWidget(tab_file_read);
         layoutWidget->setObjectName(QString::fromUtf8("layoutWidget"));
-        layoutWidget->setGeometry(QRect(22, 12, 691, 481));
+        layoutWidget->setGeometry(QRect(22, 12, 941, 671));
         verticalLayout_4 = new QVBoxLayout(layoutWidget);
         verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
         verticalLayout_4->setContentsMargins(0, 0, 0, 0);
@@ -841,7 +839,7 @@ public:
 
         tabWidget->addTab(tab_file_read, QString());
         tab_turntable_control = new QWidget();
-        tab_turntable_control->setObjectName(QString::fromUtf8("tab"));
+        tab_turntable_control->setObjectName(QString::fromUtf8("tab_turntable_control"));
         group_box_turntable_shape = new QGroupBox(tab_turntable_control);
         group_box_turntable_shape->setObjectName(QString::fromUtf8("group_box_turntable_shape"));
         group_box_turntable_shape->setGeometry(QRect(1, 1, 291, 191));
@@ -855,7 +853,7 @@ public:
 
         open_group_box_turntable_control = new QGroupBox(tab_turntable_control);
         open_group_box_turntable_control->setObjectName(QString::fromUtf8("open_group_box_turntable_control"));
-        open_group_box_turntable_control->setGeometry(QRect(0, 200, 301, 341));
+        open_group_box_turntable_control->setGeometry(QRect(0, 200, 311, 481));
         verticalLayout_2 = new QVBoxLayout(open_group_box_turntable_control);
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
         groupBox_3 = new QGroupBox(open_group_box_turntable_control);
@@ -992,113 +990,98 @@ public:
 
         groupBox_8 = new QGroupBox(tab_turntable_control);
         groupBox_8->setObjectName(QString::fromUtf8("groupBox_8"));
-        groupBox_8->setGeometry(QRect(300, 130, 421, 101));
-        verticalLayout_8 = new QVBoxLayout(groupBox_8);
-        verticalLayout_8->setObjectName(QString::fromUtf8("verticalLayout_8"));
-        horizontalLayout_25 = new QHBoxLayout();
-        horizontalLayout_25->setObjectName(QString::fromUtf8("horizontalLayout_25"));
+        groupBox_8->setGeometry(QRect(310, 210, 671, 71));
+        horizontalLayout_22 = new QHBoxLayout(groupBox_8);
+        horizontalLayout_22->setObjectName(QString::fromUtf8("horizontalLayout_22"));
         label = new QLabel(groupBox_8);
         label->setObjectName(QString::fromUtf8("label"));
 
-        horizontalLayout_25->addWidget(label);
+        horizontalLayout_22->addWidget(label);
 
         line_edit_monitor_x_pos = new QLineEdit(groupBox_8);
         line_edit_monitor_x_pos->setObjectName(QString::fromUtf8("line_edit_monitor_x_pos"));
 
-        horizontalLayout_25->addWidget(line_edit_monitor_x_pos);
+        horizontalLayout_22->addWidget(line_edit_monitor_x_pos);
 
         label_27 = new QLabel(groupBox_8);
         label_27->setObjectName(QString::fromUtf8("label_27"));
 
-        horizontalLayout_25->addWidget(label_27);
+        horizontalLayout_22->addWidget(label_27);
 
         line_edit_monitor_x_speed = new QLineEdit(groupBox_8);
         line_edit_monitor_x_speed->setObjectName(QString::fromUtf8("line_edit_monitor_x_speed"));
 
-        horizontalLayout_25->addWidget(line_edit_monitor_x_speed);
+        horizontalLayout_22->addWidget(line_edit_monitor_x_speed);
 
-
-        verticalLayout_8->addLayout(horizontalLayout_25);
-
-        horizontalLayout_26 = new QHBoxLayout();
-        horizontalLayout_26->setObjectName(QString::fromUtf8("horizontalLayout_26"));
         label_3 = new QLabel(groupBox_8);
         label_3->setObjectName(QString::fromUtf8("label_3"));
 
-        horizontalLayout_26->addWidget(label_3);
+        horizontalLayout_22->addWidget(label_3);
 
         line_edit_monitor_y_pos = new QLineEdit(groupBox_8);
         line_edit_monitor_y_pos->setObjectName(QString::fromUtf8("line_edit_monitor_y_pos"));
 
-        horizontalLayout_26->addWidget(line_edit_monitor_y_pos);
+        horizontalLayout_22->addWidget(line_edit_monitor_y_pos);
 
         label_28 = new QLabel(groupBox_8);
         label_28->setObjectName(QString::fromUtf8("label_28"));
 
-        horizontalLayout_26->addWidget(label_28);
+        horizontalLayout_22->addWidget(label_28);
 
         line_edit_monitor_y_speed = new QLineEdit(groupBox_8);
         line_edit_monitor_y_speed->setObjectName(QString::fromUtf8("line_edit_monitor_y_speed"));
 
-        horizontalLayout_26->addWidget(line_edit_monitor_y_speed);
-
-
-        verticalLayout_8->addLayout(horizontalLayout_26);
+        horizontalLayout_22->addWidget(line_edit_monitor_y_speed);
 
         groupBox_9 = new QGroupBox(tab_turntable_control);
         groupBox_9->setObjectName(QString::fromUtf8("groupBox_9"));
-        groupBox_9->setGeometry(QRect(301, 1, 421, 131));
-        verticalLayout_11 = new QVBoxLayout(groupBox_9);
-        verticalLayout_11->setObjectName(QString::fromUtf8("verticalLayout_11"));
-        horizontalLayout_22 = new QHBoxLayout();
-        horizontalLayout_22->setObjectName(QString::fromUtf8("horizontalLayout_22"));
+        groupBox_9->setGeometry(QRect(310, 1, 671, 141));
+        verticalLayout_8 = new QVBoxLayout(groupBox_9);
+        verticalLayout_8->setObjectName(QString::fromUtf8("verticalLayout_8"));
+        horizontalLayout_25 = new QHBoxLayout();
+        horizontalLayout_25->setObjectName(QString::fromUtf8("horizontalLayout_25"));
         label_29 = new QLabel(groupBox_9);
         label_29->setObjectName(QString::fromUtf8("label_29"));
 
-        horizontalLayout_22->addWidget(label_29);
+        horizontalLayout_25->addWidget(label_29);
 
         line_edit_x_pos_ref = new QLineEdit(groupBox_9);
         line_edit_x_pos_ref->setObjectName(QString::fromUtf8("line_edit_x_pos_ref"));
 
-        horizontalLayout_22->addWidget(line_edit_x_pos_ref);
+        horizontalLayout_25->addWidget(line_edit_x_pos_ref);
 
         label_31 = new QLabel(groupBox_9);
         label_31->setObjectName(QString::fromUtf8("label_31"));
 
-        horizontalLayout_22->addWidget(label_31);
+        horizontalLayout_25->addWidget(label_31);
 
         combo_box_x_track_ref = new QComboBox(groupBox_9);
         combo_box_x_track_ref->setObjectName(QString::fromUtf8("combo_box_x_track_ref"));
 
-        horizontalLayout_22->addWidget(combo_box_x_track_ref);
+        horizontalLayout_25->addWidget(combo_box_x_track_ref);
 
-
-        verticalLayout_11->addLayout(horizontalLayout_22);
-
-        horizontalLayout_23 = new QHBoxLayout();
-        horizontalLayout_23->setObjectName(QString::fromUtf8("horizontalLayout_23"));
         label_30 = new QLabel(groupBox_9);
         label_30->setObjectName(QString::fromUtf8("label_30"));
 
-        horizontalLayout_23->addWidget(label_30);
+        horizontalLayout_25->addWidget(label_30);
 
         line_edit_y_pos_ref = new QLineEdit(groupBox_9);
         line_edit_y_pos_ref->setObjectName(QString::fromUtf8("line_edit_y_pos_ref"));
 
-        horizontalLayout_23->addWidget(line_edit_y_pos_ref);
+        horizontalLayout_25->addWidget(line_edit_y_pos_ref);
 
         label_32 = new QLabel(groupBox_9);
         label_32->setObjectName(QString::fromUtf8("label_32"));
 
-        horizontalLayout_23->addWidget(label_32);
+        horizontalLayout_25->addWidget(label_32);
 
         combo_box_y_track_ref = new QComboBox(groupBox_9);
         combo_box_y_track_ref->setObjectName(QString::fromUtf8("combo_box_y_track_ref"));
 
-        horizontalLayout_23->addWidget(combo_box_y_track_ref);
+        horizontalLayout_25->addWidget(combo_box_y_track_ref);
 
 
-        verticalLayout_11->addLayout(horizontalLayout_23);
+        verticalLayout_8->addLayout(horizontalLayout_25);
 
         horizontalLayout_24 = new QHBoxLayout();
         horizontalLayout_24->setObjectName(QString::fromUtf8("horizontalLayout_24"));
@@ -1107,79 +1090,84 @@ public:
 
         horizontalLayout_24->addWidget(btn_set_target_pos);
 
+        label_45 = new QLabel(groupBox_9);
+        label_45->setObjectName(QString::fromUtf8("label_45"));
+
+        horizontalLayout_24->addWidget(label_45);
+
+        controller_selection = new QComboBox(groupBox_9);
+        controller_selection->setObjectName(QString::fromUtf8("controller_selection"));
+
+        horizontalLayout_24->addWidget(controller_selection);
+
         control_status = new QLabel(groupBox_9);
         control_status->setObjectName(QString::fromUtf8("control_status"));
 
         horizontalLayout_24->addWidget(control_status);
 
 
-        verticalLayout_11->addLayout(horizontalLayout_24);
+        verticalLayout_8->addLayout(horizontalLayout_24);
 
         groupBox_10 = new QGroupBox(tab_turntable_control);
         groupBox_10->setObjectName(QString::fromUtf8("groupBox_10"));
-        groupBox_10->setGeometry(QRect(300, 230, 421, 101));
-        controller_selection = new QComboBox(groupBox_10);
-        controller_selection->setObjectName(QString::fromUtf8("controller_selection"));
-        controller_selection->setGeometry(QRect(110, 30, 121, 21));
-        label_45 = new QLabel(groupBox_10);
-        label_45->setObjectName(QString::fromUtf8("label_45"));
-        label_45->setGeometry(QRect(10, 30, 101, 21));
-        layoutWidget1 = new QWidget(groupBox_10);
-        layoutWidget1->setObjectName(QString::fromUtf8("layoutWidget1"));
-        layoutWidget1->setGeometry(QRect(10, 60, 411, 31));
-        horizontalLayout_38 = new QHBoxLayout(layoutWidget1);
-        horizontalLayout_38->setObjectName(QString::fromUtf8("horizontalLayout_38"));
-        horizontalLayout_38->setContentsMargins(0, 0, 0, 0);
-        label_46 = new QLabel(layoutWidget1);
+        groupBox_10->setGeometry(QRect(310, 140, 671, 71));
+        horizontalLayout_23 = new QHBoxLayout(groupBox_10);
+        horizontalLayout_23->setObjectName(QString::fromUtf8("horizontalLayout_23"));
+        label_46 = new QLabel(groupBox_10);
         label_46->setObjectName(QString::fromUtf8("label_46"));
 
-        horizontalLayout_38->addWidget(label_46);
+        horizontalLayout_23->addWidget(label_46);
 
-        line_edit_kp_parameter = new QLineEdit(layoutWidget1);
+        line_edit_kp_parameter = new QLineEdit(groupBox_10);
         line_edit_kp_parameter->setObjectName(QString::fromUtf8("line_edit_kp_parameter"));
 
-        horizontalLayout_38->addWidget(line_edit_kp_parameter);
+        horizontalLayout_23->addWidget(line_edit_kp_parameter);
 
-        label_47 = new QLabel(layoutWidget1);
+        label_47 = new QLabel(groupBox_10);
         label_47->setObjectName(QString::fromUtf8("label_47"));
 
-        horizontalLayout_38->addWidget(label_47);
+        horizontalLayout_23->addWidget(label_47);
 
-        line_edit_ki_parameter = new QLineEdit(layoutWidget1);
+        line_edit_ki_parameter = new QLineEdit(groupBox_10);
         line_edit_ki_parameter->setObjectName(QString::fromUtf8("line_edit_ki_parameter"));
 
-        horizontalLayout_38->addWidget(line_edit_ki_parameter);
+        horizontalLayout_23->addWidget(line_edit_ki_parameter);
 
-        label_48 = new QLabel(layoutWidget1);
+        label_48 = new QLabel(groupBox_10);
         label_48->setObjectName(QString::fromUtf8("label_48"));
 
-        horizontalLayout_38->addWidget(label_48);
+        horizontalLayout_23->addWidget(label_48);
 
-        line_edit_kd_parameter = new QLineEdit(layoutWidget1);
+        line_edit_kd_parameter = new QLineEdit(groupBox_10);
         line_edit_kd_parameter->setObjectName(QString::fromUtf8("line_edit_kd_parameter"));
 
-        horizontalLayout_38->addWidget(line_edit_kd_parameter);
+        horizontalLayout_23->addWidget(line_edit_kd_parameter);
 
-        btn_set_pidcontroller_parameter = new QPushButton(layoutWidget1);
+        btn_set_pidcontroller_parameter = new QPushButton(groupBox_10);
         btn_set_pidcontroller_parameter->setObjectName(QString::fromUtf8("btn_set_pidcontroller_parameter"));
 
-        horizontalLayout_38->addWidget(btn_set_pidcontroller_parameter);
+        horizontalLayout_23->addWidget(btn_set_pidcontroller_parameter);
+
+        btn_stop_pidcontrol = new QPushButton(groupBox_10);
+        btn_stop_pidcontrol->setObjectName(QString::fromUtf8("btn_stop_pidcontrol"));
+
+        horizontalLayout_23->addWidget(btn_stop_pidcontrol);
 
         groupBox_chart_2 = new QGroupBox(tab_turntable_control);
         groupBox_chart_2->setObjectName(QString::fromUtf8("groupBox_chart_2"));
-        groupBox_chart_2->setGeometry(QRect(310, 330, 421, 211));
+        groupBox_chart_2->setGeometry(QRect(310, 280, 671, 401));
         groupBox_chart_2->setFont(font1);
-        verticalLayout_12 = new QVBoxLayout(groupBox_chart_2);
-        verticalLayout_12->setObjectName(QString::fromUtf8("verticalLayout_12"));
+        horizontalLayout_38 = new QHBoxLayout(groupBox_chart_2);
+        horizontalLayout_38->setObjectName(QString::fromUtf8("horizontalLayout_38"));
         turntable_position_chart = new QWidget(groupBox_chart_2);
         turntable_position_chart->setObjectName(QString::fromUtf8("turntable_position_chart"));
 
-        verticalLayout_12->addWidget(turntable_position_chart);
+        horizontalLayout_38->addWidget(turntable_position_chart);
 
         tabWidget->addTab(tab_turntable_control, QString());
         label_39 = new QLabel(centralwidget);
         label_39->setObjectName(QString::fromUtf8("label_39"));
-        label_39->setGeometry(QRect(10, 10, 161, 21));
+        label_39->setGeometry(QRect(20, 10, 191, 21));
         QFont font4;
         font4.setFamily(QString::fromUtf8("Times New Roman"));
         font4.setPointSize(16);
@@ -1189,7 +1177,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        tabWidget->setCurrentIndex(1);
+        tabWidget->setCurrentIndex(3);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -1216,6 +1204,11 @@ public:
         label_37->setText(QCoreApplication::translate("MainWindow", "\347\212\266\346\200\201", nullptr));
         connection_status->setText(QCoreApplication::translate("MainWindow", "\346\234\252\350\277\236\346\216\245", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tab_device_connect), QCoreApplication::translate("MainWindow", "\350\256\276\345\244\207\350\277\236\346\216\245", nullptr));
+        groupBox->setTitle(QCoreApplication::translate("MainWindow", "\347\224\265\346\234\272\346\216\247\345\210\266\346\214\207\344\273\244\350\256\276\347\275\256", nullptr));
+        label_13->setText(QCoreApplication::translate("MainWindow", "X\345\235\220\346\240\207", nullptr));
+        label_14->setText(QCoreApplication::translate("MainWindow", "Y\345\235\220\346\240\207", nullptr));
+        label_15->setText(QCoreApplication::translate("MainWindow", "\351\200\237\345\272\246", nullptr));
+        pushButton_motor_control->setText(QCoreApplication::translate("MainWindow", "\345\217\221\351\200\201\347\224\265\346\234\272\346\214\207\344\273\244", nullptr));
         groupBox_2->setTitle(QCoreApplication::translate("MainWindow", "\345\212\237\347\216\207\345\257\273\344\274\230\346\214\207\344\273\244\350\256\276\347\275\256", nullptr));
         label_16->setText(QCoreApplication::translate("MainWindow", "\350\275\250\350\277\271\350\256\276\345\256\232", nullptr));
         label_10->setText(QCoreApplication::translate("MainWindow", "\346\234\200\345\244\247\347\224\265\345\216\213", nullptr));
@@ -1225,12 +1218,10 @@ public:
         label_8->setText(QCoreApplication::translate("MainWindow", "\346\226\271\345\275\242\346\255\245\351\225\277", nullptr));
         label_7->setText(QCoreApplication::translate("MainWindow", "\345\234\206\345\275\242\345\215\212\345\276\204", nullptr));
         pushButton_find_optimal->setText(QCoreApplication::translate("MainWindow", "\345\217\221\351\200\201\345\257\273\344\274\230\346\214\207\344\273\244", nullptr));
-        groupBox->setTitle(QCoreApplication::translate("MainWindow", "\347\224\265\346\234\272\346\216\247\345\210\266\346\214\207\344\273\244\350\256\276\347\275\256", nullptr));
-        label_13->setText(QCoreApplication::translate("MainWindow", "X\345\235\220\346\240\207", nullptr));
-        label_14->setText(QCoreApplication::translate("MainWindow", "Y\345\235\220\346\240\207", nullptr));
-        label_15->setText(QCoreApplication::translate("MainWindow", "\351\200\237\345\272\246", nullptr));
-        pushButton_motor_control->setText(QCoreApplication::translate("MainWindow", "\345\217\221\351\200\201\347\224\265\346\234\272\346\214\207\344\273\244", nullptr));
-        tabWidget->setTabText(tabWidget->indexOf(tab_3), QCoreApplication::translate("MainWindow", "STM32\350\242\253\346\216\247\346\214\207\344\273\244", nullptr));
+        groupBox_7->setTitle(QCoreApplication::translate("MainWindow", "\345\257\273\344\274\230\350\277\207\347\250\213\346\225\260\346\215\256\346\230\276\347\244\272", nullptr));
+        label_18->setText(QCoreApplication::translate("MainWindow", "\345\275\223\345\211\215\351\200\232\351\201\223", nullptr));
+        label_20->setText(QCoreApplication::translate("MainWindow", "\345\275\223\345\211\215\345\212\237\347\216\207", nullptr));
+        label_19->setText(QCoreApplication::translate("MainWindow", "\345\275\223\345\211\215\347\224\265\345\216\213", nullptr));
         groupBox_chart->setTitle(QCoreApplication::translate("MainWindow", "\347\224\265\346\234\272\344\275\215\347\275\256\350\275\250\350\277\271\345\233\276", nullptr));
         groupBox_6->setTitle(QCoreApplication::translate("MainWindow", "\345\257\273\344\274\230\347\273\223\346\236\234\346\230\276\347\244\272", nullptr));
         label_21->setText(QCoreApplication::translate("MainWindow", "Channel1_Vmax", nullptr));
@@ -1238,10 +1229,6 @@ public:
         label_23->setText(QCoreApplication::translate("MainWindow", "Channel3_Vmax", nullptr));
         label_24->setText(QCoreApplication::translate("MainWindow", "Channel4_Vmax", nullptr));
         label_25->setText(QCoreApplication::translate("MainWindow", "Pmax", nullptr));
-        groupBox_7->setTitle(QCoreApplication::translate("MainWindow", "\345\257\273\344\274\230\350\277\207\347\250\213\346\225\260\346\215\256\346\230\276\347\244\272", nullptr));
-        label_18->setText(QCoreApplication::translate("MainWindow", "\345\275\223\345\211\215\351\200\232\351\201\223", nullptr));
-        label_20->setText(QCoreApplication::translate("MainWindow", "\345\275\223\345\211\215\345\212\237\347\216\207", nullptr));
-        label_19->setText(QCoreApplication::translate("MainWindow", "\345\275\223\345\211\215\347\224\265\345\216\213", nullptr));
         groupBox_5->setTitle(QCoreApplication::translate("MainWindow", "\347\224\265\346\234\272\345\275\223\345\211\215\347\212\266\346\200\201\350\257\273\345\217\226", nullptr));
         label_6->setText(QCoreApplication::translate("MainWindow", "x\345\235\220\346\240\207", nullptr));
         label_12->setText(QCoreApplication::translate("MainWindow", "y\345\235\220\346\240\207", nullptr));
@@ -1278,16 +1265,17 @@ public:
         label_30->setText(QCoreApplication::translate("MainWindow", "Y\350\275\264\344\275\215\347\275\256", nullptr));
         label_32->setText(QCoreApplication::translate("MainWindow", "\345\217\202\350\200\203\350\275\250\350\277\271", nullptr));
         btn_set_target_pos->setText(QCoreApplication::translate("MainWindow", "\350\256\276\345\256\232\347\233\256\346\240\207\344\275\215\347\275\256", nullptr));
-        control_status->setText(QCoreApplication::translate("MainWindow", "\346\234\252\350\277\233\345\205\245\351\227\255\347\216\257\346\265\213\350\257\225", nullptr));
-        groupBox_10->setTitle(QCoreApplication::translate("MainWindow", "\346\216\247\345\210\266\347\256\227\346\263\225\345\217\212\345\217\202\346\225\260\350\256\276\345\256\232", nullptr));
         label_45->setText(QCoreApplication::translate("MainWindow", "\346\216\247\345\210\266\347\256\227\346\263\225\350\256\276\347\275\256", nullptr));
+        control_status->setText(QCoreApplication::translate("MainWindow", "\346\234\252\350\277\233\345\205\245\351\227\255\347\216\257\346\265\213\350\257\225", nullptr));
+        groupBox_10->setTitle(QCoreApplication::translate("MainWindow", "PID\347\256\227\345\217\202\346\225\260\350\256\276\345\256\232", nullptr));
         label_46->setText(QCoreApplication::translate("MainWindow", "KP", nullptr));
         label_47->setText(QCoreApplication::translate("MainWindow", "KI", nullptr));
         label_48->setText(QCoreApplication::translate("MainWindow", "KD", nullptr));
         btn_set_pidcontroller_parameter->setText(QCoreApplication::translate("MainWindow", "\345\217\202\346\225\260\350\256\276\345\256\232", nullptr));
+        btn_stop_pidcontrol->setText(QCoreApplication::translate("MainWindow", "\345\201\234\346\255\242\351\227\255\347\216\257", nullptr));
         groupBox_chart_2->setTitle(QCoreApplication::translate("MainWindow", "\350\275\254\345\217\260\344\275\215\347\275\256\350\275\250\350\277\271\345\233\276", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tab_turntable_control), QCoreApplication::translate("MainWindow", "\345\244\251\347\272\277\350\275\254\345\217\260\346\216\247\345\210\266", nullptr));
-        label_39->setText(QCoreApplication::translate("MainWindow", "\350\275\254\345\217\260\346\216\247\345\210\266\344\270\255\345\277\203", nullptr));
+        label_39->setText(QCoreApplication::translate("MainWindow", "\345\220\204\347\261\273\350\256\276\345\244\207\346\216\247\345\210\266\344\270\255\345\277\203", nullptr));
     } // retranslateUi
 
 };
