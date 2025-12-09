@@ -13,6 +13,10 @@ LIBS += -lmodbus
 SOURCES += \
     PID_Controller.cpp \
     command_transmitter.cpp \
+    tab_file_read.cpp \
+    tab_stm32.cpp \
+    tab_turntable_control.cpp \
+    tabdeviceconnect.cpp \
     turntable_controller.cpp\
     logindialog.cpp \
     main.cpp \
@@ -22,6 +26,10 @@ HEADERS += \
     PID_Controller.h \
     command_struct.h \
     command_transmitter.h \
+    tab_file_read.h \
+    tab_stm32.h \
+    tab_turntable_control.h \
+    tabdeviceconnect.h \
     turntable_controller.h\
     logindialog.h \
     mainwindow.h

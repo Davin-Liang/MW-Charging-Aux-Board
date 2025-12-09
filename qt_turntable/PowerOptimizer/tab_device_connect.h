@@ -1,10 +1,26 @@
 #ifndef TAB_DEVICE_CONNECT_H
 #define TAB_DEVICE_CONNECT_H
 
-class DeviceConnectWidget
+#include <QObject>
+
+class MainWindow;
+
+class TabDeviceConnect : public QObject
 {
+    Q_OBJECT
+
 public:
-    DeviceConnectWidget();
+    explicit TabDeviceConnect(MainWindow *mw);
+    void setupConnections();
+
+private slots:
+    void onConnectSTM32();
+    void onDisconnectSTM32();
+    void onConnectTurntable();
+    void onDisconnectTurntable();
+
+private:
+    MainWindow *mw; // 直接访问 mw->ui
 };
 
-#endif // TAB_DEVICE_CONNECT_H
+#endif
