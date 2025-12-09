@@ -32,7 +32,7 @@ class Ui_MainWindow
 public:
     QWidget *centralwidget;
     QTabWidget *tabWidget;
-    QWidget *tab_2;
+    QWidget *tab_device_connect;
     QGroupBox *group_box_stm32_connection;
     QVBoxLayout *verticalLayout_5;
     QHBoxLayout *horizontalLayout;
@@ -101,7 +101,7 @@ public:
     QLabel *label_15;
     QLineEdit *lineEdit_motor_speed;
     QPushButton *pushButton_motor_control;
-    QWidget *tab_4;
+    QWidget *tab_stm32;
     QGroupBox *groupBox_chart;
     QWidget *widget_chart;
     QGroupBox *groupBox_6;
@@ -150,7 +150,7 @@ public:
     QListWidget *listWidget_files;
     QLabel *label_selected_file;
     QTableWidget *tableWidget_file_content;
-    QWidget *tab;
+    QWidget *tab_turntable_control;
     QGroupBox *group_box_turntable_shape;
     QVBoxLayout *verticalLayout_7;
     QLabel *label_turntable_img;
@@ -246,9 +246,9 @@ public:
         tabWidget->setFont(font1);
         tabWidget->setIconSize(QSize(20, 20));
         tabWidget->setDocumentMode(false);
-        tab_2 = new QWidget();
-        tab_2->setObjectName(QString::fromUtf8("tab_2"));
-        group_box_stm32_connection = new QGroupBox(tab_2);
+        tab_device_connect = new QWidget();
+        tab_device_connect->setObjectName(QString::fromUtf8("tab_2"));
+        group_box_stm32_connection = new QGroupBox(tab_device_connect);
         group_box_stm32_connection->setObjectName(QString::fromUtf8("group_box_stm32_connection"));
         group_box_stm32_connection->setGeometry(QRect(10, 10, 341, 241));
         group_box_stm32_connection->setFont(font1);
@@ -326,7 +326,7 @@ public:
 
         verticalLayout_5->addLayout(horizontalLayout_10);
 
-        turntable_connection = new QGroupBox(tab_2);
+        turntable_connection = new QGroupBox(tab_device_connect);
         turntable_connection->setObjectName(QString::fromUtf8("turntable_connection"));
         turntable_connection->setGeometry(QRect(350, 10, 361, 241));
         turntable_connection->setFont(font1);
@@ -456,7 +456,7 @@ public:
 
         verticalLayout_13->addLayout(horizontalLayout_34);
 
-        tabWidget->addTab(tab_2, QString());
+        tabWidget->addTab(tab_device_connect, QString());
         tab_3 = new QWidget();
         tab_3->setObjectName(QString::fromUtf8("tab_3"));
         groupBox_2 = new QGroupBox(tab_3);
@@ -594,16 +594,16 @@ public:
         horizontalLayout_4->addWidget(pushButton_motor_control);
 
         tabWidget->addTab(tab_3, QString());
-        tab_4 = new QWidget();
-        tab_4->setObjectName(QString::fromUtf8("tab_4"));
-        groupBox_chart = new QGroupBox(tab_4);
+        tab_stm32 = new QWidget();
+        tab_stm32->setObjectName(QString::fromUtf8("tab_4"));
+        groupBox_chart = new QGroupBox(tab_stm32);
         groupBox_chart->setObjectName(QString::fromUtf8("groupBox_chart"));
         groupBox_chart->setGeometry(QRect(240, 10, 481, 371));
         groupBox_chart->setFont(font1);
         widget_chart = new QWidget(groupBox_chart);
         widget_chart->setObjectName(QString::fromUtf8("widget_chart"));
         widget_chart->setGeometry(QRect(10, 26, 461, 335));
-        groupBox_6 = new QGroupBox(tab_4);
+        groupBox_6 = new QGroupBox(tab_stm32);
         groupBox_6->setObjectName(QString::fromUtf8("groupBox_6"));
         groupBox_6->setGeometry(QRect(0, 380, 721, 121));
         groupBox_6->setFont(font1);
@@ -679,7 +679,7 @@ public:
 
         verticalLayout_3->addLayout(horizontalLayout_17);
 
-        groupBox_7 = new QGroupBox(tab_4);
+        groupBox_7 = new QGroupBox(tab_stm32);
         groupBox_7->setObjectName(QString::fromUtf8("groupBox_7"));
         groupBox_7->setGeometry(QRect(0, 190, 241, 191));
         groupBox_7->setFont(font1);
@@ -733,7 +733,7 @@ public:
 
         verticalLayout_9->addLayout(horizontalLayout_3);
 
-        groupBox_5 = new QGroupBox(tab_4);
+        groupBox_5 = new QGroupBox(tab_stm32);
         groupBox_5->setObjectName(QString::fromUtf8("groupBox_5"));
         groupBox_5->setGeometry(QRect(0, 20, 241, 171));
         groupBox_5->setFont(font1);
@@ -791,7 +791,7 @@ public:
 
         verticalLayout->addLayout(horizontalLayout_19);
 
-        tabWidget->addTab(tab_4, QString());
+        tabWidget->addTab(tab_stm32, QString());
         tab_file_read = new QWidget();
         tab_file_read->setObjectName(QString::fromUtf8("tab_file_read"));
         layoutWidget = new QWidget(tab_file_read);
@@ -840,9 +840,9 @@ public:
         verticalLayout_4->addWidget(tableWidget_file_content);
 
         tabWidget->addTab(tab_file_read, QString());
-        tab = new QWidget();
-        tab->setObjectName(QString::fromUtf8("tab"));
-        group_box_turntable_shape = new QGroupBox(tab);
+        tab_turntable_control = new QWidget();
+        tab_turntable_control->setObjectName(QString::fromUtf8("tab"));
+        group_box_turntable_shape = new QGroupBox(tab_turntable_control);
         group_box_turntable_shape->setObjectName(QString::fromUtf8("group_box_turntable_shape"));
         group_box_turntable_shape->setGeometry(QRect(1, 1, 291, 191));
         verticalLayout_7 = new QVBoxLayout(group_box_turntable_shape);
@@ -853,7 +853,7 @@ public:
 
         verticalLayout_7->addWidget(label_turntable_img);
 
-        open_group_box_turntable_control = new QGroupBox(tab);
+        open_group_box_turntable_control = new QGroupBox(tab_turntable_control);
         open_group_box_turntable_control->setObjectName(QString::fromUtf8("open_group_box_turntable_control"));
         open_group_box_turntable_control->setGeometry(QRect(0, 200, 301, 341));
         verticalLayout_2 = new QVBoxLayout(open_group_box_turntable_control);
@@ -990,7 +990,7 @@ public:
 
         verticalLayout_2->addWidget(groupBox_4);
 
-        groupBox_8 = new QGroupBox(tab);
+        groupBox_8 = new QGroupBox(tab_turntable_control);
         groupBox_8->setObjectName(QString::fromUtf8("groupBox_8"));
         groupBox_8->setGeometry(QRect(300, 130, 421, 101));
         verticalLayout_8 = new QVBoxLayout(groupBox_8);
@@ -1045,7 +1045,7 @@ public:
 
         verticalLayout_8->addLayout(horizontalLayout_26);
 
-        groupBox_9 = new QGroupBox(tab);
+        groupBox_9 = new QGroupBox(tab_turntable_control);
         groupBox_9->setObjectName(QString::fromUtf8("groupBox_9"));
         groupBox_9->setGeometry(QRect(301, 1, 421, 131));
         verticalLayout_11 = new QVBoxLayout(groupBox_9);
@@ -1115,7 +1115,7 @@ public:
 
         verticalLayout_11->addLayout(horizontalLayout_24);
 
-        groupBox_10 = new QGroupBox(tab);
+        groupBox_10 = new QGroupBox(tab_turntable_control);
         groupBox_10->setObjectName(QString::fromUtf8("groupBox_10"));
         groupBox_10->setGeometry(QRect(300, 230, 421, 101));
         controller_selection = new QComboBox(groupBox_10);
@@ -1165,7 +1165,7 @@ public:
 
         horizontalLayout_38->addWidget(btn_set_pidcontroller_parameter);
 
-        groupBox_chart_2 = new QGroupBox(tab);
+        groupBox_chart_2 = new QGroupBox(tab_turntable_control);
         groupBox_chart_2->setObjectName(QString::fromUtf8("groupBox_chart_2"));
         groupBox_chart_2->setGeometry(QRect(310, 330, 421, 211));
         groupBox_chart_2->setFont(font1);
@@ -1176,7 +1176,7 @@ public:
 
         verticalLayout_12->addWidget(turntable_position_chart);
 
-        tabWidget->addTab(tab, QString());
+        tabWidget->addTab(tab_turntable_control, QString());
         label_39 = new QLabel(centralwidget);
         label_39->setObjectName(QString::fromUtf8("label_39"));
         label_39->setGeometry(QRect(10, 10, 161, 21));
@@ -1215,7 +1215,7 @@ public:
         pushButton_disconnection->setText(QCoreApplication::translate("MainWindow", "\346\226\255\345\274\200\350\277\236\346\216\245", nullptr));
         label_37->setText(QCoreApplication::translate("MainWindow", "\347\212\266\346\200\201", nullptr));
         connection_status->setText(QCoreApplication::translate("MainWindow", "\346\234\252\350\277\236\346\216\245", nullptr));
-        tabWidget->setTabText(tabWidget->indexOf(tab_2), QCoreApplication::translate("MainWindow", "\350\256\276\345\244\207\350\277\236\346\216\245", nullptr));
+        tabWidget->setTabText(tabWidget->indexOf(tab_device_connect), QCoreApplication::translate("MainWindow", "\350\256\276\345\244\207\350\277\236\346\216\245", nullptr));
         groupBox_2->setTitle(QCoreApplication::translate("MainWindow", "\345\212\237\347\216\207\345\257\273\344\274\230\346\214\207\344\273\244\350\256\276\347\275\256", nullptr));
         label_16->setText(QCoreApplication::translate("MainWindow", "\350\275\250\350\277\271\350\256\276\345\256\232", nullptr));
         label_10->setText(QCoreApplication::translate("MainWindow", "\346\234\200\345\244\247\347\224\265\345\216\213", nullptr));
@@ -1246,7 +1246,7 @@ public:
         label_6->setText(QCoreApplication::translate("MainWindow", "x\345\235\220\346\240\207", nullptr));
         label_12->setText(QCoreApplication::translate("MainWindow", "y\345\235\220\346\240\207", nullptr));
         label_17->setText(QCoreApplication::translate("MainWindow", "\351\200\237\345\272\246", nullptr));
-        tabWidget->setTabText(tabWidget->indexOf(tab_4), QCoreApplication::translate("MainWindow", "\346\216\245\346\224\266STM32\346\225\260\346\215\256", nullptr));
+        tabWidget->setTabText(tabWidget->indexOf(tab_stm32), QCoreApplication::translate("MainWindow", "\346\216\245\346\224\266STM32\346\225\260\346\215\256", nullptr));
         pushButton_filenamedisplay->setText(QCoreApplication::translate("MainWindow", "\346\226\207\344\273\266\346\265\217\350\247\210", nullptr));
         pushButton_read_file->setText(QCoreApplication::translate("MainWindow", "\345\206\205\345\256\271\346\237\245\347\234\213", nullptr));
         label_selected_file->setText(QCoreApplication::translate("MainWindow", "\345\275\223\345\211\215\346\234\252\351\200\211\344\270\255", nullptr));
@@ -1286,7 +1286,7 @@ public:
         label_48->setText(QCoreApplication::translate("MainWindow", "KD", nullptr));
         btn_set_pidcontroller_parameter->setText(QCoreApplication::translate("MainWindow", "\345\217\202\346\225\260\350\256\276\345\256\232", nullptr));
         groupBox_chart_2->setTitle(QCoreApplication::translate("MainWindow", "\350\275\254\345\217\260\344\275\215\347\275\256\350\275\250\350\277\271\345\233\276", nullptr));
-        tabWidget->setTabText(tabWidget->indexOf(tab), QCoreApplication::translate("MainWindow", "\345\244\251\347\272\277\350\275\254\345\217\260\346\216\247\345\210\266", nullptr));
+        tabWidget->setTabText(tabWidget->indexOf(tab_turntable_control), QCoreApplication::translate("MainWindow", "\345\244\251\347\272\277\350\275\254\345\217\260\346\216\247\345\210\266", nullptr));
         label_39->setText(QCoreApplication::translate("MainWindow", "\350\275\254\345\217\260\346\216\247\345\210\266\344\270\255\345\277\203", nullptr));
     } // retranslateUi
 
