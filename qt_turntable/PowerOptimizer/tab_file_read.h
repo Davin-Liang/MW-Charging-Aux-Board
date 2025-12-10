@@ -2,7 +2,7 @@
 #define TAB_FILE_READ_H
 
 #include <QObject>
-
+#include <QHeaderView>    
 class MainWindow;
 
 class TabFileRead : public QObject

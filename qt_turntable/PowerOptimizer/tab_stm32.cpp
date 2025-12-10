@@ -16,6 +16,9 @@ TabSTM32::TabSTM32(MainWindow *mw_)
 
 TabSTM32::~TabSTM32()
 {
+        // 主图表视图资源显式释放（其父对象未托管）
+        delete chartView;
+        chartView = nullptr;
     // 不 delete transmitter（由 MainWindow 管理）
 }
 
@@ -126,21 +129,21 @@ void TabSTM32::initializeUIWithConfig()
 void TabSTM32::initializeMotorChart()
 {
     // 创建图表
-    motorChart = new QChart();
+    motorChart = new QtCharts::QChart();
     motorChart->setTitle("");  // 不显示标题
-    motorChart->setAnimationOptions(QChart::NoAnimation);
+    motorChart->setAnimationOptions(QtCharts::QChart::NoAnimation);
     motorChart->legend()->hide();
     motorChart->setMargins(QMargins(0, 0, 0, 0)); // 去除图表边距
     motorChart->setBackgroundRoundness(0);   // 设置图表边距为0，使其完全填充
 
     // 创建轨迹曲线（蓝色线条）
-    motorTrajectorySeries = new QLineSeries();
+    motorTrajectorySeries = new QtCharts::QLineSeries();
     // 移除名称设置，不显示图例
     motorTrajectorySeries->setColor(Qt::blue);
     motorTrajectorySeries->setPointsVisible(false);  // 不显示轨迹上的点，只显示线条
 
     // 创建当前位置点（红色散点）
-    currentPositionSeries = new QScatterSeries();
+    currentPositionSeries = new QtCharts::QScatterSeries();
     // 移除名称设置，不显示图例
     currentPositionSeries->setColor(Qt::red);
     currentPositionSeries->setBorderColor(Qt::darkRed);
@@ -177,7 +180,7 @@ void TabSTM32::initializeMotorChart()
 
 
     // 创建图表视图
-    chartView = new QChartView(motorChart);
+    chartView = new QtCharts::QChartView(motorChart);
     chartView->setRenderHint(QPainter::Antialiasing);
     chartView->setContentsMargins(0, 0, 0, 0);  // 设置图表视图的边距为0
 

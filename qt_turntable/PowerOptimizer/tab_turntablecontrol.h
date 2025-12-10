@@ -1,5 +1,6 @@
-#ifndef TAB_TURNTABLE_CONTROL_H
-#define TAB_TURNTABLE_CONTROL_H
+#ifndef TAB_TURNTABLECONTROL_H
+#define TAB_TURNTABLECONTROL_H
+
 
 #include <QObject>
 #include <QPointF>
@@ -8,6 +9,7 @@
 #include <QtCharts/QChartView>
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QValueAxis> 
+
 class MainWindow;
 class TurntableController;
 class PIDController;

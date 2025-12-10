@@ -1,9 +1,9 @@
-#include "tab_turntable_control.h"
+#include "tab_turntablecontrol.h"
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include "turntable_controller.h"
 #include "PID_Controller.h"
-
+#include "command_transmitter.h" 
 #include <QMessageBox>
 #include <QDebug>
 #include <QTimer>
@@ -288,11 +288,11 @@ void TabTurntableControl::on_controller_selection_changed(int index)
 void TabTurntableControl::on_btn_set_target_pos_clicked()
 {
     // 读取目标并显示
-    mw->target_x = mw->ui->line_edit_x_pos_ref->text().toDouble();
-    mw->target_y = mw->ui->line_edit_y_pos_ref->text().toDouble();
+    target_x = mw->ui->line_edit_x_pos_ref->text().toDouble();
+    target_y = mw->ui->line_edit_y_pos_ref->text().toDouble();
     QMessageBox::information(mw, "成功",
                              QString("已设置参考坐标：X=%1, Y=%2")
-                                 .arg(mw->target_x).arg(mw->target_y));
+                                 .arg(target_x).arg(target_y));
 }
 /**
  * @brief 设置 PID 参数并开启闭环控制
@@ -392,8 +392,8 @@ void TabTurntableControl::closedLoopTick()
 
     if (!pidX || !pidY) return;
     // 使用 pid 控制器的 controlLoop 接口（假定定义类似于你的实现）
-    bool doneX = pidX->controlLoop(mw->target_x, 0.01, 0.05);
-    bool doneY = pidY->controlLoop(mw->target_y, 0.01, 0.05);
+    bool doneX = pidX->controlLoop(target_x, 0.01, 0.05);
+    bool doneY = pidY->controlLoop(target_y, 0.01, 0.05);
 
     if (doneX && doneY) {
         if (closedLoopTimer) closedLoopTimer->stop();

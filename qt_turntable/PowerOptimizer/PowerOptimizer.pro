@@ -15,8 +15,8 @@ SOURCES += \
     command_transmitter.cpp \
     tab_file_read.cpp \
     tab_stm32.cpp \
-    tab_turntable_control.cpp \
-    tabdeviceconnect.cpp \
+    tab_turntablecontrol.cpp \
+    tab_deviceconnect.cpp \
     turntable_controller.cpp\
     logindialog.cpp \
     main.cpp \
@@ -28,8 +28,8 @@ HEADERS += \
     command_transmitter.h \
     tab_file_read.h \
     tab_stm32.h \
-    tab_turntable_control.h \
-    tabdeviceconnect.h \
+    tab_turntablecontrol.h \
+    tab_deviceconnect.h \
     turntable_controller.h\
     logindialog.h \
     mainwindow.h

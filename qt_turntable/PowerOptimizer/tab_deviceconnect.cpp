@@ -1,18 +1,17 @@
-#include "tab_device_connect.h"
+#include "tab_deviceconnect.h"
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
-#include "CommandTransmitter.h"
-#include "TurntableController.h"
-
+#include "turntable_controller.h"
+#include "command_transmitter.h" 
 #include <QMessageBox>
 #include <QNetworkProxy>
 #include <QNetworkProxyFactory>
 #include <QDebug>
-#include <QTimer>
+
 
 
 TabDeviceConnect::TabDeviceConnect(MainWindow *mw_)
-    : QObject(mw_), mw(mw_), transmitter(nullptr), turntable(nullptr)
+    : QObject(mw_), mw(mw_), transmitter(nullptr), turntable(nullptr), turntableMonitorTimer(nullptr)
 {
     // 从 MainWindow 提取控制对象，使本类实现真正的模块化
     transmitter = mw->commandTransmitter;
@@ -211,11 +210,11 @@ void TabDeviceConnect::on_pushButton_connection_clicked()
     // 创建新的控制器对象
     TurntableController *ctl = new TurntableController(port.toStdString().c_str());
     bool ok = ctl->connect(baudrate, parity, dataBit, stopBit);
-    // 尝试连接
-    bool ok = turntable->connect(baudrate, parity, dataBit, stopBit);
+    // // 尝试连接
+    // ok = turntable->connect(baudrate, parity, dataBit, stopBit);
     if (ok) {
         // 保存为主窗口的指针
-        mw->turntable_controller = ctl;
+        // mw->turntable_controller = ctl;
         turntable = ctl;
         isTurntableConnected = true;
         setTurntableConnectionStatus(true);

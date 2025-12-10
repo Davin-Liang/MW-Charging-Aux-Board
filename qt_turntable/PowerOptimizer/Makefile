@@ -56,8 +56,8 @@ SOURCES       = PID_Controller.cpp \
 		command_transmitter.cpp \
 		tab_file_read.cpp \
 		tab_stm32.cpp \
-		tab_turntable_control.cpp \
-		tabdeviceconnect.cpp \
+		tab_turntablecontrol.cpp \
+		tab_deviceconnect.cpp \
 		turntable_controller.cpp \
 		logindialog.cpp \
 		main.cpp \
@@ -65,16 +65,16 @@ SOURCES       = PID_Controller.cpp \
 		moc_command_transmitter.cpp \
 		moc_tab_file_read.cpp \
 		moc_tab_stm32.cpp \
-		moc_tab_turntable_control.cpp \
-		moc_tabdeviceconnect.cpp \
+		moc_tab_turntablecontrol.cpp \
+		moc_tab_deviceconnect.cpp \
 		moc_logindialog.cpp \
 		moc_mainwindow.cpp
 OBJECTS       = PID_Controller.o \
 		command_transmitter.o \
 		tab_file_read.o \
 		tab_stm32.o \
-		tab_turntable_control.o \
-		tabdeviceconnect.o \
+		tab_turntablecontrol.o \
+		tab_deviceconnect.o \
 		turntable_controller.o \
 		logindialog.o \
 		main.o \
@@ -83,8 +83,8 @@ OBJECTS       = PID_Controller.o \
 		moc_command_transmitter.o \
 		moc_tab_file_read.o \
 		moc_tab_stm32.o \
-		moc_tab_turntable_control.o \
-		moc_tabdeviceconnect.o \
+		moc_tab_turntablecontrol.o \
+		moc_tab_deviceconnect.o \
 		moc_logindialog.o \
 		moc_mainwindow.o
 DIST          = /usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
@@ -187,16 +187,16 @@ DIST          = /usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		command_transmitter.h \
 		tab_file_read.h \
 		tab_stm32.h \
-		tab_turntable_control.h \
-		tabdeviceconnect.h \
+		tab_turntablecontrol.h \
+		tab_deviceconnect.h \
 		turntable_controller.h \
 		logindialog.h \
 		mainwindow.h PID_Controller.cpp \
 		command_transmitter.cpp \
 		tab_file_read.cpp \
 		tab_stm32.cpp \
-		tab_turntable_control.cpp \
-		tabdeviceconnect.cpp \
+		tab_turntablecontrol.cpp \
+		tab_deviceconnect.cpp \
 		turntable_controller.cpp \
 		logindialog.cpp \
 		main.cpp \
@@ -425,8 +425,8 @@ distdir: FORCE
 	$(COPY_FILE) --parents PowerOptimizer_zh_CN.ts $(DISTDIR)/
 	$(COPY_FILE) --parents qmake_qmake_qm_files.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents PID_Controller.h command_struct.h command_transmitter.h tab_file_read.h tab_stm32.h tab_turntable_control.h tabdeviceconnect.h turntable_controller.h logindialog.h mainwindow.h $(DISTDIR)/
-	$(COPY_FILE) --parents PID_Controller.cpp command_transmitter.cpp tab_file_read.cpp tab_stm32.cpp tab_turntable_control.cpp tabdeviceconnect.cpp turntable_controller.cpp logindialog.cpp main.cpp mainwindow.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents PID_Controller.h command_struct.h command_transmitter.h tab_file_read.h tab_stm32.h tab_turntablecontrol.h tab_deviceconnect.h turntable_controller.h logindialog.h mainwindow.h $(DISTDIR)/
+	$(COPY_FILE) --parents PID_Controller.cpp command_transmitter.cpp tab_file_read.cpp tab_stm32.cpp tab_turntablecontrol.cpp tab_deviceconnect.cpp turntable_controller.cpp logindialog.cpp main.cpp mainwindow.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents mainwindow.ui $(DISTDIR)/
 	$(COPY_FILE) --parents PowerOptimizer_zh_CN.ts $(DISTDIR)/
 
@@ -472,9 +472,9 @@ compiler_moc_predefs_clean:
 moc_predefs.h: /usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 	g++ -pipe -O2 -std=gnu++1z -Wall -Wextra -dM -E -o moc_predefs.h /usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 
-compiler_moc_header_make_all: moc_command_transmitter.cpp moc_tab_file_read.cpp moc_tab_stm32.cpp moc_tab_turntable_control.cpp moc_tabdeviceconnect.cpp moc_logindialog.cpp moc_mainwindow.cpp
+compiler_moc_header_make_all: moc_command_transmitter.cpp moc_tab_file_read.cpp moc_tab_stm32.cpp moc_tab_turntablecontrol.cpp moc_tab_deviceconnect.cpp moc_logindialog.cpp moc_mainwindow.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_command_transmitter.cpp moc_tab_file_read.cpp moc_tab_stm32.cpp moc_tab_turntable_control.cpp moc_tabdeviceconnect.cpp moc_logindialog.cpp moc_mainwindow.cpp
+	-$(DEL_FILE) moc_command_transmitter.cpp moc_tab_file_read.cpp moc_tab_stm32.cpp moc_tab_turntablecontrol.cpp moc_tab_deviceconnect.cpp moc_logindialog.cpp moc_mainwindow.cpp
 moc_command_transmitter.cpp: command_transmitter.h \
 		command_struct.h \
 		moc_predefs.h \
@@ -487,19 +487,21 @@ moc_tab_file_read.cpp: tab_file_read.h \
 	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable/PowerOptimizer/moc_predefs.h -I/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable/PowerOptimizer -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable/PowerOptimizer/thirdparty -I/usr/include/modbus -I/usr/include/aarch64-linux-gnu/qt5 -I/usr/include/aarch64-linux-gnu/qt5/QtCharts -I/usr/include/aarch64-linux-gnu/qt5/QtWidgets -I/usr/include/aarch64-linux-gnu/qt5/QtGui -I/usr/include/aarch64-linux-gnu/qt5/QtNetwork -I/usr/include/aarch64-linux-gnu/qt5/QtCore -I/usr/include/c++/11 -I/usr/include/aarch64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/aarch64-linux-gnu/11/include -I/usr/local/include -I/usr/include/aarch64-linux-gnu -I/usr/include tab_file_read.h -o moc_tab_file_read.cpp
 
 moc_tab_stm32.cpp: tab_stm32.h \
+		command_transmitter.h \
+		command_struct.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
 	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable/PowerOptimizer/moc_predefs.h -I/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable/PowerOptimizer -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable/PowerOptimizer/thirdparty -I/usr/include/modbus -I/usr/include/aarch64-linux-gnu/qt5 -I/usr/include/aarch64-linux-gnu/qt5/QtCharts -I/usr/include/aarch64-linux-gnu/qt5/QtWidgets -I/usr/include/aarch64-linux-gnu/qt5/QtGui -I/usr/include/aarch64-linux-gnu/qt5/QtNetwork -I/usr/include/aarch64-linux-gnu/qt5/QtCore -I/usr/include/c++/11 -I/usr/include/aarch64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/aarch64-linux-gnu/11/include -I/usr/local/include -I/usr/include/aarch64-linux-gnu -I/usr/include tab_stm32.h -o moc_tab_stm32.cpp
 
-moc_tab_turntable_control.cpp: tab_turntable_control.h \
+moc_tab_turntablecontrol.cpp: tab_turntablecontrol.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable/PowerOptimizer/moc_predefs.h -I/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable/PowerOptimizer -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable/PowerOptimizer/thirdparty -I/usr/include/modbus -I/usr/include/aarch64-linux-gnu/qt5 -I/usr/include/aarch64-linux-gnu/qt5/QtCharts -I/usr/include/aarch64-linux-gnu/qt5/QtWidgets -I/usr/include/aarch64-linux-gnu/qt5/QtGui -I/usr/include/aarch64-linux-gnu/qt5/QtNetwork -I/usr/include/aarch64-linux-gnu/qt5/QtCore -I/usr/include/c++/11 -I/usr/include/aarch64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/aarch64-linux-gnu/11/include -I/usr/local/include -I/usr/include/aarch64-linux-gnu -I/usr/include tab_turntable_control.h -o moc_tab_turntable_control.cpp
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable/PowerOptimizer/moc_predefs.h -I/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable/PowerOptimizer -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable/PowerOptimizer/thirdparty -I/usr/include/modbus -I/usr/include/aarch64-linux-gnu/qt5 -I/usr/include/aarch64-linux-gnu/qt5/QtCharts -I/usr/include/aarch64-linux-gnu/qt5/QtWidgets -I/usr/include/aarch64-linux-gnu/qt5/QtGui -I/usr/include/aarch64-linux-gnu/qt5/QtNetwork -I/usr/include/aarch64-linux-gnu/qt5/QtCore -I/usr/include/c++/11 -I/usr/include/aarch64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/aarch64-linux-gnu/11/include -I/usr/local/include -I/usr/include/aarch64-linux-gnu -I/usr/include tab_turntablecontrol.h -o moc_tab_turntablecontrol.cpp
 
-moc_tabdeviceconnect.cpp: tabdeviceconnect.h \
+moc_tab_deviceconnect.cpp: tab_deviceconnect.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable/PowerOptimizer/moc_predefs.h -I/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable/PowerOptimizer -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable/PowerOptimizer/thirdparty -I/usr/include/modbus -I/usr/include/aarch64-linux-gnu/qt5 -I/usr/include/aarch64-linux-gnu/qt5/QtCharts -I/usr/include/aarch64-linux-gnu/qt5/QtWidgets -I/usr/include/aarch64-linux-gnu/qt5/QtGui -I/usr/include/aarch64-linux-gnu/qt5/QtNetwork -I/usr/include/aarch64-linux-gnu/qt5/QtCore -I/usr/include/c++/11 -I/usr/include/aarch64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/aarch64-linux-gnu/11/include -I/usr/local/include -I/usr/include/aarch64-linux-gnu -I/usr/include tabdeviceconnect.h -o moc_tabdeviceconnect.cpp
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable/PowerOptimizer/moc_predefs.h -I/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable/PowerOptimizer -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable/PowerOptimizer/thirdparty -I/usr/include/modbus -I/usr/include/aarch64-linux-gnu/qt5 -I/usr/include/aarch64-linux-gnu/qt5/QtCharts -I/usr/include/aarch64-linux-gnu/qt5/QtWidgets -I/usr/include/aarch64-linux-gnu/qt5/QtGui -I/usr/include/aarch64-linux-gnu/qt5/QtNetwork -I/usr/include/aarch64-linux-gnu/qt5/QtCore -I/usr/include/c++/11 -I/usr/include/aarch64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/aarch64-linux-gnu/11/include -I/usr/local/include -I/usr/include/aarch64-linux-gnu -I/usr/include tab_deviceconnect.h -o moc_tab_deviceconnect.cpp
 
 moc_logindialog.cpp: logindialog.h \
 		moc_predefs.h \
@@ -512,9 +514,9 @@ moc_mainwindow.cpp: mainwindow.h \
 		turntable_controller.h \
 		PID_Controller.h \
 		tab_file_read.h \
-		tab_turntable_control.h \
+		tab_turntablecontrol.h \
 		tab_stm32.h \
-		tab_device_connect.h \
+		tab_deviceconnect.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
 	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable/PowerOptimizer/moc_predefs.h -I/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable/PowerOptimizer -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable/PowerOptimizer/thirdparty -I/usr/include/modbus -I/usr/include/aarch64-linux-gnu/qt5 -I/usr/include/aarch64-linux-gnu/qt5/QtCharts -I/usr/include/aarch64-linux-gnu/qt5/QtWidgets -I/usr/include/aarch64-linux-gnu/qt5/QtGui -I/usr/include/aarch64-linux-gnu/qt5/QtNetwork -I/usr/include/aarch64-linux-gnu/qt5/QtCore -I/usr/include/c++/11 -I/usr/include/aarch64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/aarch64-linux-gnu/11/include -I/usr/local/include -I/usr/include/aarch64-linux-gnu -I/usr/include mainwindow.h -o moc_mainwindow.cpp
@@ -600,25 +602,25 @@ tab_file_read.o: tab_file_read.cpp tab_file_read.h \
 		command_struct.h \
 		turntable_controller.h \
 		PID_Controller.h \
-		tab_turntable_control.h \
+		tab_turntablecontrol.h \
 		tab_stm32.h \
-		tab_device_connect.h \
+		tab_deviceconnect.h \
 		ui_mainwindow.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o tab_file_read.o tab_file_read.cpp
 
 tab_stm32.o: tab_stm32.cpp tab_stm32.h \
-		mainwindow.h \
 		command_transmitter.h \
 		command_struct.h \
+		mainwindow.h \
 		turntable_controller.h \
 		PID_Controller.h \
 		tab_file_read.h \
-		tab_turntable_control.h \
-		tab_device_connect.h \
+		tab_turntablecontrol.h \
+		tab_deviceconnect.h \
 		ui_mainwindow.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o tab_stm32.o tab_stm32.cpp
 
-tab_turntable_control.o: tab_turntable_control.cpp tab_turntable_control.h \
+tab_turntablecontrol.o: tab_turntablecontrol.cpp tab_turntablecontrol.h \
 		mainwindow.h \
 		command_transmitter.h \
 		command_struct.h \
@@ -626,21 +628,21 @@ tab_turntable_control.o: tab_turntable_control.cpp tab_turntable_control.h \
 		PID_Controller.h \
 		tab_file_read.h \
 		tab_stm32.h \
-		tab_device_connect.h \
+		tab_deviceconnect.h \
 		ui_mainwindow.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o tab_turntable_control.o tab_turntable_control.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o tab_turntablecontrol.o tab_turntablecontrol.cpp
 
-tabdeviceconnect.o: tabdeviceconnect.cpp tab_device_connect.h \
+tab_deviceconnect.o: tab_deviceconnect.cpp tab_deviceconnect.h \
 		mainwindow.h \
 		command_transmitter.h \
 		command_struct.h \
 		turntable_controller.h \
 		PID_Controller.h \
 		tab_file_read.h \
-		tab_turntable_control.h \
+		tab_turntablecontrol.h \
 		tab_stm32.h \
 		ui_mainwindow.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o tabdeviceconnect.o tabdeviceconnect.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o tab_deviceconnect.o tab_deviceconnect.cpp
 
 turntable_controller.o: turntable_controller.cpp turntable_controller.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o turntable_controller.o turntable_controller.cpp
@@ -654,9 +656,9 @@ main.o: main.cpp mainwindow.h \
 		turntable_controller.h \
 		PID_Controller.h \
 		tab_file_read.h \
-		tab_turntable_control.h \
+		tab_turntablecontrol.h \
 		tab_stm32.h \
-		tab_device_connect.h \
+		tab_deviceconnect.h \
 		logindialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
@@ -666,9 +668,9 @@ mainwindow.o: mainwindow.cpp mainwindow.h \
 		turntable_controller.h \
 		PID_Controller.h \
 		tab_file_read.h \
-		tab_turntable_control.h \
+		tab_turntablecontrol.h \
 		tab_stm32.h \
-		tab_device_connect.h \
+		tab_deviceconnect.h \
 		ui_mainwindow.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o mainwindow.cpp
 
@@ -684,11 +686,11 @@ moc_tab_file_read.o: moc_tab_file_read.cpp
 moc_tab_stm32.o: moc_tab_stm32.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_tab_stm32.o moc_tab_stm32.cpp
 
-moc_tab_turntable_control.o: moc_tab_turntable_control.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_tab_turntable_control.o moc_tab_turntable_control.cpp
+moc_tab_turntablecontrol.o: moc_tab_turntablecontrol.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_tab_turntablecontrol.o moc_tab_turntablecontrol.cpp
 
-moc_tabdeviceconnect.o: moc_tabdeviceconnect.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_tabdeviceconnect.o moc_tabdeviceconnect.cpp
+moc_tab_deviceconnect.o: moc_tab_deviceconnect.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_tab_deviceconnect.o moc_tab_deviceconnect.cpp
 
 moc_logindialog.o: moc_logindialog.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_logindialog.o moc_logindialog.cpp

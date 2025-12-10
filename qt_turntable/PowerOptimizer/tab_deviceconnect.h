@@ -1,9 +1,10 @@
-#ifndef TAB_DEVICE_CONNECT_H
-#define TAB_DEVICE_CONNECT_H
+#ifndef TAB_DEVICECONNECT_H
+#define TAB_DEVICECONNECT_H
 
 #include <QObject>
 #include <QHostAddress>
 #include <QAbstractSocket>
+#include <QTimer>
 class MainWindow;
 class TurntableController;
 class CommandTransmitter;
