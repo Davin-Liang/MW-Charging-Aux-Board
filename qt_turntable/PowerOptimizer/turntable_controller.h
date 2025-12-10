@@ -45,7 +45,7 @@ public:
     ~TurntableController();
 
     // 连接管理函数
-    bool connect(int baudrate = 9600, char parity = 'N', int dataBit = 8, int stopBit = 1);
+    bool connect(int baudrate = 115200, char parity = 'N', int dataBit = 8, int stopBit = 1);
     void disconnect(void);
 
     /**

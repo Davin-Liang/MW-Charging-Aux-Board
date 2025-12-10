@@ -74,8 +74,7 @@ private:
     //初始化
     void initializeTurntablePositionChart();
 
-    double target_x;
-    double target_y;
+     double targetX = 0, targetY = 0;
 };
 
 #endif // TAB_TURNTABLE_CONTROL_H

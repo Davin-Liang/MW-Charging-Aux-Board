@@ -11,14 +11,14 @@
 
 
 TabDeviceConnect::TabDeviceConnect(MainWindow *mw_)
-    : QObject(mw_), mw(mw_), transmitter(nullptr), turntable(nullptr), turntableMonitorTimer(nullptr)
+    : QObject(mw_), mw(mw_)
 {
     // 从 MainWindow 提取控制对象，使本类实现真正的模块化
     transmitter = mw->commandTransmitter;
     turntable   = mw->turntable_controller;
     turntableMonitorTimer = mw->turntableMonitorTimer;
-}
 
+}
 TabDeviceConnect::~TabDeviceConnect()
 {
     // 这里不用 delete transmitter 或 turntable，因为他们由 MainWindow 负责析构
@@ -200,31 +200,23 @@ void TabDeviceConnect::on_pushButton_connection_clicked()
     }
     // 如果主窗口已有控制器，先断开并删除（确保只有一个实例）
     if (mw->turntable_controller) {
-        try {
-            mw->turntable_controller->disconnect();
-        } catch (...) { }
+        mw->turntable_controller->disconnect();
         delete mw->turntable_controller;
         mw->turntable_controller = nullptr;
     }
 
     // 创建新的控制器对象
-    TurntableController *ctl = new TurntableController(port.toStdString().c_str());
-    bool ok = ctl->connect(baudrate, parity, dataBit, stopBit);
-    // // 尝试连接
-    // ok = turntable->connect(baudrate, parity, dataBit, stopBit);
+     mw->turntable_controller = new TurntableController(port.toStdString().c_str());
+    bool ok = mw->turntable_controller->connect(baudrate, parity, dataBit, stopBit);
     if (ok) {
         // 保存为主窗口的指针
-        // mw->turntable_controller = ctl;
-        turntable = ctl;
         isTurntableConnected = true;
         setTurntableConnectionStatus(true);
         if (turntableMonitorTimer)
             turntableMonitorTimer->start(40); // 每40ms刷新数据
         QMessageBox::information(mw, "成功", "转台连接成功");
     } else {
-        delete ctl;
-        ctl = nullptr;
-        turntable = nullptr;
+        delete mw->turntable_controller;
         mw->turntable_controller = nullptr;
         isTurntableConnected = false;
         setTurntableConnectionStatus(false);
