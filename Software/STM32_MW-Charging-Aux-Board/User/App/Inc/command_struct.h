@@ -46,8 +46,8 @@ typedef struct __attribute__((packed)) {
 
 // 电机控制命令  
 typedef struct __attribute__((packed)) {
-    float x; // 接收天线 X 坐标[m]
-    float y; // 接收天线 Y 坐标[m]
+    int16_t x; // 接收天线 X 坐标[m] float >> int16_t
+    int16_t y; // 接收天线 Y 坐标[m] float >> int16_t
     uint16_t speed; // 接收天线移动速度——0 表示不设置速度/ >0 表示设置速度
 } MotorCmd_t;
 
@@ -78,12 +78,12 @@ typedef struct __attribute__((packed)) {
 // 寻优控制命令
 typedef struct __attribute__((packed)) {
     uint8_t whichThaj; // 哪种轨迹
-    float cirTrajRad; // 圆形轨迹半径[m]
-    float squThajLen; // 方形轨迹边长[mm]
-    uint8_t squThajStepLen; // 执行方形轨迹的步长[mm]
+    uint16_t cirTrajRad; // 圆形轨迹半径[mm]
+    uint16_t squThajLen; // 方形轨迹边长[mm]
+    uint16_t squThajStepLen; // 执行方形轨迹的步长[mm]
     float maxVol; // 通道可设置的最大电压[v]
     float volStepLen; // 设置电压时电压跳变的步长[v]
-    float initialVol; // 通道初始电压    
+    float initialVol; // 通道初始电压[V]    
 } FindOptimalCmd_t;
 
 typedef struct __attribute__((packed)) {
@@ -116,10 +116,25 @@ typedef struct __attribute__((packed)) {
     } payload;
 } CommandFrame_t;
 
+// 数据中心
+struct DataCenter_t {
+    uint16_t dataUpdateFlag;
+    MotorCmd_t * motorCmd;
+    FindOptimalCmd_t * findOptCmd;
+    DateTime_t * timeData;
+};
+
 // 函数声明
 uint8_t calculate_checksum(const uint8_t* data, uint16_t len);
 int build_command_frame(uint8_t* buffer, CommandType_t cmdType, const void* data, uint16_t dataLen);
 int parse_command_frame(const uint8_t* buffer, uint16_t len, CommandFrame_t* cmd);
 ResponseStatus_t execute_command(const CommandFrame_t* cmd, uint8_t* responseData, uint16_t* respLen);
+
+uint16_t get_data_update_flag(struct DataCenter_t * dc);
+MotorCmd_t * get_motor_cmd(struct DataCenter_t * dc);
+FindOptimalCmd_t * get_find_optimal_cmd(struct DataCenter_t * dc);
+uint8_t check_data_update_flag(uint16_t flag, uint8_t bit);
+DateTime_t * get_time_data(struct DataCenter_t * dc);
+struct DataCenter_t * malloc_data_center(void);
 
 #endif
