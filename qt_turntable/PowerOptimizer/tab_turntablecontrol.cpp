@@ -111,6 +111,9 @@ void TabTurntableControl::setupConnections()
     connect(mw->ui->controller_selection,
             QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &TabTurntableControl::on_controller_selection_changed, Qt::UniqueConnection);
+    // 数据监控开关（QCheckBox）
+    connect(mw->ui->data_monitor_section,   &QCheckBox::stateChanged,this,&TabTurntableControl::on_data_monitor_section_stateChanged, Qt::UniqueConnection);
+
     // 初始化转台图像与状态
     update_turntable_image();
     //初始化转台位置跟踪控制图
@@ -459,5 +462,25 @@ void TabTurntableControl::closedLoopTickY()
         mw->ui->control_status->setText("y轴闭环控制：完成");
         mw->ui->control_status->setStyleSheet("color: blue;");
         QMessageBox::information(mw, "完成", "转台已到达目标点（误差 ≤ 0.01）");
+    }
+}
+
+void TabTurntableControl::on_data_monitor_section_stateChanged(int state)
+{
+    if (!monitorTimer) {
+        QMessageBox::warning(mw, "错误", "监控定时器不可用");
+        return;
+    }
+
+    if (state == Qt::Checked) {
+        // ✅ 开始数据监控
+        monitorTimer->start(50);   // 200 ms，根据你之前 chart_time += 0.5 来看是合理的
+        mw->ui->control_status->setText("数据监控：开启");
+        mw->ui->control_status->setStyleSheet("color: green;");
+    } else {
+        // ⛔ 停止数据监控
+        monitorTimer->stop();
+        mw->ui->control_status->setText("数据监控：关闭");
+        mw->ui->control_status->setStyleSheet("color: gray;");
     }
 }

@@ -150,3 +150,9 @@ MainWindow::~MainWindow()
     delete ui;
     ui = nullptr;
 }
+
+void MainWindow::on_data_monitor_section_checkStateChanged(const Qt::CheckState &arg1)
+{
+
+}
+
