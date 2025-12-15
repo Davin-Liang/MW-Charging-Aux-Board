@@ -42,19 +42,16 @@ bool PIDController::controlLoop(double target, double threshold, double controlP
     // 确保 controller 可用
     if (!controller_) return false;
 
-    // 读取当前角度（由 TurntableController 实现）
+    // 读取当前角度
     float current = 0.0f;
-    bool ok = false;
-    if (axis_ == YawOrPitch_t::Yaw) {
-        ok = controller_->read_axis_angle(Yaw, &current);
-    } else {
-        ok = controller_->read_axis_angle(Pitch, &current);
-    }
-    if (!ok) {
-        // 读取失败，不进行控制
-        return false;
-    }
-
+    // bool ok = false;
+    // if (axis_ == YawOrPitch_t::Yaw) {
+    //     ok = controller_->read_axis_angle(Yaw, &current);
+    // } else {
+    //     ok = controller_->read_axis_angle(Pitch, &current);
+    // }
+    bool ok = controller_->read_axis_angle(axis_, &current);
+    if (!ok) return false;
     // PID 计算
     double error = target - static_cast<double>(current);
 
@@ -65,45 +62,29 @@ bool PIDController::controlLoop(double target, double threshold, double controlP
         double derivative = (error - state_.lastError) / controlPeriodSec;
 
         // 控制量
-        double u = gains_.kp * error + gains_.ki * state_.integral + gains_.kd * derivative;
-
-        // 限制输出幅度（避免发送过大速度）
-        const double maxSpeed = 10.0; // deg/s，演示值
-        if (u > maxSpeed) u = maxSpeed;
-        if (u < -maxSpeed) u = -maxSpeed;
-
-        // 将控制量转换为速度 + 方向并下发给转台
-        double speed = -u;
-
-        if (axis_ == YawOrPitch_t::Yaw) {
-            if ( speed>= 0){
-                controller_->set_axis_speed(Yaw, static_cast<float>(speed));
-                controller_->set_manual_rotation(Yaw, Left);
-            }    
-            else{
-                controller_->set_axis_speed(Yaw, static_cast<float>(-speed));
-                controller_->set_manual_rotation(Yaw, Right);
-            }             
-        // } else {
-            // controller_->set_axis_speed(Pitch, static_cast<float>(speed));
-            // if (u >= 0)
-            //     controller_->set_manual_rotation(Pitch, Left);
-            // else
-            //     controller_->set_manual_rotation(Pitch, Right);
-        }
-
+        double u = gains_.kp * error + gains_.ki * state_.integral + gains_.kd * derivative;          
         state_.lastError = error;
     }
+    // 限制输出幅度（避免发送过大速度）
+    const double maxSpeed = 10.0; // deg/s，演示值
+    if (u > maxSpeed) u = maxSpeed;
+    if (u < -maxSpeed) u = -maxSpeed;
 
+    // 将控制量转换为速度 + 方向并下发给转台
+    double speed = -u;
+    if ( speed>= 0){
+        controller_->set_axis_speed(axis_, static_cast<float>(speed));
+        controller_->set_manual_rotation(axis_, Left);
+    }    
+    else{
+        controller_->set_axis_speed(axis_, static_cast<float>(-speed));
+        controller_->set_manual_rotation(axis_, Right);
+    }       
     // 判断是否到达目标（绝对误差）
     if (std::fabs(error) <= threshold) {
-        // 到位：停止轴运动
-        if (axis_ == YawOrPitch_t::Yaw) controller_->stop_manual_rotation(Yaw);
-        else controller_->stop_manual_rotation(Pitch);
-
+        controller_->stop_manual_rotation(axis_);
         return true;
     }
-
     return false;
 }
 

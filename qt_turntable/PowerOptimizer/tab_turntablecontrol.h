@@ -41,24 +41,32 @@ public slots:
     void on_btn_y_zero_clicked();
 
     void on_btn_set_target_pos_clicked();              // 设置参考位置
+
+
     void on_btn_set_pidcontroller_parameter_clicked(); // 设置PID参数并启动控制
+    // X 轴 PID
+    void on_btn_set_x_pidcontroller_parameter_clicked();
+    void on_btn_stop_x_pidcontrol_clicked();
+    void closedLoopTickX();/// 定时器 tick：用于 PID 闭环（连接到 MainWindow::closedLoopTimer）
+
+    // Y 轴 PID
+    void on_btn_set_y_pidcontroller_parameter_clicked();
+    void on_btn_stop_y_pidcontrol_clicked();
+    void closedLoopTickY();/// 定时器 tick：用于 PID 闭环（连接到 MainWindow::closedLoopTimer）
 
     /// 定时器 tick：用于刷新转台数据（连接到 MainWindow::turntableMonitorTimer）
     void updateTurntableData();
 
-    /// 定时器 tick：用于 PID 闭环（连接到 MainWindow::closedLoopTimer）
-    void closedLoopTick(); // 定时执行 PID.controlLoop()
-
-
     void on_controller_selection_changed(int index);//转台控制选择
-    void on_btn_stop_pidcontrol_clicked();
+
 
 private:
     MainWindow *mw;                          ///< 主窗口指针（不拥有）
     PIDController *pidX;                    ///< 指向主窗口 PID 对象（不拥有）
     PIDController *pidY;
     QTimer *monitorTimer;                   ///< 指向主窗口的监控定时器（不拥有）
-    QTimer *closedLoopTimer;                ///< 指向主窗口闭环定时器（不拥有）
+    QTimer *closedLoopTimerX;             ///< 指向主窗口闭环定时器（不拥有） 
+    QTimer *closedLoopTimerY;              
     
     
     // 图表

@@ -49,7 +49,8 @@ private:
     PIDController *pid_x;
     PIDController *pid_y;
     QTimer *turntableMonitorTimer;
-    QTimer *closedLoopTimer;
+    QTimer *closedLoopTimer_x;
+    QTimer *closedLoopTimer_y;
 
 
      // 四个 Tab 页面对象

@@ -28,11 +28,12 @@ TabTurntableControl::TabTurntableControl(MainWindow *mw_)
         pidX = mw->pid_x;
         pidY = mw->pid_y;
         monitorTimer = mw->turntableMonitorTimer;
-        closedLoopTimer = mw->closedLoopTimer;
+        closedLoopTimerX = mw->closedLoopTimer_x;
+        closedLoopTimerY = mw->closedLoopTimer_y
     } else {
     
         pidX = pidY = nullptr;
-        monitorTimer = closedLoopTimer = nullptr;
+        monitorTimer = closedLoopTimer_x = closedLoopTimer_y = nullptr;
     }
 }
 
@@ -79,12 +80,18 @@ void TabTurntableControl::setupConnections()
     connect(mw->ui->btn_set_target_pos, &QPushButton::clicked,
             this, &TabTurntableControl::on_btn_set_target_pos_clicked, Qt::UniqueConnection);
 
-    connect(mw->ui->btn_set_pidcontroller_parameter, &QPushButton::clicked,
-            this, &TabTurntableControl::on_btn_set_pidcontroller_parameter_clicked, Qt::UniqueConnection);
+    connect(mw->ui->btn_set_x_pidcontroller_parameter, &QPushButton::clicked,
+            this, &TabTurntableControl::on_btn_set_x_pidcontroller_parameter_clicked, Qt::UniqueConnection);
 
     connect(mw->ui->btn_stop_x_pidcontrol, &QPushButton::clicked,
-            this, &TabTurntableControl::on_btn_stop_pidcontrol_clicked, Qt::UniqueConnection);
+            this, &TabTurntableControl::on_btn_stop_x_pidcontrol_clicked, Qt::UniqueConnection);
 
+    connect(mw->ui->btn_set_y_pidcontroller_parameter, &QPushButton::clicked,
+            this, &TabTurntableControl::on_btn_set_y_pidcontroller_parameter_clicked, Qt::UniqueConnection);
+
+    connect(mw->ui->btn_stop_y_pidcontrol, &QPushButton::clicked,
+            this, &TabTurntableControl::on_btn_stop_y_pidcontrol_clicked, Qt::UniqueConnection);
+            
     // 将监控定时器连接到本类的 updateTurntableData（如果存在）
     if (monitorTimer) {
         connect(monitorTimer, &QTimer::timeout,
@@ -92,11 +99,14 @@ void TabTurntableControl::setupConnections()
     }
 
     // 将闭环定时器连接到 closedLoopTick  /转台定时器（闭环控制）
-    if (closedLoopTimer) {
-        connect(closedLoopTimer, &QTimer::timeout,
-                this, &TabTurntableControl::closedLoopTick, Qt::UniqueConnection);
+    if (closedLoopTimerX) {
+        connect(closedLoopTimerX, &QTimer::timeout,
+                this, &TabTurntableControl::closedLoopTickX, Qt::UniqueConnection);
     }
-
+    if (closedLoopTimerY) {
+        connect(closedLoopTimerY, &QTimer::timeout,
+                this, &TabTurntableControl::closedLoopTickY, Qt::UniqueConnection);
+    }
     // controller selection change
     connect(mw->ui->controller_selection,
             QOverload<int>::of(&QComboBox::currentIndexChanged),
@@ -297,12 +307,12 @@ void TabTurntableControl::on_btn_set_target_pos_clicked()
                                  .arg(target_x).arg(target_y));
 }
 /**
- * @brief 设置 PID 参数并开启闭环控制
+ * @brief 设置 X轴 PID 参数并开启X轴闭环控制
  */
 
-void TabTurntableControl::on_btn_set_pidcontroller_parameter_clicked()
+void TabTurntableControl::on_btn_set_x_pidcontroller_parameter_clicked()
 {
-    if (!pidX || !pidY) {
+    if (!pidX ) {
         QMessageBox::warning(mw, "错误", "PID 控制器未配置");
         return;
     }
@@ -312,40 +322,74 @@ void TabTurntableControl::on_btn_set_pidcontroller_parameter_clicked()
     }
     PIDController::Gains g;
     g.kp = mw->ui->line_edit_kp_x_parameter->text().toDouble();
-    g.ki = mw->ui->line_edit_ki_parameter->text().toDouble();
+    g.ki = mw->ui->line_edit_ki_x_parameter->text().toDouble();
     g.kd = mw->ui->line_edit_kd_x_parameter->text().toDouble();
 
     pidX->setGains(g);
-    pidY->setGains(g);
-
     pidX->reset();
-    pidY->reset();
-
     pidX->setController(mw->turntable_controller);
-    pidY->setController(mw->turntable_controller);
-
-    QMessageBox::information(mw, "PID 启动", "PID 参数已设置，闭环控制开始");
-    mw->ui->control_status->setText("闭环控制：开启");
-    mw->ui->control_status->setStyleSheet("color: green;");
-
-
-    if (closedLoopTimer) {
-        closedLoopTimer->start(50);
+ 
+    if (closedLoopTimerX) {
+        closedLoopTimerX->start(50);
+        QMessageBox::information(mw, "PID 启动", "X轴PID 参数已设置，X轴闭环控制开始");
+        mw->ui->control_status->setText("X轴闭环控制：开启");
+        mw->ui->control_status->setStyleSheet("color: green;");
     } else {
-        QMessageBox::warning(mw, "警告", "闭环定时器不可用");
+        QMessageBox::warning(mw, "警告", "X轴闭环定时器不可用");
     }
 }
 /**
- * @brief PID闭环停止
+ * @brief 设置 y轴 PID 参数并开启y轴闭环控制
  */
 
-void TabTurntableControl::on_btn_stop_pidcontrol_clicked()
+ void TabTurntableControl::on_btn_set_y_pidcontroller_parameter_clicked()
+ {
+     if (!pidY ) {
+         QMessageBox::warning(mw, "错误", "PID 控制器未配置");
+         return;
+     }
+     if (mw->ui->controller_selection->currentText() != "PID 控制器") {
+         QMessageBox::warning(mw, "错误", "请选择 PID 控制器");
+         return;
+     }
+     PIDController::Gains g;
+     g.kp = mw->ui->line_edit_kp_y_parameter->text().toDouble();
+     g.ki = mw->ui->line_edit_ki_y_parameter->text().toDouble();
+     g.kd = mw->ui->line_edit_kd_y_parameter->text().toDouble(); 
+ 
+     pidY->setGains(g);
+     pidY->reset();
+     pidY->setController(mw->turntable_controller);
+  
+     if (closedLoopTimerY) {
+        closedLoopTimerY->start(50);
+         QMessageBox::information(mw, "PID 启动", "y轴PID 参数已设置，y轴闭环控制开始");
+         mw->ui->control_status->setText("y轴闭环控制：开启");
+         mw->ui->control_status->setStyleSheet("color: green;");
+     } else {
+         QMessageBox::warning(mw, "警告", "y轴闭环定时器不可用");
+     }
+ }
+/**
+ * @brief x轴PID闭环停止
+ */
+
+void TabTurntableControl::on_btn_stop_x_pidcontrol_clicked()
 {
-    if (closedLoopTimer) closedLoopTimer->stop();
+    if (closedLoopTimerX) closedLoopTimerX->stop();
     mw->ui->control_status->setText("闭环控制：停止");
     mw->ui->control_status->setStyleSheet("color: red;");
 }
+/**
+ * @brief y轴PID闭环停止
+ */
 
+ void TabTurntableControl::on_btn_stop_y_pidcontrol_clicked()
+ {
+     if (closedLoopTimerY) closedLoopTimerY->stop();
+     mw->ui->control_status->setText("闭环控制：停止");
+     mw->ui->control_status->setStyleSheet("color: red;");
+ }
 
 /**
  * @brief 更新实时曲线。
@@ -386,19 +430,33 @@ void TabTurntableControl::updateTurntableData()
 }
 
 /**
- * @brief 闭环 PID 控制定时器回调（周期性执行）
+ * @brief 闭环x轴 PID 控制定时器回调（周期性执行）
  */
-void TabTurntableControl::closedLoopTick()
+void TabTurntableControl::closedLoopTickX()
 {
-
-    if (!pidX || !pidY) return;
+    if (!pidX ) return;
     // 使用 pid 控制器的 controlLoop 接口（假定定义类似于你的实现）
     bool doneX = pidX->controlLoop(target_x, 0.01, 0.05);
-    bool doneY = pidY->controlLoop(target_y, 0.01, 0.05);
 
-    if (doneX && doneY) {
-        if (closedLoopTimer) closedLoopTimer->stop();
-        mw->ui->control_status->setText("闭环控制：完成");
+    if (doneX && closedLoopTimerX) {
+        closedLoopTimerX->stop();
+        mw->ui->control_status->setText("X轴闭环控制：完成");
+        mw->ui->control_status->setStyleSheet("color: blue;");
+        QMessageBox::information(mw, "完成", "转台已到达目标点（误差 ≤ 0.05）");
+    }
+}
+/**
+ * @brief 闭环 y轴PID 控制定时器回调（周期性执行）
+ */
+void TabTurntableControl::closedLoopTickY()
+{
+
+    if (!pidY ) return;
+    // 使用 pid 控制器的 controlLoop 接口（假定定义类似于你的实现）
+    bool doneY = pidY->controlLoop(target_y, 0.01, 0.05);
+    if ( closedLoopTimerY&& doneY) {
+        closedLoopTimerY->stop();
+        mw->ui->control_status->setText("y轴闭环控制：完成");
         mw->ui->control_status->setStyleSheet("color: blue;");
         QMessageBox::information(mw, "完成", "转台已到达目标点（误差 ≤ 0.01）");
     }
