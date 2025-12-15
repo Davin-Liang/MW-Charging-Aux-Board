@@ -9,6 +9,7 @@
 #include "stdio.h"
 #include <string.h> 
 #include "modbus.h"
+#include "type_cast_common.h"
 
 #include "data_sum_task.h"
 #include "modbus-tcp-server-task.h"
@@ -19,7 +20,6 @@ static void data_sum_Task(void * param);
 static int datetime_to_filename(const DateTime_t *dt, const char *filename, 
                         char *output, size_t output_size);
 static uint8_t validate_date_time(const DateTime_t * dt);
-static void float_to_uint16(float data, uint16_t * uint16);
 
 static struct MotorData_t currentMotorData;
 static struct Optimal_v_p_t currentOptimalVP;
@@ -28,7 +28,7 @@ static DateTime_t g_currentDateTime;
 static char g_nameOutput[40];
 static TaskHandle_t g_dataSumTaskHandle = NULL;
 static struct SystemQueues_t * queues;
-static  modbus_mapping_t * mbMapping;
+static modbus_mapping_t * mbMapping;
 
 /**
   * @brief  data_sum_Task 任务主体
@@ -43,7 +43,6 @@ static void data_sum_Task(void * param)
     mbMapping = get_mbMapping();
     
     insert_task_handle(g_dataSumTaskHandle, "data_sum");
-      // vTaskSuspend(NULL);
   
     while (1)
     {
@@ -219,16 +218,3 @@ static int datetime_to_filename(const DateTime_t *dt, const char *filename,
     
     return 0; // 成功
 }
-
-static void float_to_uint16(float data, uint16_t * uint16)
-{
-    uint32_t temp = 0;
-
-    float result;
-    memcpy(&temp, &data, sizeof(float));
-
-    /* 组合两个16位成一个32位（Modbus 默认大端，高字在前） */
-    uint16[0] = (temp << 16);
-    uint16[1] = temp;
-}
-

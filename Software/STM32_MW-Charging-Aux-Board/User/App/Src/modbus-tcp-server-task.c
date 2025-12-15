@@ -10,6 +10,7 @@
 #include "queue.h"
 #include "event_groups.h"
 #include <stdio.h>
+#include "type_cast_common.h"
 /* Peripherals */
 // #include "enet.h"
 /* libmodbus */
@@ -23,8 +24,6 @@
 #define SERVER_IP   "192.168.1.30"
 #define SERVER_PORT 8080
 
-static float uint16_to_float(const uint16_t *data);
-
 static TaskHandle_t g_modbusTCPServerTaskHandle = NULL;
 static struct DataCenter_t * g_dataCenter;
 static struct CommandInfo command;
@@ -35,26 +34,14 @@ static struct MotorData_t currentMotorData;
 static struct Optimal_v_p_t currentOptimalVP;
 static struct CurrentV_P_Ch_t currentVPCh;
 
-static void float_to_uint16(float data, uint16_t * uint16)
-{
-    uint32_t temp = 0;
-
-    float result;
-    memcpy(&temp, &data, sizeof(float));
-
-    /* ç»„åˆä¸¤ä¸ª16ä½æˆä¸€ä¸ª32ä½ï¼ˆModbus é»˜è®¤å¤§ç«¯ï¼Œé«˜å­—åœ¨å‰ï¼‰ */
-    uint16[0] = (temp << 16);
-    uint16[1] = temp;
-}
-
 static void modbus_tcp_server_task(void* param)
 {
     xEventGroupWaitBits(xSystemEventGroup, BIT_WAKE_MODBUS_TCP, pdTRUE, pdTRUE, portMAX_DELAY);
     
-		g_dataCenter = malloc_data_center();
+    g_dataCenter = malloc_data_center();
     queues = get_queues();
     
-    /* åˆ›å»º Modbus TCP ä»æœº */
+    /* ´´½¨ Modbus TCP ´Ó»ú */
     modbus_t *ctx = modbus_new_tcp(SERVER_IP, SERVER_PORT);
     if (ctx == NULL) {
         printf("Failed to create context\n");
@@ -67,7 +54,7 @@ static void modbus_tcp_server_task(void* param)
     modbus_set_response_timeout(ctx, 0, 500000);
     modbus_flush(ctx);
 
-    /* åˆ›å»ºå¯„å­˜å™¨æ˜ å°„ */
+    /* ´´½¨¼Ä´æÆ÷Ó³Éä */
     mbMapping = modbus_mapping_new(3, 0, 20, 20);
     if (mbMapping == NULL) {
         printf("Failed to create mapping\n");
@@ -75,7 +62,7 @@ static void modbus_tcp_server_task(void* param)
         vTaskDelete(NULL);
     }
 
-    /* æ‰“å¼€ TCP ç›‘å¬ */
+    /* ´ò¿ª TCP ¼àÌı */
     int serverSocket = modbus_tcp_listen(ctx, 1);
     if (serverSocket < 0) {
         printf("Listen failed\n");
@@ -87,8 +74,8 @@ static void modbus_tcp_server_task(void* param)
     printf("Modbus TCP slave started at %s:%d\n", SERVER_IP, SERVER_PORT);
 
     while (1) {
-        /* ç­‰å¾…å®¢æˆ·ç«¯è¿æ¥ */
-        int clientSocket = modbus_tcp_accept(ctx, &serverSocket); // è¿ä¸ä¸Šä¼šä¸€ç›´å µå¡
+        /* µÈ´ı¿Í»§¶ËÁ¬½Ó */
+        int clientSocket = modbus_tcp_accept(ctx, &serverSocket); // Á¬²»ÉÏ»áÒ»Ö±¶ÂÈû
         if (clientSocket < 0) {
             printf("Accept failed\n");
             continue;
@@ -101,16 +88,16 @@ static void modbus_tcp_server_task(void* param)
             int rc = modbus_receive(ctx, query);
 
             if (pdPASS == xQueueReceive(queues->motorDataQueue, &currentMotorData, 0)) {
-                /* æ‰“å°ç”µæœºæ•°æ® */
+                /* ´òÓ¡µç»úÊı¾İ */
                 mutual_printf("Position:(%dmm,%dmm)\r\n", currentMotorData.x, currentMotorData.y);
 
-                /* å†™å…¥è¾“å…¥å¯„å­˜å™¨ */
+                /* Ğ´ÈëÊäÈë¼Ä´æÆ÷ */
                 mbMapping->tab_input_registers[0x0001] = (uint16_t)currentMotorData.x;
                 mbMapping->tab_input_registers[0x0002] = (uint16_t)currentMotorData.y;
             }
                 
             if (pdPASS == xQueueReceive(queues->optimalVPDataQueue, &currentOptimalVP, 0)) {
-                /* æ‰“å°ç”µæœºæ•°æ®ã€æœ€ä¼˜åŠŸç‡å’Œå››ä¸ªé€šé“çš„æœ€ä¼˜ç”µå‹ */
+                /* ´òÓ¡µç»úÊı¾İ¡¢×îÓÅ¹¦ÂÊºÍËÄ¸öÍ¨µÀµÄ×îÓÅµçÑ¹ */
                 mutual_printf("(%.2f,%.2f): V1 = %.2fV, V2 = %.2fV, V3 = %.2fV, V4 = %.2fV, P = %.3fdBm\r\n",
                     currentMotorData.x,
                     currentMotorData.y,
@@ -120,7 +107,7 @@ static void modbus_tcp_server_task(void* param)
                     currentOptimalVP.optimalVs[3], 
                     currentOptimalVP.optimalP);
 
-                /* å†™å…¥è¾“å…¥å¯„å­˜å™¨ */
+                /* Ğ´ÈëÊäÈë¼Ä´æÆ÷ */
                 mbMapping->tab_input_registers[0x0009] = currentMotorData.x;
                 mbMapping->tab_input_registers[0x000A] = currentMotorData.y;
                 float_to_uint16(currentOptimalVP.optimalP, &mbMapping->tab_input_registers[0x000B]);
@@ -131,13 +118,13 @@ static void modbus_tcp_server_task(void* param)
             }
 
             if (pdPASS == xQueueReceive(queues->currentVPChQueue, &currentVPCh, 0)) {
-                /* æ‰“å°å½“å‰é€šé“çš„ç”µå‹ã€åŠŸç‡ */
+                /* ´òÓ¡µ±Ç°Í¨µÀµÄµçÑ¹¡¢¹¦ÂÊ */
                 mutual_printf("channel: %d current V: %.2f current P: %.3f\r\n",
                 currentVPCh.channel,
                 currentVPCh.currentV,
                 currentVPCh.currentP);
 
-                /* å†™å…¥è¾“å…¥å¯„å­˜å™¨ */
+                /* Ğ´ÈëÊäÈë¼Ä´æÆ÷ */
                 mbMapping->tab_input_registers[0x0004] = currentVPCh.channel;
                         // mbMapping->tab_input_registers[0x0004] = 1234;
                 float_to_uint16(currentVPCh.currentV, &mbMapping->tab_input_registers[0x0005]);
@@ -146,7 +133,7 @@ static void modbus_tcp_server_task(void* param)
             
             if (rc > 0) {
                 modbus_reply(ctx, query, rc, mbMapping);
-                /* è·å–ä»ä¸Šä½æœºå‘é€çš„ä¿æŒå¯„å­˜å™¨çš„å€¼ */
+                /* »ñÈ¡´ÓÉÏÎ»»ú·¢ËÍµÄ±£³Ö¼Ä´æÆ÷µÄÖµ */
 								mbMapping->tab_input_registers[0x0001] = 1234;
                 g_dataCenter->dataUpdateFlag = mbMapping->tab_registers[0x0011];
                 if (check_data_update_flag(get_data_update_flag(g_dataCenter), 0)) {
@@ -184,7 +171,7 @@ static void modbus_tcp_server_task(void* param)
                     mbMapping->tab_registers[0x0011] &= ~(1 << 2);
                 }
 
-                /* è·å–ä»ä¸Šä½æœºå‘é€çš„çº¿åœˆçš„å€¼ */
+                /* »ñÈ¡´ÓÉÏÎ»»ú·¢ËÍµÄÏßÈ¦µÄÖµ */
                 if (mbMapping->tab_bits[0x0001] != 0) {
                     printf("Received find opt res command!");
                     uint8_t cmd = CMD_FIND_OPT_RES;
@@ -211,17 +198,17 @@ static void modbus_tcp_server_task(void* param)
                 
             }
             else {
-                /* å®¢æˆ·ç«¯æ–­å¼€ */
+                /* ¿Í»§¶Ë¶Ï¿ª */
                 printf("Client disconnected.\n");
-                lwip_close(clientSocket);   // é˜²æ­¢å¥æŸ„æ³„æ¼
-                break;                       // ç­‰å¾…ä¸‹ä¸€ä¸ªå®¢æˆ·ç«¯
+                lwip_close(clientSocket);   // ·ÀÖ¹¾ä±úĞ¹Â©
+                break;                       // µÈ´ıÏÂÒ»¸ö¿Í»§¶Ë
             }
 
             vTaskDelay(1000);
         }
     }
 
-    /* æ°¸ä¸åˆ°è¾¾ï¼Œä½†å†™ç€è§„èŒƒ */
+    /* ÓÀ²»µ½´ï£¬µ«Ğ´×Å¹æ·¶ */
     lwip_close(serverSocket);
     modbus_mapping_free(mbMapping);
     modbus_free(ctx);
@@ -232,12 +219,12 @@ static void modbus_tcp_server_task(void* param)
 
 BaseType_t create_task_for_modbus_TCP(uint16_t size, UBaseType_t priority)
 {
-	return xTaskCreate((TaskFunction_t )modbus_tcp_server_task,  /* ä»»åŠ¡å…¥å£å‡½æ•° */
-										(const char*    )"modbus_tcp_server_task",/* ä»»åŠ¡åå­— */
-										(uint16_t       )size,  /* ä»»åŠ¡æ ˆå¤§å° */
-										(void*          )NULL,/* ä»»åŠ¡å…¥å£å‡½æ•°å‚æ•° */
-										(UBaseType_t    )priority, /* ä»»åŠ¡çš„ä¼˜å…ˆçº§ */
-										(TaskHandle_t*  )&g_modbusTCPServerTaskHandle); /* ä»»åŠ¡æ§åˆ¶å—æŒ‡é’ˆ */ 
+	return xTaskCreate((TaskFunction_t )modbus_tcp_server_task,  /* ÈÎÎñÈë¿Úº¯Êı */
+                        (const char*    )"modbus_tcp_server_task",/* ÈÎÎñÃû×Ö */
+                        (uint16_t       )size,  /* ÈÎÎñÕ»´óĞ¡ */
+                        (void*          )NULL,/* ÈÎÎñÈë¿Úº¯Êı²ÎÊı */
+                        (UBaseType_t    )priority, /* ÈÎÎñµÄÓÅÏÈ¼¶ */
+                        (TaskHandle_t*  )&g_modbusTCPServerTaskHandle); /* ÈÎÎñ¿ØÖÆ¿éÖ¸Õë */ 
 }
 
 struct DataCenter_t * get_data_center(void)
@@ -248,17 +235,4 @@ struct DataCenter_t * get_data_center(void)
 modbus_mapping_t * get_mbMapping(void)
 {
     return mbMapping;
-}
-
-static float uint16_to_float(const uint16_t *data)
-{
-    uint32_t temp = 0;
-
-    /* ç»„åˆä¸¤ä¸ª16ä½æˆä¸€ä¸ª32ä½ï¼ˆModbus é»˜è®¤å¤§ç«¯ï¼Œé«˜å­—åœ¨å‰ï¼‰ */
-    temp |= ((uint32_t)data[0] << 16);
-    temp |= ((uint32_t)data[1]);
-
-    float result;
-    memcpy(&result, &temp, sizeof(float));
-    return result;
 }
