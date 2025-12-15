@@ -1219,6 +1219,19 @@
         </rect>
        </property>
       </widget>
+      <widget class="QCheckBox" name="data_monitor_section">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>20</y>
+         <width>121</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>开始数据监控</string>
+       </property>
+      </widget>
      </widget>
      <widget class="QGroupBox" name="groupBox_9">
       <property name="geometry">

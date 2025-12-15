@@ -58,6 +58,7 @@ public slots:
 
     void on_controller_selection_changed(int index);//转台控制选择
 
+    void on_data_monitor_section_stateChanged(int state);
 
 private:
     MainWindow *mw;                          ///< 主窗口指针（不拥有）
