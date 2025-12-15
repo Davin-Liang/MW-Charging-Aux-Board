@@ -48,8 +48,9 @@ private slots:
     // —— 转台连接 —— //
     void on_pushButton_connection_clicked();
     void on_pushButton_disconnection_clicked();
-
-
+    //   /// 定时器 tick：用于刷新转台数据（连接到 MainWindow::turntableMonitorTimer）
+    // void updateTurntableData();
+    
 private:
 
     // —— 访问主窗口及其成员 —— //
@@ -57,8 +58,7 @@ private:
 
     // —— 外部核心对象（由 MainWindow 创建和销毁） —— //
     CommandTransmitter *transmitter; // 缓存指针（不拥有），等于 mw->commandTransmitter
-    TurntableController *turntable; // 若本类创建 TurntableController 则负责释放；否则指向 mw->turntable_controller
-    QTimer *turntableMonitorTimer;  // 监控转台数据的定时器（本类负责 new/delete）
+    QTimer *MonitorTimer;  // 监控转台数据的定时器
 
     // —— 本类内部状态 —— //
     bool isTurntableConnected = false;
@@ -68,6 +68,7 @@ private:
     // —— UI 更新 —— //
     void updateConnectionStatus(bool connected);
     void setTurntableConnectionStatus(bool connected);
+
 };
 
 #endif // TAB_DEVICE_CONNECT_H

@@ -15,8 +15,7 @@ TabDeviceConnect::TabDeviceConnect(MainWindow *mw_)
 {
     // 从 MainWindow 提取控制对象，使本类实现真正的模块化
     transmitter = mw->commandTransmitter;
-    turntable   = mw->turntable_controller;
-    turntableMonitorTimer = mw->turntableMonitorTimer;
+    MonitorTimer = mw->turntableMonitorTimer;
 
 }
 TabDeviceConnect::~TabDeviceConnect()
@@ -62,7 +61,7 @@ void TabDeviceConnect::setupConnections()
             this, &TabDeviceConnect::on_pushButton_connection_clicked);
 
     connect(mw->ui->pushButton_disconnection, &QPushButton::clicked,
-            this, &TabDeviceConnect::on_pushButton_disconnection_clicked);
+            this, &TabDeviceConnect::on_pushButton_disconnection_clicked);          
 }
 
 
@@ -110,7 +109,7 @@ void TabDeviceConnect::on_pushButton_connect_clicked()
     if (transmitter->start_server(serverPort, serverAddress)) {
         isSTM32ServerRunning = true;
         updateConnectionStatus(true);
-        qDebug() << "服务器启动成功，等待客户端连接";
+        
     } else {
         isSTM32ServerRunning = false;
         updateConnectionStatus(false);
@@ -206,14 +205,14 @@ void TabDeviceConnect::on_pushButton_connection_clicked()
     }
 
     // 创建新的控制器对象
-     mw->turntable_controller = new TurntableController(port.toStdString().c_str());
+    mw->turntable_controller = new TurntableController(port.toStdString().c_str());
     bool ok = mw->turntable_controller->connect(baudrate, parity, dataBit, stopBit);
     if (ok) {
         // 保存为主窗口的指针
         isTurntableConnected = true;
         setTurntableConnectionStatus(true);
-        if (turntableMonitorTimer)
-            turntableMonitorTimer->start(40); // 每40ms刷新数据
+        if (MonitorTimer)
+        MonitorTimer->start(40); // 每40ms刷新数据
         QMessageBox::information(mw, "成功", "转台连接成功");
     } else {
         delete mw->turntable_controller;
@@ -228,7 +227,7 @@ void TabDeviceConnect::on_pushButton_connection_clicked()
  */
 void TabDeviceConnect::on_pushButton_disconnection_clicked()
 {
-    if (!turntable && !mw->turntable_controller) {
+    if (!mw->turntable_controller) {
         setTurntableConnectionStatus(false);
         QMessageBox::information(mw, "提示", "转台未连接");
         return;
@@ -240,10 +239,8 @@ void TabDeviceConnect::on_pushButton_disconnection_clicked()
         delete mw->turntable_controller;
         mw->turntable_controller = nullptr;
     }
-    turntable = nullptr;
-
-    if (turntableMonitorTimer) {
-        turntableMonitorTimer->stop();
+    if (MonitorTimer) {
+        MonitorTimer->stop();
     }
 
     isTurntableConnected = false;

@@ -19,16 +19,18 @@ TabTurntableControl::TabTurntableControl(MainWindow *mw_)
     , series_target_y(nullptr)
     , series_current_x(nullptr)
     , series_current_y(nullptr)
+    , chart_time(0.0)
+    , target_x(0.0)
+    , target_y(0.0)
 {
     // 不 new 主资源；只引用 MainWindow 持有的对象
     if (mw) {
-        turntable = mw->turntable_controller;
         pidX = mw->pid_x;
         pidY = mw->pid_y;
         monitorTimer = mw->turntableMonitorTimer;
         closedLoopTimer = mw->closedLoopTimer;
     } else {
-        turntable = nullptr;
+    
         pidX = pidY = nullptr;
         monitorTimer = closedLoopTimer = nullptr;
     }
@@ -192,7 +194,7 @@ void TabTurntableControl::initializeTurntablePositionChart()
  */
 void TabTurntableControl::on_btn_set_speed_clicked()
 {
-    if (!turntable) {
+    if (!mw->turntable_controller) {
         QMessageBox::warning(mw, "错误", "未连接转台");
         return;
     }
@@ -202,11 +204,11 @@ void TabTurntableControl::on_btn_set_speed_clicked()
     QString x_dir = mw->ui->combo_box_x_speed_cmd->currentText();
     QString y_dir = mw->ui->combo_box_y_speed_cmd->currentText();
 
-    turntable->set_axis_speed(Yaw, x_speed);
-    turntable->set_manual_rotation(Yaw,(x_dir == "正转") ? Left : Right);
+    mw->turntable_controller->set_axis_speed(Yaw, x_speed);
+    mw->turntable_controller->set_manual_rotation(Yaw,(x_dir == "正转") ? Left : Right);
 
-    turntable->set_axis_speed(Pitch, y_speed);
-    turntable->set_manual_rotation(Pitch, (y_dir == "正转") ? Left : Right);
+    mw->turntable_controller->set_axis_speed(Pitch, y_speed);
+    mw->turntable_controller->set_manual_rotation(Pitch, (y_dir == "正转") ? Left : Right);
 
 }
 /**
@@ -214,8 +216,8 @@ void TabTurntableControl::on_btn_set_speed_clicked()
  */
 void TabTurntableControl::on_btn_stop_x_turntable_run_clicked()
 {
-    if (!turntable) return;
-    turntable->stop_manual_rotation(Yaw);
+    if (!mw->turntable_controller) return;
+    mw->turntable_controller->stop_manual_rotation(Yaw);
 }
 
 /**
@@ -223,20 +225,20 @@ void TabTurntableControl::on_btn_stop_x_turntable_run_clicked()
  */
 void TabTurntableControl::on_btn_stop_y_turntable_run_clicked()
 {
-    if (!turntable) return;
-    turntable->stop_manual_rotation(Pitch);
+    if (!mw->turntable_controller) return;
+    mw->turntable_controller->stop_manual_rotation(Pitch);
 }
 /**
  * @brief 设置 X 轴（Yaw）角度
  */
 void TabTurntableControl::on_btn_set_x_pos_clicked()
 {
-    if (!turntable) {
+    if (!mw->turntable_controller) {
         QMessageBox::information(mw, "提示", "未连接转台");
         return;
     }
     float x_pos = mw->ui->line_edit_x_pos->text().toFloat();
-    turntable->set_axis_angle(Yaw, x_pos);
+    mw->turntable_controller->set_axis_angle(Yaw, x_pos);
 }
 
 /**
@@ -244,28 +246,28 @@ void TabTurntableControl::on_btn_set_x_pos_clicked()
  */
 void TabTurntableControl::on_btn_set_y_pos_clicked()
 {
-    if (!turntable) {
+    if (!mw->turntable_controller) {
         QMessageBox::information(mw, "提示", "未连接转台");
         return;
     }
     float y_pos = mw->ui->line_edit_y_pos->text().toFloat();
-    turntable->set_axis_angle(Pitch, y_pos);
+    mw->turntable_controller->set_axis_angle(Pitch, y_pos);
 }
 /**
  * @brief X 轴（Yaw）归零
  */
 void TabTurntableControl::on_btn_x_zero_clicked()
 {
-    if (!turntable) return;
-    turntable->reset_axis_coord(Yaw);
+    if (!mw->turntable_controller) return;
+    mw->turntable_controller->reset_axis_coord(Yaw);
 }
 /**
  * @brief Y 轴（Pitch）归零
  */
 void TabTurntableControl::on_btn_y_zero_clicked()
 {
-    if (!turntable) return;
-    turntable->reset_axis_coord(Pitch);
+    if (!mw->turntable_controller) return;
+    mw->turntable_controller->reset_axis_coord(Pitch);
 }
 /**
  * @brief 控制器选择下拉框变化时触发
@@ -346,19 +348,19 @@ void TabTurntableControl::on_btn_stop_pidcontrol_clicked()
 
 
 /**
- * @brief 实时更新转台角度、速度，并更新实时曲线。
+ * @brief 更新实时曲线。
  */
 void TabTurntableControl::updateTurntableData()
 {
 
-    if (!turntable) return;
+    if (!mw->turntable_controller) return;
 
     float xPos = 0.0f, yPos = 0.0f, xSpeed = 0.0f, ySpeed = 0.0f;
 
-    bool ok1 = turntable->read_axis_angle(Yaw, &xPos);
-    bool ok2 = turntable->read_axis_angle(Pitch, &yPos);
-    bool ok3 = turntable->read_axis_speed(Yaw, &xSpeed);
-    bool ok4 = turntable->read_axis_speed(Pitch, &ySpeed);
+    bool ok1 = mw->turntable_controller->read_axis_angle(Yaw, &xPos);
+    bool ok2 = mw->turntable_controller->read_axis_angle(Pitch, &yPos);
+    bool ok3 = mw->turntable_controller->read_axis_speed(Yaw, &xSpeed);
+    bool ok4 = mw->turntable_controller->read_axis_speed(Pitch, &ySpeed);
 
     if (ok1 && ok2 && ok3 && ok4) {
         mw->ui->line_edit_monitor_x_pos->setText(QString::number(xPos, 'f', 2));
@@ -366,7 +368,6 @@ void TabTurntableControl::updateTurntableData()
         mw->ui->line_edit_monitor_x_speed->setText(QString::number(xSpeed, 'f', 2));
         mw->ui->line_edit_monitor_y_speed->setText(QString::number(ySpeed, 'f', 2));
     }
-
     //===================  更新实时曲线 ===================//
     chart_time += 0.5;  // update interval = 200ms
 

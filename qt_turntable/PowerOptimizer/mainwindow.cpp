@@ -31,6 +31,7 @@ MainWindow::MainWindow(QWidget *parent)
     tabDeviceConnect     = new TabDeviceConnect(this);
     tabDeviceConnect->setupConnections();
 
+    
     tabSTM32             = new TabSTM32(this);
     tabSTM32->setupConnections();
 

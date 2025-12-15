@@ -458,7 +458,7 @@ public:
         tab_stm32->setObjectName(QString::fromUtf8("tab_stm32"));
         groupBox = new QGroupBox(tab_stm32);
         groupBox->setObjectName(QString::fromUtf8("groupBox"));
-        groupBox->setGeometry(QRect(0, 10, 981, 61));
+        groupBox->setGeometry(QRect(0, 0, 981, 81));
         groupBox->setFont(font1);
         horizontalLayout_4 = new QHBoxLayout(groupBox);
         horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
@@ -500,7 +500,7 @@ public:
 
         groupBox_2 = new QGroupBox(tab_stm32);
         groupBox_2->setObjectName(QString::fromUtf8("groupBox_2"));
-        groupBox_2->setGeometry(QRect(0, 70, 981, 111));
+        groupBox_2->setGeometry(QRect(0, 80, 981, 121));
         groupBox_2->setFont(font1);
         verticalLayout_14 = new QVBoxLayout(groupBox_2);
         verticalLayout_14->setObjectName(QString::fromUtf8("verticalLayout_14"));
@@ -592,7 +592,7 @@ public:
 
         groupBox_7 = new QGroupBox(tab_stm32);
         groupBox_7->setObjectName(QString::fromUtf8("groupBox_7"));
-        groupBox_7->setGeometry(QRect(0, 360, 341, 191));
+        groupBox_7->setGeometry(QRect(0, 380, 341, 181));
         groupBox_7->setFont(font1);
         verticalLayout_9 = new QVBoxLayout(groupBox_7);
         verticalLayout_9->setObjectName(QString::fromUtf8("verticalLayout_9"));
@@ -646,7 +646,7 @@ public:
 
         groupBox_chart = new QGroupBox(tab_stm32);
         groupBox_chart->setObjectName(QString::fromUtf8("groupBox_chart"));
-        groupBox_chart->setGeometry(QRect(340, 180, 641, 371));
+        groupBox_chart->setGeometry(QRect(340, 210, 641, 341));
         groupBox_chart->setFont(font1);
         horizontalLayout_26 = new QHBoxLayout(groupBox_chart);
         horizontalLayout_26->setObjectName(QString::fromUtf8("horizontalLayout_26"));
@@ -657,7 +657,7 @@ public:
 
         groupBox_6 = new QGroupBox(tab_stm32);
         groupBox_6->setObjectName(QString::fromUtf8("groupBox_6"));
-        groupBox_6->setGeometry(QRect(0, 550, 981, 141));
+        groupBox_6->setGeometry(QRect(0, 560, 981, 131));
         groupBox_6->setFont(font1);
         verticalLayout_3 = new QVBoxLayout(groupBox_6);
         verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
@@ -733,7 +733,7 @@ public:
 
         groupBox_5 = new QGroupBox(tab_stm32);
         groupBox_5->setObjectName(QString::fromUtf8("groupBox_5"));
-        groupBox_5->setGeometry(QRect(0, 180, 341, 181));
+        groupBox_5->setGeometry(QRect(0, 210, 341, 171));
         groupBox_5->setFont(font1);
         verticalLayout = new QVBoxLayout(groupBox_5);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
@@ -1177,7 +1177,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        tabWidget->setCurrentIndex(3);
+        tabWidget->setCurrentIndex(1);
 
 
         QMetaObject::connectSlotsByName(MainWindow);

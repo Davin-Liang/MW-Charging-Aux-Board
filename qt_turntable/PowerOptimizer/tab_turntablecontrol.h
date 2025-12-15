@@ -55,7 +55,6 @@ public slots:
 
 private:
     MainWindow *mw;                          ///< 主窗口指针（不拥有）
-    TurntableController *turntable;         ///< 指向主窗口的转台控制器（不拥有）
     PIDController *pidX;                    ///< 指向主窗口 PID 对象（不拥有）
     PIDController *pidY;
     QTimer *monitorTimer;                   ///< 指向主窗口的监控定时器（不拥有）
@@ -70,11 +69,11 @@ private:
     QtCharts::QValueAxis *axisY;
 
     double chart_time = 0.0;   // 曲线横轴时间
-
+    double target_x = 0, target_y = 0;
     //初始化
     void initializeTurntablePositionChart();
 
-     double targetX = 0, targetY = 0;
+    
 };
 
 #endif // TAB_TURNTABLE_CONTROL_H
