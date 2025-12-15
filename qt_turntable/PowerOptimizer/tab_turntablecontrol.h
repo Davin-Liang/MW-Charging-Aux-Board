@@ -43,7 +43,6 @@ public slots:
     void on_btn_set_target_pos_clicked();              // 设置参考位置
 
 
-    void on_btn_set_pidcontroller_parameter_clicked(); // 设置PID参数并启动控制
     // X 轴 PID
     void on_btn_set_x_pidcontroller_parameter_clicked();
     void on_btn_stop_x_pidcontrol_clicked();

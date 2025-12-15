@@ -29,11 +29,11 @@ TabTurntableControl::TabTurntableControl(MainWindow *mw_)
         pidY = mw->pid_y;
         monitorTimer = mw->turntableMonitorTimer;
         closedLoopTimerX = mw->closedLoopTimer_x;
-        closedLoopTimerY = mw->closedLoopTimer_y
+        closedLoopTimerY = mw->closedLoopTimer_y;
     } else {
     
         pidX = pidY = nullptr;
-        monitorTimer = closedLoopTimer_x = closedLoopTimer_y = nullptr;
+        monitorTimer = closedLoopTimerX = closedLoopTimerY = nullptr;
     }
 }
 
@@ -377,7 +377,7 @@ void TabTurntableControl::on_btn_set_x_pidcontroller_parameter_clicked()
 void TabTurntableControl::on_btn_stop_x_pidcontrol_clicked()
 {
     if (closedLoopTimerX) closedLoopTimerX->stop();
-    mw->ui->control_status->setText("闭环控制：停止");
+    mw->ui->control_status->setText("X轴闭环控制：停止");
     mw->ui->control_status->setStyleSheet("color: red;");
 }
 /**
@@ -387,7 +387,7 @@ void TabTurntableControl::on_btn_stop_x_pidcontrol_clicked()
  void TabTurntableControl::on_btn_stop_y_pidcontrol_clicked()
  {
      if (closedLoopTimerY) closedLoopTimerY->stop();
-     mw->ui->control_status->setText("闭环控制：停止");
+     mw->ui->control_status->setText("y轴闭环控制：停止");
      mw->ui->control_status->setStyleSheet("color: red;");
  }
 
