@@ -82,7 +82,7 @@ void TabTurntableControl::setupConnections()
     connect(mw->ui->btn_set_pidcontroller_parameter, &QPushButton::clicked,
             this, &TabTurntableControl::on_btn_set_pidcontroller_parameter_clicked, Qt::UniqueConnection);
 
-    connect(mw->ui->btn_stop_pidcontrol, &QPushButton::clicked,
+    connect(mw->ui->btn_stop_x_pidcontrol, &QPushButton::clicked,
             this, &TabTurntableControl::on_btn_stop_pidcontrol_clicked, Qt::UniqueConnection);
 
     // 将监控定时器连接到本类的 updateTurntableData（如果存在）
@@ -311,9 +311,9 @@ void TabTurntableControl::on_btn_set_pidcontroller_parameter_clicked()
         return;
     }
     PIDController::Gains g;
-    g.kp = mw->ui->line_edit_kp_parameter->text().toDouble();
+    g.kp = mw->ui->line_edit_kp_x_parameter->text().toDouble();
     g.ki = mw->ui->line_edit_ki_parameter->text().toDouble();
-    g.kd = mw->ui->line_edit_kd_parameter->text().toDouble();
+    g.kd = mw->ui->line_edit_kd_x_parameter->text().toDouble();
 
     pidX->setGains(g);
     pidY->setGains(g);
