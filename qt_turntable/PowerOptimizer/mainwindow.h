@@ -32,12 +32,6 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-private slots:
-
-    void on_data_monitor_section_checkStateChanged(const Qt::CheckState &arg1);
-
-    void on_data_monitor_section_stateChanged(int arg1);
-
 private:
     Ui::MainWindow *ui;
     QTcpSocket *tcpSocket;                     // TCP套接字（保留用于兼容性）

@@ -11,6 +11,7 @@
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
@@ -192,6 +193,7 @@ public:
     QLineEdit *line_edit_monitor_y_pos;
     QLabel *label_28;
     QLineEdit *line_edit_monitor_y_speed;
+    QCheckBox *data_monitor_section;
     QGroupBox *groupBox_9;
     QVBoxLayout *verticalLayout_8;
     QHBoxLayout *horizontalLayout_25;
@@ -1024,6 +1026,9 @@ public:
         line_edit_monitor_y_speed = new QLineEdit(groupBox_8);
         line_edit_monitor_y_speed->setObjectName(QString::fromUtf8("line_edit_monitor_y_speed"));
         line_edit_monitor_y_speed->setGeometry(QRect(640, 32, 71, 22));
+        data_monitor_section = new QCheckBox(groupBox_8);
+        data_monitor_section->setObjectName(QString::fromUtf8("data_monitor_section"));
+        data_monitor_section->setGeometry(QRect(20, 20, 121, 31));
         groupBox_9 = new QGroupBox(tab_turntable_control);
         groupBox_9->setObjectName(QString::fromUtf8("groupBox_9"));
         groupBox_9->setGeometry(QRect(260, 1, 721, 131));
@@ -1300,6 +1305,7 @@ public:
         label_27->setText(QCoreApplication::translate("MainWindow", "X\350\275\264\351\200\237\345\272\246", nullptr));
         label_3->setText(QCoreApplication::translate("MainWindow", "Y\350\275\264\344\275\215\347\275\256", nullptr));
         label_28->setText(QCoreApplication::translate("MainWindow", "Y\350\275\264\351\200\237\345\272\246", nullptr));
+        data_monitor_section->setText(QCoreApplication::translate("MainWindow", "\345\274\200\345\247\213\346\225\260\346\215\256\347\233\221\346\216\247", nullptr));
         groupBox_9->setTitle(QCoreApplication::translate("MainWindow", "\345\217\202\350\200\203\344\275\215\347\275\256\350\256\276\345\256\232", nullptr));
         label_29->setText(QCoreApplication::translate("MainWindow", "X\350\275\264\344\275\215\347\275\256", nullptr));
         label_31->setText(QCoreApplication::translate("MainWindow", "\345\217\202\350\200\203\350\275\250\350\277\271", nullptr));

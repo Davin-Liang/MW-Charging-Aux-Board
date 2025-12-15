@@ -211,8 +211,8 @@ void TabDeviceConnect::on_pushButton_connection_clicked()
         // 保存为主窗口的指针
         isTurntableConnected = true;
         setTurntableConnectionStatus(true);
-        if (MonitorTimer)
-        MonitorTimer->start(40); // 每40ms刷新数据
+        // if (MonitorTimer)
+        // MonitorTimer->start(40); // 每40ms刷新数据
         QMessageBox::information(mw, "成功", "转台连接成功");
     } else {
         delete mw->turntable_controller;

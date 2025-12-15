@@ -22,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_TabTurntableControl_t {
-    QByteArrayData data[20];
-    char stringdata0[511];
+    QByteArrayData data[22];
+    char stringdata0[554];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -51,7 +51,9 @@ QT_MOC_LITERAL(15, 404, 32), // "on_btn_stop_y_pidcontrol_clicked"
 QT_MOC_LITERAL(16, 437, 15), // "closedLoopTickY"
 QT_MOC_LITERAL(17, 453, 19), // "updateTurntableData"
 QT_MOC_LITERAL(18, 473, 31), // "on_controller_selection_changed"
-QT_MOC_LITERAL(19, 505, 5) // "index"
+QT_MOC_LITERAL(19, 505, 5), // "index"
+QT_MOC_LITERAL(20, 511, 36), // "on_data_monitor_section_state..."
+QT_MOC_LITERAL(21, 548, 5) // "state"
 
     },
     "TabTurntableControl\0update_turntable_image\0"
@@ -68,7 +70,9 @@ QT_MOC_LITERAL(19, 505, 5) // "index"
     "on_btn_set_y_pidcontroller_parameter_clicked\0"
     "on_btn_stop_y_pidcontrol_clicked\0"
     "closedLoopTickY\0updateTurntableData\0"
-    "on_controller_selection_changed\0index"
+    "on_controller_selection_changed\0index\0"
+    "on_data_monitor_section_stateChanged\0"
+    "state"
 };
 #undef QT_MOC_LITERAL
 
@@ -78,7 +82,7 @@ static const uint qt_meta_data_TabTurntableControl[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-      17,   14, // methods
+      18,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -86,23 +90,24 @@ static const uint qt_meta_data_TabTurntableControl[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,   99,    2, 0x0a /* Public */,
-       3,    0,  100,    2, 0x0a /* Public */,
-       4,    0,  101,    2, 0x0a /* Public */,
-       5,    0,  102,    2, 0x0a /* Public */,
-       6,    0,  103,    2, 0x0a /* Public */,
-       7,    0,  104,    2, 0x0a /* Public */,
-       8,    0,  105,    2, 0x0a /* Public */,
-       9,    0,  106,    2, 0x0a /* Public */,
-      10,    0,  107,    2, 0x0a /* Public */,
-      11,    0,  108,    2, 0x0a /* Public */,
-      12,    0,  109,    2, 0x0a /* Public */,
-      13,    0,  110,    2, 0x0a /* Public */,
-      14,    0,  111,    2, 0x0a /* Public */,
-      15,    0,  112,    2, 0x0a /* Public */,
-      16,    0,  113,    2, 0x0a /* Public */,
-      17,    0,  114,    2, 0x0a /* Public */,
-      18,    1,  115,    2, 0x0a /* Public */,
+       1,    0,  104,    2, 0x0a /* Public */,
+       3,    0,  105,    2, 0x0a /* Public */,
+       4,    0,  106,    2, 0x0a /* Public */,
+       5,    0,  107,    2, 0x0a /* Public */,
+       6,    0,  108,    2, 0x0a /* Public */,
+       7,    0,  109,    2, 0x0a /* Public */,
+       8,    0,  110,    2, 0x0a /* Public */,
+       9,    0,  111,    2, 0x0a /* Public */,
+      10,    0,  112,    2, 0x0a /* Public */,
+      11,    0,  113,    2, 0x0a /* Public */,
+      12,    0,  114,    2, 0x0a /* Public */,
+      13,    0,  115,    2, 0x0a /* Public */,
+      14,    0,  116,    2, 0x0a /* Public */,
+      15,    0,  117,    2, 0x0a /* Public */,
+      16,    0,  118,    2, 0x0a /* Public */,
+      17,    0,  119,    2, 0x0a /* Public */,
+      18,    1,  120,    2, 0x0a /* Public */,
+      20,    1,  123,    2, 0x0a /* Public */,
 
  // slots: parameters
     QMetaType::Void,
@@ -122,6 +127,7 @@ static const uint qt_meta_data_TabTurntableControl[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void, QMetaType::Int,   19,
+    QMetaType::Void, QMetaType::Int,   21,
 
        0        // eod
 };
@@ -149,6 +155,7 @@ void TabTurntableControl::qt_static_metacall(QObject *_o, QMetaObject::Call _c, 
         case 14: _t->closedLoopTickY(); break;
         case 15: _t->updateTurntableData(); break;
         case 16: _t->on_controller_selection_changed((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 17: _t->on_data_monitor_section_stateChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
         default: ;
         }
     }
@@ -183,13 +190,13 @@ int TabTurntableControl::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 17)
+        if (_id < 18)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 17;
+        _id -= 18;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 17)
+        if (_id < 18)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 17;
+        _id -= 18;
     }
     return _id;
 }
