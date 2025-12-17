@@ -27,6 +27,8 @@ MainWindow::MainWindow(QWidget *parent)
     setupUI();
     // 创建核心通信对象（服务器）
     commandTransmitter = new CommandTransmitter(this);
+    // 这里只初始化为空，不连接
+    stm32_mb_ctx = nullptr;
 
     // 创建并初始化四个 Tab 页面模块
     tabDeviceConnect     = new TabDeviceConnect(this);
@@ -137,7 +139,11 @@ MainWindow::~MainWindow()
         commandTransmitter->stop_server();
     }
 
-
+    if (stm32_mb_ctx != nullptr) {
+        modbus_close(stm32_mb_ctx);
+        modbus_free(stm32_mb_ctx);
+        stm32_mb_ctx = nullptr;
+    }
     // PID 控制器资源释放
     delete pid_x;
     delete pid_y;

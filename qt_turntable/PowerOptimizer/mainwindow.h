@@ -5,6 +5,7 @@
 #include <QTcpSocket>
 #include <QTimer>
 
+#include <modbus/modbus.h>
 #include "command_transmitter.h"
 #include "turntable_controller.h"
 #include "PID_Controller.h"
@@ -41,7 +42,8 @@ private slots:
 private:
     Ui::MainWindow *ui;
     QTcpSocket *tcpSocket;                     // TCP套接字（保留用于兼容性）
-
+    // ===== STM32 Modbus TCP =====
+    modbus_t *stm32_mb_ctx = nullptr;
   
     // 主通信服务端
     CommandTransmitter *commandTransmitter;
