@@ -10,6 +10,7 @@
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QScatterSeries>
 #include <QtCharts/QValueAxis>
+#include <ctime>
 
 
 
@@ -39,6 +40,8 @@ public slots:
     void onChannelDataReceived(const CurrentVPCh_t &data);
     void onOptResDataReceived(const OptResData_t &data);
 
+    void onStm32MonitorTimeout();
+
 
 private:
     MainWindow *mw;
@@ -53,6 +56,7 @@ private:
     QtCharts::QChartView *chartView;
     QVector<QPointF> positionHistory;
 
+    QTimer *stm32_MonitorTimer;
     // 图表相关函数
     void initializeMotorChart();               // 初始化电机状态图表
     void updateMotorChart(double x, double y); // 更新电机状态图表
@@ -60,6 +64,12 @@ private:
     void initializeUIWithConfig();
     void setupReadOnlyDataMonitoring();
     void parseEthernetData(const QByteArray &data);
+
+    // ===== 新增：Modbus 写入辅助函数 =====
+    void writeMotorRegisters();
+    void writeFindOptRegisters();
+    void writeTimeRegisters();
+    void setUpdateFlag(uint16_t bitMask);
 };
 
 #endif // TAB_STM32_H

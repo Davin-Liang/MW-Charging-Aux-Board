@@ -57,7 +57,8 @@ private:
     QTimer *turntableMonitorTimer;
     QTimer *closedLoopTimer_x;
     QTimer *closedLoopTimer_y;
-
+    //stm32数据监控定时器
+    QTimer *stm32MonitorTimer;
 
      // 四个 Tab 页面对象
     TabDeviceConnect *tabDeviceConnect;

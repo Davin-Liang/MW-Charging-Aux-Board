@@ -17,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent)
     ,turntableMonitorTimer(new QTimer(this))
     ,closedLoopTimer_x(new QTimer(this))
     ,closedLoopTimer_y(new QTimer(this))
+    ,stm32MonitorTimer (new QTimer(this))
     ,pid_x(nullptr)
     ,pid_y(nullptr)
 

@@ -12,6 +12,7 @@ TabSTM32::TabSTM32(MainWindow *mw_)
     : QObject(mw_), mw(mw_)
 {
     transmitter = mw->commandTransmitter;
+    stm32_MonitorTimer = mw.stm32MonitorTimer;
 }
 
 TabSTM32::~TabSTM32()
@@ -39,20 +40,10 @@ void TabSTM32::setupConnections()
             QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &TabSTM32::trajTypeChanged);
     // === 数据接收信号 ===
-    connect(transmitter,
-            &CommandTransmitter::motorDataReceived,
-            this,
-            &TabSTM32::onMotorDataReceived);
 
-    connect(transmitter,
-            &CommandTransmitter::channelDataReceived,
-            this,
-            &TabSTM32::onChannelDataReceived);
 
-    connect(transmitter,
-            &CommandTransmitter::optResDataReceived,
-            this,
-            &TabSTM32::onOptResDataReceived);
+    connect(stm32_MonitorTimer, &QTimer::timeout,
+            this, &TabStm32::onStm32MonitorTimeout);
 
 }
 /**
@@ -87,6 +78,8 @@ void TabSTM32::setupReadOnlyDataMonitoring()
     setRO(mw->ui->lineEdit_read_channel3voltagemax);
     setRO(mw->ui->lineEdit_read_channel4voltagemax);
     setRO(mw->ui->lineEdit_read_powermax);
+    setRO(mw->ui->lineEdit_opt_motor_x);
+    setRO(mw->ui->lineEdit_opt_motor_y);
 
 }
 /**
@@ -122,6 +115,7 @@ void TabSTM32::initializeUIWithConfig()
     mw->ui->lineEdit_voltage_step->setText(QString::number(findOptCmd.volStepLen, 'f', 2));
     // 根据轨迹模式更新 UI
     trajTypeChanged(mw->ui->comboBox_traj_type->currentIndex());
+
 }
 /**
  * @brief 初始化电机状态图表，包括轨迹曲线、当前位置标记和坐标轴样式
@@ -195,24 +189,7 @@ void TabSTM32::initializeMotorChart()
 
     qDebug()<<"电机位置轨迹图初始化完成";
 }
-/**
- * @brief 接收电机数据并更新界面与图表
- * @param data 解析后的电机数据结构体
- */
-void TabSTM32::onMotorDataReceived(const MotorData_t &data)
-{
-    // 更新电机状态读取区域
-    mw->ui->lineEdit_read_motor_x->setText(QString::number(data.motorX, 'f', 2));
-    mw->ui->lineEdit_read_motor_y->setText(QString::number(data.motorY, 'f', 2));
-    mw->ui->lineEdit_read_motor_speed->setText(QString::number(data.motorSpeed));
 
-    // 更新图表
-    updateMotorChart(data.motorX, data.motorY);
-
-    QString message = QString("收到电机数据 - X: %1, Y: %2, 速度: %3")
-                          .arg(data.motorX).arg(data.motorY).arg(data.motorSpeed);
-    qDebug()<<message;
-}
 /**
  * @brief 更新电机图表：轨迹曲线 + 实时位置点 + 自适应坐标轴
  */
@@ -255,40 +232,9 @@ void TabSTM32::updateMotorChart(double x, double y)
         axisY->setRange(minY - marginY, maxY + marginY);
     }
 }
-/**
- * @brief 接收并更新当前通道、电压与功率信息
- */
-void TabSTM32::onChannelDataReceived(const CurrentVPCh_t &data)
-{
-    // 更新寻优过程数据显示区域
-    mw->ui->lineEdit_read_currentchannel->setText(QString::number(data.currentChannel));
-    mw->ui->lineEdit_read_currentvoltage->setText(QString::number(data.currentV, 'f', 2));
-    mw->ui->lineEdit_read_currentpower->setText(QString::number(data.currentP, 'f', 2));
 
-    QString message = QString("收到通道信息 - 通道: %1, 电压: %2V, 功率: %3W")
-                          .arg(data.currentChannel).arg(data.currentV).arg(data.currentP);
 
-    qDebug()<<message;
-}
 
-/**
- * @brief 接收寻优结果并更新显示区域
- */
-void TabSTM32::onOptResDataReceived(const OptResData_t &data)
-{
-    // 更新寻优结果显示区域
-    mw->ui->lineEdit_read_channel1voltagemax->setText(QString::number(data.optimalVs[0], 'f', 2));
-    mw->ui->lineEdit_read_channel2voltagemax->setText(QString::number(data.optimalVs[1], 'f', 2));
-    mw->ui->lineEdit_read_channel3voltagemax->setText(QString::number(data.optimalVs[2], 'f', 2));
-    mw->ui->lineEdit_read_channel4voltagemax->setText(QString::number(data.optimalVs[3], 'f', 2));
-    mw->ui->lineEdit_read_powermax->setText(QString::number(data.optimalPower, 'f', 2));
-
-    QString message = QString("收到优化结果 - 最大功率: %1W, 电压: [%2, %3, %4, %5]V")
-                          .arg(data.optimalPower)
-                          .arg(data.optimalVs[0]).arg(data.optimalVs[1])
-                          .arg(data.optimalVs[2]).arg(data.optimalVs[3]);
-    qDebug()<<message;
-}
 /**
  * @brief 当轨迹类型切换时，调整 UI 使对应输入框可用/禁用
  */
@@ -322,130 +268,186 @@ void TabSTM32::trajTypeChanged(int index)
  */
 void TabSTM32::on_pushButton_motor_control_clicked()
 {
-    if (transmitter == nullptr || transmitter->m_clientSocket == nullptr) {
-        QMessageBox::warning(mw, "错误", "请先启动服务器并等待 STM32 连接");
+    if (!mw || !mw->stm32_mb_ctx) {
+        QMessageBox::warning(mw, "错误", "Modbus 未连接");
         return;
     }
-    // 获取电机控制参数并更新到commandTransmitter
-    MotorCmd_t motorCmd;
-    motorCmd.x = mw->ui->lineEdit_motor_x->text().toFloat();
-    motorCmd.y = mw->ui->lineEdit_motor_y->text().toFloat();
-    motorCmd.speed = mw->ui->lineEdit_motor_speed->text().toUShort();
+    // ===== 1. 写电机参数（保持寄存器）=====
+    writeMotorRegisters();
 
-    // 更新到commandTransmitter
-    transmitter->setMotorCmd(motorCmd);
+    // ===== 2. 打开电机控制线圈 =====
+    modbus_write_bit(mw->stm32_mb_ctx, 0x0002, 1);
 
-    int result = transmitter->send_motor_command();
-    if (result == 0) {
-        qDebug() << "电机控制命令发送成功: X=" << motorCmd.x << ", Y=" << motorCmd.y << ", Speed=" << motorCmd.speed;
-    } else {
-        qDebug() << "电机控制命令发送失败，错误码:" <<result ;
-    }
+    // ===== 3. 写时间 =====
+    writeTimeRegisters();
+
+    // ===== 4. 更新标志位：bit0(电机) + bit2(时间) =====
+    setUpdateFlag((1 << 0) | (1 << 2));
+
+    qDebug() << "电机控制参数已发送";
 }
+/**
+ * @brief 写电机参数（保持寄存器）
+ */
+void TabSTM32::writeMotorRegisters()
+{
+    int16_t regs[3];
+
+    regs[0] = static_cast<int16_t>(mw->ui->lineEdit_motor_x->text().toInt());
+    regs[1] = static_cast<int16_t>(mw->ui->lineEdit_motor_y->text().toInt());
+    regs[2] = static_cast<uint16_t>(mw->ui->lineEdit_motor_speed->text().toUInt());
+
+    modbus_write_registers(mw->stm32_mb_ctx,0x0001,3,reinterpret_cast<uint16_t*>(regs));
+}
+
 /**
  * @brief “寻优控制”按钮点击事件。根据用户选择的轨迹类型读取参数并发送寻优控制命令。
  */
 void TabSTM32::on_pushButton_find_optimal_clicked()
 {
-    if (transmitter == nullptr || transmitter->m_clientSocket == nullptr) {
-        QMessageBox::warning(mw, "错误", "请先启动服务器并等待 STM32 连接");
+    if (!mw || !mw->stm32_mb_ctx) {
+        QMessageBox::warning(mw, "错误", "Modbus 未连接");
         return;
     }
-    // 获取轨迹类型
-    int trajTypeIndex = mw->ui->comboBox_traj_type->currentIndex();
-    ThajType_t whichThaj = (trajTypeIndex == 0) ? SQU_TRAJ : CIR_TRAJ;//只有两个index的情况下
+    // ===== 1. 写寻优参数 =====
+    writeFindOptRegisters();
 
-    // 根据轨迹类型获取正确的参数
-    float cirTrajRad = 0.0f;
-    float squThajLen = 0.0f;  // 新增：方形轨迹边长
-    uint8_t squThajStepLen = 0;
+    // ===== 2. 打开寻优控制线圈 =====
+    modbus_write_bit(mw->stm32_mb_ctx, 0x0001, 1);
 
-    float maxVol = mw->ui->lineEdit_max_voltage->text().toFloat();
-    float initialVol = mw->ui->lineEdit_initial_voltage->text().toFloat();
-    float volStepLen = mw->ui->lineEdit_voltage_step->text().toFloat();
+    // ===== 3. 写时间 =====
+    writeTimeRegisters();
 
+    // ===== 4. 更新标志位：bit1(寻优) + bit2(时间) =====
+    setUpdateFlag((1 << 1) | (1 << 2));
 
-    if (whichThaj == SQU_TRAJ) {
-        // 方形轨迹：只使用方形步长，圆形半径设为0
-        squThajLen = mw->ui->lineEdit_square_step_2->text().toFloat(); // 获取方形边长
-        squThajStepLen = mw->ui->lineEdit_square_step->text().toUShort();
-        cirTrajRad = 0.0f;
+    qDebug() << "寻优控制参数已发送";
 
-        // 确保UI状态正确（方形步长可用，圆形半径禁用）
-        mw->ui->lineEdit_square_step_2->setEnabled(true);
-        mw->ui->lineEdit_square_step->setEnabled(true);
-        mw->ui->lineEdit_circle_radius->setEnabled(false);
-
-        // 验证方形轨迹参数
-        if (squThajLen <= 0) {
-            QMessageBox::warning(mw, "参数错误", "方形轨迹必须设置有效的方形边长");
-            return;
-        }
-        if (squThajStepLen == 0) {
-            QMessageBox::warning(mw, "参数错误", "方形轨迹必须设置方形步长");
-            return;
-        }
-
-    } else {
-        // 圆形轨迹：只使用圆形半径，方形参数设为0
-        cirTrajRad = mw->ui->lineEdit_circle_radius->text().toFloat();
-        squThajLen = 0.0f;
-        squThajStepLen = 0;
-
-        // 确保UI状态正确（圆形半径可用，方形参数禁用）
-        mw->ui->lineEdit_circle_radius->setEnabled(true);
-        mw->ui->lineEdit_square_step_2->setEnabled(false);
-        mw->ui->lineEdit_square_step->setEnabled(false);
-        // 验证圆形轨迹参数
-        if (cirTrajRad <= 0) {
-            QMessageBox::warning(mw, "参数错误", "圆形轨迹必须设置有效的圆形半径");
-            return;
-        }
-    }
-
-    if (maxVol <= 0 || volStepLen <= 0) {
-        QMessageBox::warning(mw, "参数错误", "最大电压和电压步长必须大于0");
-        return;
-    }
-    // 发送时间同步命令
-    int timeResult = transmitter->send_time_command();
-    if (timeResult == 0) {
-        qDebug()<<"时间命令发送成功";
-    } else {
-        qDebug() << "时间命令发送失败，错误码:" << timeResult;
-        // 即使时间命令失败，也继续发送寻优命令
-    }
-    // 发送寻优任务命令
-    const int result = transmitter->send_find_opt_command(whichThaj, cirTrajRad, squThajLen, squThajStepLen, maxVol, volStepLen,initialVol);
-    if (result == 0) {
-        qDebug()<<"寻优控制命令发送成功";
-
-        // 更新commandTransmitter中的配置
-        FindOptimalCmd_t findOptCmd = transmitter->getFindOptCmd();
-        findOptCmd.whichThaj = whichThaj;
-        findOptCmd.cirTrajRad = cirTrajRad;
-        findOptCmd.squThajLen = squThajLen;
-        findOptCmd.squThajStepLen = squThajStepLen;
-        findOptCmd.maxVol = maxVol;
-        findOptCmd.volStepLen = volStepLen;
-        findOptCmd.initialVol = initialVol;
-        transmitter->setFindOptCmd(findOptCmd);
-
-        // 显示发送的参数信息
-        QString paramInfo;
-        if (whichThaj == SQU_TRAJ) {
-            paramInfo = QString("轨迹类型: 方形轨迹, 方形边长: %1mm, 方形步长: %2mm, 最大电压: %3V, 电压步长: %4V, 初始电压: %3V")
-                            .arg(squThajLen).arg(squThajStepLen).arg(maxVol).arg(volStepLen).arg(initialVol);
-        } else {
-            paramInfo = QString("轨迹类型: 圆形轨迹, 圆形半径: %1m, 最大电压: %2V, 电压步长: %3V, 初始电压: %2V")
-                            .arg(cirTrajRad).arg(maxVol).arg(volStepLen).arg(initialVol);
-        }
-        qDebug()<<paramInfo;
-    } else {
-        qDebug() << "寻优控制命令发送失败，错误码:" << result;
-    }
 }
 
+/**
+ * @brief 写寻优参数
+ */
+void TabSTM32::writeFindOptRegisters()
+{
+    uint16_t reg;
 
+    // 轨迹类型
+    reg = (mw->ui->comboBox_traj_type->currentIndex() == 0) ? 1 : 2;
+    modbus_write_register(mw->stm32_mb_ctx, 0x0004, reg);
+
+    // 圆 / 方参数
+    modbus_write_register(mw->stm32_mb_ctx, 0x0005, static_cast<uint16_t>(mw->ui->lineEdit_circle_radius->text().toUInt()));
+    modbus_write_register(mw->stm32_mb_ctx, 0x0006, static_cast<uint16_t>(mw->ui->lineEdit_square_step_2->text().toUInt()));
+    modbus_write_register(mw->stm32_mb_ctx, 0x0007, static_cast<uint16_t>(mw->ui->lineEdit_square_step->text().toUInt()));
+
+    // float 参数
+    float v;
+    uint16_t fbuf[2];
+
+    v = mw->ui->lineEdit_max_voltage->text().toFloat();
+    modbus_set_float_abcd(v, fbuf);
+    modbus_write_registers(mw->stm32_mb_ctx, 0x0008, 2, fbuf);
+
+    v = mw->ui->lineEdit_voltage_step->text().toFloat();
+    modbus_set_float_abcd(v, fbuf);
+    modbus_write_registers(mw->stm32_mb_ctx, 0x000A, 2, fbuf);
+
+    v = mw->ui->lineEdit_initial_voltage->text().toFloat();
+    modbus_set_float_abcd(v, fbuf);
+    modbus_write_registers(mw->stm32_mb_ctx, 0x000C, 2, fbuf);
+}
+/**
+ * @brief 获取时间并写入
+ */
+void TabSTM32::writeTimeRegisters()
+{
+    time_t now = time(nullptr);
+    tm *lt = localtime(&now);
+
+    uint16_t year = lt->tm_year + 1900;
+    uint16_t month_day = ((lt->tm_mon + 1) << 8) | lt->tm_mday;
+    uint16_t hour_min = (lt->tm_hour << 8) | lt->tm_min;
+
+    modbus_write_register(mw->stm32_mb_ctx, 0x000E, year);
+    modbus_write_register(mw->stm32_mb_ctx, 0x000F, month_day);
+    modbus_write_register(mw->stm32_mb_ctx, 0x0010, hour_min);
+
+    // 时间线圈
+    modbus_write_bit(mw->stm32_mb_ctx, 0x0003, 1);
+}
+/**
+ * @brief 0x0011 数据更新标志位
+ */
+void TabSTM32::setUpdateFlag(uint16_t bitMask)
+{
+    uint16_t flag = 0;
+    modbus_read_registers(mw->stm32_mb_ctx, 0x0011, 1, &flag);
+    flag |= bitMask;
+    modbus_write_register(mw->stm32_mb_ctx, 0x0011, flag);
+}
+
+/**
+ * @brief 获取实时数据，实现数据监控
+ */
+void TabStm32::onStm32MonitorTimeout()
+{
+    if (!mw || !mw->stm32_mb_ctx)
+        return;
+
+    uint16_t regs[20] = {0};
+
+    // 从 0x0001 连续读 0x0013
+    int rc = modbus_read_input_registers(
+        mw->stm32_mb_ctx,0x0001,0x0013 - 0x0001 + 1,regs);
+
+    if (rc == -1) {
+        qDebug() << "Modbus read failed:" << modbus_strerror(errno);
+        return;
+    }
+
+    // ========= 数据解析 =========
+    int16_t motor_x = (int16_t)regs[0];   // 0x0001
+    int16_t motor_y = (int16_t)regs[1];   // 0x0002
+    uint16_t speed  = regs[2];            // 0x0003
+    uint8_t channel = regs[3] & 0xFF;     // 0x0004
+
+
+    float voltage = modbus_get_float_abcd(&regs[4]); // 0x0005
+    float power   = modbus_get_float_abcd(&regs[5]); // 0x0007
+
+    int16_t opt_x = (int16_t)regs[6];      // 0x0009
+    int16_t opt_y = (int16_t)regs[7];      // 0x000A
+    float opt_pwr = modbus_get_float_abcd(&regs[8]); // 0x000B
+
+    // ========= UI 更新 =========
+    mw->ui->lineEdit_read_motor_x->setText(QString::number(motor_x));
+    mw->ui->lineEdit_read_motor_y->setText(QString::number(motor_y));
+    mw->ui->lineEdit_read_motor_speed->setText(QString::number(speed));
+    mw->ui->lineEdit_read_currentchannel->setText(QString::number(channel));
+
+    mw->ui->lineEdit_read_currentvoltage->setText(QString::number(voltage, 'f', 2));
+    mw->ui->lineEdit_read_currentpower->setText(QString::number(power, 'f', 2));
+
+    mw->ui->lineEdit_opt_motor_x->setText(QString::number(opt_x));
+    mw->ui->lineEdit_opt_motor_y->setText(QString::number(opt_y));
+    mw->ui->lineEdit_read_powermax->setText(QString::number(opt_pwr, 'f', 2));
+
+    mw->ui->lineEdit_read_channel1voltagemax->setText(QString::number(modbus_get_float_abcd(&regs[9]), 'f', 2));
+    mw->ui->lineEdit_read_channel2voltagemax->setText(QString::number(modbus_get_float_abcd(&regs[10]), 'f', 2));
+    mw->ui->lineEdit_read_channel3voltagemax->setText(QString::number(modbus_get_float_abcd(&regs[11]), 'f', 2));
+    mw->ui->lineEdit_read_channel4voltagemax->setText(QString::number(modbus_get_float_abcd(&regs[12]), 'f', 2));
+
+
+    QString message = QString("收到电机数据 - X: %1, Y: %2, 速度: %3")
+                          .arg(motor_x).arg(motor_y).arg(speed);
+    QString message = QString("收到通道信息 - 通道: %1, 电压: %2V, 功率: %3W")
+                          .arg(channel).arg(voltage).arg(power);
+    QString message = QString("收到优化结果 - 最大功率: %1W, 电压: [%2, %3, %4, %5]V")
+                          .arg(opt_pwr)
+                          .arg(modbus_get_float_abcd(&regs[9])).arg(modbus_get_float_abcd(&regs[10]))
+                          .arg(modbus_get_float_abcd(&regs[11])).arg(modbus_get_float_abcd(&regs[12]));
+    qDebug()<<message;
+}
 
 

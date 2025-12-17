@@ -22,8 +22,6 @@ public:
     bool param_initialize(const std::string & filename);
     bool param_record(const std::string & filename);
 
-    bool start_server(quint16 port, const QHostAddress &address);
-    void stop_server();
 
     int build_command_frame(uint8_t* buffer, CommandType_t cmdType, const void* data, uint16_t dataLen);
     int parse_command_frame(const uint8_t * buffer, uint16_t len, CommandFrame_t * cmd);
@@ -57,10 +55,8 @@ signals:
     void optResDataReceived(const OptResData_t &data);
 
 private slots:
-    void on_new_connection(void);
+
     void on_ready_read(void);
-    void on_disconnected(void);
-    void on_error_occurred(QAbstractSocket::SocketError error);
 
 private:
     uint8_t calculate_checksum(const uint8_t* data, uint16_t len);
