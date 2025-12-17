@@ -318,7 +318,7 @@ bool TurntableController::stop_manual_rotation(enum YawOrPitch_t axis)
 {
     if (Yaw == axis)
         return write_single_coil(0x001E, 0x0000);
-    return write_single_coil(0x001F, 0x0000);
+    return write_single_coil(0x0020, 0x0000);
 }
 
 /**
