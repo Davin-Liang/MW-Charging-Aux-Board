@@ -77,7 +77,6 @@ static void dm542_task(void * param)
         }
         case demandMotorControl:
         {
-          printf("Ready to action motors.\n");
 					MotorCmd_t * motorCmd = get_motor_cmd(get_data_center());
           if (pdPASS == xQueueReceive(queues->cmdQueue, &cmd, portMAX_DELAY)) {
             if (cmd == CMD_MOTOR_CONTROL) {

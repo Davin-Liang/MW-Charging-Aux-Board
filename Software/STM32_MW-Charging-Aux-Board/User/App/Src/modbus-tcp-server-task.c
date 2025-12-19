@@ -30,10 +30,6 @@ static struct CommandInfo command;
 static struct SystemQueues_t * queues;
 static  modbus_mapping_t * mbMapping;
 
-static struct MotorData_t currentMotorData;
-static struct Optimal_v_p_t currentOptimalVP;
-static struct CurrentV_P_Ch_t currentVPCh;
-
 static void modbus_tcp_server_task(void* param)
 {
     xEventGroupWaitBits(xSystemEventGroup, BIT_WAKE_MODBUS_TCP, pdTRUE, pdTRUE, portMAX_DELAY);
@@ -55,7 +51,7 @@ static void modbus_tcp_server_task(void* param)
     modbus_flush(ctx);
 
     /* 创建寄存器映射 */
-    mbMapping = modbus_mapping_new(3, 0, 20, 20);
+    mbMapping = modbus_mapping_new(3, 0, 20, 22);
     if (mbMapping == NULL) {
         printf("Failed to create mapping\n");
         modbus_free(ctx);
@@ -86,60 +82,14 @@ static void modbus_tcp_server_task(void* param)
         while (1) {
             uint8_t query[MODBUS_TCP_MAX_ADU_LENGTH];
             int rc = modbus_receive(ctx, query);
-
-            if (pdPASS == xQueueReceive(queues->motorDataQueue, &currentMotorData, 0)) {
-                /* 打印电机数据 */
-                mutual_printf("Position:(%dmm,%dmm)\r\n", currentMotorData.x, currentMotorData.y);
-
-                /* 写入输入寄存器 */
-                mbMapping->tab_input_registers[0x0001] = (uint16_t)currentMotorData.x;
-                mbMapping->tab_input_registers[0x0002] = (uint16_t)currentMotorData.y;
-            }
-                
-            if (pdPASS == xQueueReceive(queues->optimalVPDataQueue, &currentOptimalVP, 0)) {
-                /* 打印电机数据、最优功率和四个通道的最优电压 */
-                mutual_printf("(%.2f,%.2f): V1 = %.2fV, V2 = %.2fV, V3 = %.2fV, V4 = %.2fV, P = %.3fdBm\r\n",
-                    currentMotorData.x,
-                    currentMotorData.y,
-                                    currentOptimalVP.optimalVs[0],
-                    currentOptimalVP.optimalVs[1], 
-                    currentOptimalVP.optimalVs[2],
-                    currentOptimalVP.optimalVs[3], 
-                    currentOptimalVP.optimalP);
-
-                /* 写入输入寄存器 */
-                mbMapping->tab_input_registers[0x0009] = currentMotorData.x;
-                mbMapping->tab_input_registers[0x000A] = currentMotorData.y;
-                float_to_uint16(currentOptimalVP.optimalP, &mbMapping->tab_input_registers[0x000B]);
-                float_to_uint16(currentOptimalVP.optimalVs[0], &mbMapping->tab_input_registers[0x000D]);
-                float_to_uint16(currentOptimalVP.optimalVs[1], &mbMapping->tab_input_registers[0x000F]);
-                float_to_uint16(currentOptimalVP.optimalVs[2], &mbMapping->tab_input_registers[0x0011]);
-                float_to_uint16(currentOptimalVP.optimalVs[3], &mbMapping->tab_input_registers[0x0013]);
-            }
-
-            if (pdPASS == xQueueReceive(queues->currentVPChQueue, &currentVPCh, 0)) {
-                /* 打印当前通道的电压、功率 */
-                mutual_printf("channel: %d current V: %.2f current P: %.3f\r\n",
-                currentVPCh.channel,
-                currentVPCh.currentV,
-                currentVPCh.currentP);
-
-                /* 写入输入寄存器 */
-                mbMapping->tab_input_registers[0x0004] = currentVPCh.channel;
-                        // mbMapping->tab_input_registers[0x0004] = 1234;
-                float_to_uint16(currentVPCh.currentV, &mbMapping->tab_input_registers[0x0005]);
-                float_to_uint16(currentVPCh.currentP, &mbMapping->tab_input_registers[0x0007]);
-            }
             
             if (rc > 0) {
                 modbus_reply(ctx, query, rc, mbMapping);
                 /* 获取从上位机发送的保持寄存器的值 */
-								mbMapping->tab_input_registers[0x0001] = 1234;
                 g_dataCenter->dataUpdateFlag = mbMapping->tab_registers[0x0011];
                 if (check_data_update_flag(get_data_update_flag(g_dataCenter), 0)) {
                     printf("Get motor cmd.\n");
                     g_dataCenter->motorCmd->x     = (int16_t)mbMapping->tab_registers[0x0001];
-                    printf("g_dataCenter->motorCmd->x = %d\n", g_dataCenter->motorCmd->x);
 										g_dataCenter->motorCmd->y     = (int16_t)mbMapping->tab_registers[0x0002];
                     g_dataCenter->motorCmd->speed = mbMapping->tab_registers[0x0003];
 
@@ -203,8 +153,6 @@ static void modbus_tcp_server_task(void* param)
                 lwip_close(clientSocket);   // 防止句柄泄漏
                 break;                       // 等待下一个客户端
             }
-
-            vTaskDelay(1000);
         }
     }
 

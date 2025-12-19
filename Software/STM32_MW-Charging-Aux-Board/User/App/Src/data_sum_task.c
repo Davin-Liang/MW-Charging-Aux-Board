@@ -40,6 +40,7 @@ static void data_sum_Task(void * param)
     xEventGroupWaitBits(xSystemEventGroup, BIT_WAKE_DATA_SUM_TASK, pdTRUE, pdTRUE, portMAX_DELAY);
     
     queues = get_queues();
+		vTaskDelay(500);
     mbMapping = get_mbMapping();
     
     insert_task_handle(g_dataSumTaskHandle, "data_sum");
@@ -112,8 +113,6 @@ static void data_sum_Task(void * param)
         #endif
 
         /* Ğ´ÈëÊäÈë¼Ä´æÆ÷ */
-//        mbMapping->tab_input_registers[0x0004] = currentVPCh.channel;
-				mbMapping->tab_input_registers[0x0004] = 1234;
         float_to_uint16(currentVPCh.currentV, &mbMapping->tab_input_registers[0x0005]);
         float_to_uint16(currentVPCh.currentP, &mbMapping->tab_input_registers[0x0007]);
       }

@@ -26,7 +26,7 @@ static void queues_create_task(void * param)
     queues->currentVPChQueue = xQueueCreate(10, sizeof(struct CurrentV_P_Ch_t));
     queues->optimalVPDataQueue = xQueueCreate(10, sizeof(struct Optimal_v_p_t));
     xEventGroupSetBits(xSystemEventGroup, BIT_WAKE_ALL);
-
+	
     vTaskDelete(NULL);
 }
 
