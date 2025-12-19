@@ -60,11 +60,11 @@ void hor_dm542_init(uint32_t period, uint16_t prescaler, uint32_t pulse)
     GPIO_InitStructure.GPIO_Pin = HOR_DM542_DIR_PIN;  
     GPIO_Init(HOR_DM542_DIR_GPIO_PORT, &GPIO_InitStructure);
 
-    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;  
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8;  
-    GPIO_Init(GPIOA, &GPIO_InitStructure);
+//    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;  
+//    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+//    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+//    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8;  
+//    GPIO_Init(GPIOA, &GPIO_InitStructure);
 
 
 	TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
@@ -310,7 +310,11 @@ int motor_position_ctrl(float horPosition, float verPosition)
         return 0;
 		
     horDistance = horPosition - horSM.currentPosition;
+//	printf("horPosition = %f\n", horPosition);
+//	printf("horSM.currentPosition = %f\n", horSM.currentPosition);	
     verDistance = verPosition - verSM.currentPosition;
+//	printf("verPosition = %f\n", verPosition);
+//	printf("horSM.currentPosition = %f\n", verSM.currentPosition);
 		
     if (horDistance != 0)
         horSM.movingCompletionStatus = unfinished;

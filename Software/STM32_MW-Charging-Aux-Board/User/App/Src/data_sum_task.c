@@ -1,30 +1,34 @@
-#include "data_sum_task.h"
+#include "main.h"
+
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
+
 #include "file_common.h"
-#include "lwip_recv_task.h"
 #include "command_struct.h"
 #include "stdio.h"
 #include <string.h> 
-#include "send_command.h"
+#include "modbus.h"
+#include "type_cast_common.h"
+
+#include "data_sum_task.h"
+#include "modbus-tcp-server-task.h"
+#include "queues-create-task.h"
 #include "command_task.h"
-#include "main.h"
 
 static void data_sum_Task(void * param);
 static int datetime_to_filename(const DateTime_t *dt, const char *filename, 
                         char *output, size_t output_size);
 static uint8_t validate_date_time(const DateTime_t * dt);
+
 static struct MotorData_t currentMotorData;
 static struct Optimal_v_p_t currentOptimalVP;
 static struct CurrentV_P_Ch_t currentVPCh;
 static DateTime_t g_currentDateTime;
 static char g_nameOutput[40];
-QueueHandle_t g_motorDataQueue = NULL;
-QueueHandle_t g_optimalVPDataQueue = NULL;
-QueueHandle_t g_currentVPChQueue = NULL;
-
 static TaskHandle_t g_dataSumTaskHandle = NULL;
+static struct SystemQueues_t * queues;
+static modbus_mapping_t * mbMapping;
 
 /**
   * @brief  data_sum_Task 任务主体
@@ -33,33 +37,34 @@ static TaskHandle_t g_dataSumTaskHandle = NULL;
   **/
 static void data_sum_Task(void * param)
 {	
+    xEventGroupWaitBits(xSystemEventGroup, BIT_WAKE_DATA_SUM_TASK, pdTRUE, pdTRUE, portMAX_DELAY);
+    
+    queues = get_queues();
+		vTaskDelay(500);
+    mbMapping = get_mbMapping();
+    
     insert_task_handle(g_dataSumTaskHandle, "data_sum");
-		g_motorDataQueue = xQueueCreate(MOTOR_DATA_QUEUE_LEN, sizeof(struct MotorData_t));
-    g_optimalVPDataQueue = xQueueCreate(OPTIMAL_V_P_DATA_QUEUE_LEN, sizeof(struct Optimal_v_p_t));
-    g_currentVPChQueue = xQueueCreate(CURRENT_V_P_CH_QUEUE_LEN, sizeof(struct CurrentV_P_Ch_t));
-		vTaskSuspend(NULL);
   
     while (1)
     {
-      if (pdPASS == xQueueReceive(g_motorDataQueue, &currentMotorData, 10))
-      {
+      if (pdPASS == xQueueReceive(queues->motorDataQueue, &currentMotorData, 10)) {
         /* 打印电机数据 */
-        mutual_printf("Position:(%.2f,%.2f)\r\n", currentMotorData.x, currentMotorData.y);
-        /* 通过以太网上传电机数据 */
-        send_motor_data_command(1, currentMotorData.x, currentMotorData.y, 0); // TODO:
+        mutual_printf("Position:(%dmm,%dmm)\r\n", currentMotorData.x, currentMotorData.y);
+
+        /* 写入输入寄存器 */
+        mbMapping->tab_input_registers[0x0001] = (uint16_t)currentMotorData.x;
+        mbMapping->tab_input_registers[0x0002] = (uint16_t)currentMotorData.y;
       }
 
-      if (pdPASS == xQueueReceive(g_timeDataQueue, &g_currentDateTime, 10))
-      {
-        /* 打印日期时间数据 */
-        printf("获取时间: %04u-%02u-%02u %02u:%02u\n",
-              g_currentDateTime.year, g_currentDateTime.month, g_currentDateTime.day,
-              g_currentDateTime.hour, g_currentDateTime.minute);
-      }
+      // if (pdPASS == xQueueReceive(g_timeDataQueue, &g_currentDateTime, 10)) {
+      //   /* 打印日期时间数据 */
+      //   printf("获取时间: %04u-%02u-%02u %02u:%02u\n",
+      //         g_currentDateTime.year, g_currentDateTime.month, g_currentDateTime.day,
+      //         g_currentDateTime.hour, g_currentDateTime.minute);
+      // }
 
         
-      if (pdPASS == xQueueReceive(g_optimalVPDataQueue, &currentOptimalVP, 10))
-      {
+      if (pdPASS == xQueueReceive(queues->optimalVPDataQueue, &currentOptimalVP, 10)) {
         /* 打印电机数据、最优功率和四个通道的最优电压 */
         mutual_printf("(%.2f,%.2f): V1 = %.2fV, V2 = %.2fV, V3 = %.2fV, V4 = %.2fV, P = %.3fdBm\r\n",
               currentMotorData.x,
@@ -81,15 +86,17 @@ static void data_sum_Task(void * param)
                               currentOptimalVP.optimalP);
         #endif
 
-        /* 通过以太网上传最优结果 */
-        send_opt_res_data_command(1, currentMotorData.x, 
-                                      currentMotorData.y, 
-                                      currentOptimalVP.optimalP, 
-                                      currentOptimalVP.optimalVs); // TODO:
+        /* 写入输入寄存器 */
+        mbMapping->tab_input_registers[0x0009] = currentMotorData.x;
+        mbMapping->tab_input_registers[0x000A] = currentMotorData.y;
+        float_to_uint16(currentOptimalVP.optimalP, &mbMapping->tab_input_registers[0x000B]);
+        float_to_uint16(currentOptimalVP.optimalVs[0], &mbMapping->tab_input_registers[0x000D]);
+        float_to_uint16(currentOptimalVP.optimalVs[1], &mbMapping->tab_input_registers[0x000F]);
+        float_to_uint16(currentOptimalVP.optimalVs[2], &mbMapping->tab_input_registers[0x0011]);
+        float_to_uint16(currentOptimalVP.optimalVs[3], &mbMapping->tab_input_registers[0x0013]);
       }
 
-      if (pdPASS == xQueueReceive(g_currentVPChQueue, &currentVPCh, 10))
-      {
+      if (pdPASS == xQueueReceive(queues->currentVPChQueue, &currentVPCh, 10)) {
         /* 打印当前通道的电压、功率 */
         mutual_printf("channel: %d current V: %.2f current P: %.3f\r\n",
         currentVPCh.channel,
@@ -105,8 +112,9 @@ static void data_sum_Task(void * param)
                           currentVPCh.channel);
         #endif
 
-        /* 通过以太网上传当前通道的电压、功率、通道 */
-        send_current_vpch_command(1, currentVPCh.channel, currentVPCh.currentV, currentVPCh.currentP);
+        /* 写入输入寄存器 */
+        float_to_uint16(currentVPCh.currentV, &mbMapping->tab_input_registers[0x0005]);
+        float_to_uint16(currentVPCh.currentP, &mbMapping->tab_input_registers[0x0007]);
       }
 
       vTaskDelay(10);
@@ -209,31 +217,3 @@ static int datetime_to_filename(const DateTime_t *dt, const char *filename,
     
     return 0; // 成功
 }
-
-void data_sum_test1(void)
-{
-  struct MotorData_t currentMotorData;
-  struct Optimal_v_p_t currentOptimalVP;
-  struct CurrentV_P_Ch_t currentVPCh;
-
-  currentMotorData.x = 10;
-  currentMotorData.y = 100;
-  send_motor_data_command(g_sock, currentMotorData.x, currentMotorData.y, 0);
-  vTaskDelay(2000);
-
-  currentOptimalVP.optimalP = 10.11;
-  for (int i = 0; i < 4; i ++)
-    currentOptimalVP.optimalVs[i] = 13.5;
-  send_opt_res_data_command(g_sock, currentMotorData.x, 
-                                      currentMotorData.y, 
-                                      currentOptimalVP.optimalP, 
-                                      currentOptimalVP.optimalVs);
-  vTaskDelay(2000);
-  
-  currentVPCh.channel = 2;
-  currentVPCh.currentP = 12.22;
-  currentVPCh.currentV = 5.55;
-  send_current_vpch_command(g_sock, currentVPCh.channel, currentVPCh.currentV, currentVPCh.currentP); 
-  vTaskDelay(2000);                                   
-}
-

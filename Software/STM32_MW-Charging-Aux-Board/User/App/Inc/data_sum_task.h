@@ -9,8 +9,8 @@ void data_sum_test1(void);
 
 struct MotorData_t
 {
-    float x;
-    float y;
+    int16_t x;
+    int16_t y;
 };
 
 struct Optimal_v_p_t
@@ -30,9 +30,5 @@ struct CurrentV_P_Ch_t
 #define MOTOR_DATA_QUEUE_LEN 10
 #define OPTIMAL_V_P_DATA_QUEUE_LEN 10
 #define CURRENT_V_P_CH_QUEUE_LEN 10
-
-extern QueueHandle_t g_motorDataQueue;
-extern QueueHandle_t g_optimalVPDataQueue;
-extern QueueHandle_t g_currentVPChQueue;
 
 #endif

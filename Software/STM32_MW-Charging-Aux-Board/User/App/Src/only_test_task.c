@@ -25,7 +25,7 @@ static void only_test_Task(void * param)
 //    dm542_test3();
     // dm542_test4();
 //    dm542_test5();
-    data_sum_test1();
+    // data_sum_test1();
   }
 }
 

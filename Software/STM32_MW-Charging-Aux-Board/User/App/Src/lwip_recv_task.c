@@ -37,11 +37,11 @@ static void lwip_recv_task(void * param)
     err_t err;
     char tBuf[40];
     int recvDataLen;
-    vTaskDelay(5000);
+    vTaskDelay(5000); // TODO:待优化
 
     g_motorCmdQueue = xQueueCreate(MOTOR_CMD_QUEUE_LEN, sizeof(MotorCmd_t));
     g_commandQueue = xQueueCreate(COMMAND_QUEUE_LEN, sizeof(struct CommandInfo));
-    g_findOptCmdQueue = xQueueCreate(OPT_RES_QUEUE_LEN, sizeof(struct CommandInfo));
+    g_findOptCmdQueue = xQueueCreate(OPT_RES_QUEUE_LEN, sizeof(FindOptimalCmd_t));
     g_timeDataQueue = xQueueCreate(TIME_DATA_QUEUE_LEN, sizeof(DateTime_t));
 
 lwip_start:     
@@ -51,107 +51,81 @@ lwip_start:
     g_sock = socket(AF_INET, SOCK_STREAM, 0); // TCP 协议
     memset(&(lwipClientAddr.sin_zero), 0, sizeof(lwipClientAddr.sin_zero));
 	
-    // tBuf = mymalloc(SRAMIN, 200);
     sprintf((char *)tBuf, "Port:%d", LWIP_DEMO_PORT); // 客户端端口号
     
     /* 连接远程 IP 地址 */
     err = connect(g_sock, (struct sockaddr *)&lwipClientAddr, sizeof(struct sockaddr));
 
-    if (err == -1)
-    {
+    if (err == -1) {
         printf("Connection failed.\r\n");
         g_sock = -1;
         closesocket(g_sock);
         vTaskDelay(1000);
         goto lwip_start;
     }
-		
-		vTaskResume(find_task_node_by_name("data_sum")->taskHandle);
+	
+	printf("Connection succeeded.\r\n");
+    vTaskResume(find_task_node_by_name("data_sum")->taskHandle);
     
-    while (1)
-    {
+    while (1) {
         recvDataLen = recv(g_sock, g_lwipDemoRecvBuf, LWIP_RX_BUFSIZE, 0);
         
-        if (recvDataLen > 0)
-        {
+        if (recvDataLen > 0) {
             CommandFrame_t receivedCmd;
             
             /* 解析命令 */
             int parse_result = parse_command_frame(g_lwipDemoRecvBuf, recvDataLen, &receivedCmd);
-						printf("parse_result = %d\n", parse_result);
-            if (parse_result == 0) 
-            {
-                // uint16_t respDataLen = 0;
-                // uint8_t respData[LWIP_RX_BUFSIZE];
-                
+            if (parse_result == 0) {            
                 /* 执行命令 */
                 ResponseStatus_t status = STATUS_SUCCESS;
-                switch (receivedCmd.header.cmdId) 
-                {
+                switch (receivedCmd.header.cmdId) {
                     case CMD_MOTOR_CONTROL:
-                        if (receivedCmd.header.dataLen == sizeof(MotorCmd_t))
-                        {
+                        if (receivedCmd.header.dataLen == sizeof(MotorCmd_t)) {
                             printf("Received motor control!");
-                           xQueueSend(g_motorCmdQueue, &receivedCmd.payload.motorCmd, 10);
-                           command.commandType = demandMotorControl;
-                           xQueueSend(g_commandQueue, &command, 10);                          
-                        }
-
-                        else 
+                            xQueueSend(g_motorCmdQueue, &receivedCmd.payload.motorCmd, 10);
+                            command.commandType = demandMotorControl;
+                            xQueueSend(g_commandQueue, &command, 10);                          
+                        } else 
                             status = STATUS_INVALID_PARAM;
-                        
                         break;
                         
                     case CMD_FIND_OPT_RES:
-                        if (receivedCmd.header.dataLen == sizeof(FindOptimalCmd_t))     
-                        {
-                            printf("Received find opt res command!");
+                        if (receivedCmd.header.dataLen == sizeof(FindOptimalCmd_t)) {
+                           printf("Received find opt res command!");
                            xQueueSend(g_findOptCmdQueue, &receivedCmd.payload.findOptCmd, 10);
-                           xQueueSend(g_findOptCmdQueue, &receivedCmd.payload.findOptCmd, 10);
-//                            // TODO:完善 g_optResDataQueue 队列的接收部分
                            command.commandType = demandMutiFindOpt;
                            xQueueSend(g_commandQueue, &command, 10);
-                        }
-                        else
+                        } else
                             status = STATUS_INVALID_PARAM;
-                        
                         break;
 
                     case CMD_PASS_DATE_TIME:
-                        if (receivedCmd.header.dataLen == sizeof(DateTime_t))     
-                        {
+                        if (receivedCmd.header.dataLen == sizeof(DateTime_t)) {
                             printf("Received pass date command!");
                             char result[20];
                             int len = 30;
                             datetime_to_filename(&receivedCmd.payload.timeData, "test.csv", result, 30);
                             printf("%s\n", result);
                            xQueueSend(g_timeDataQueue, &receivedCmd.payload.timeData, 10);
-                        }
-                        else
+                        } else
                             status = STATUS_INVALID_PARAM;
-                        
                         break;   
                         
                     default:
                         status = STATUS_INVALID_CMD;
                         break;
-    
 
                 // TODO:构建响应帧
                 }
             }
         }
-        else if (recvDataLen == 0)
-        {
+        else if (recvDataLen == 0) {
             mutual_printf("Connection break!\r\n");
             break;
-        }
-        else
-        {
+        } else {
             printf("Reception Error!\r\n");
             break;
         }
-
 
         vTaskDelay(10);
     }

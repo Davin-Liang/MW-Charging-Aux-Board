@@ -3,6 +3,9 @@
 #include "stdio.h"
 #include <string.h> 
 
+#include "FreeRTOS.h"
+#include "task.h"
+
 #define  PC_OR_32 0 // 1 代表 电脑端 | 0 代表32端
 
 /**
@@ -144,4 +147,41 @@ ResponseStatus_t execute_command(const CommandFrame_t* cmd, uint8_t* responseDat
     // 可以在这里填充response_data
     
     return status;
+}
+
+uint16_t get_data_update_flag(struct DataCenter_t * dc)
+{
+    return dc->dataUpdateFlag;
+}
+
+MotorCmd_t * get_motor_cmd(struct DataCenter_t * dc)
+{
+    return dc->motorCmd;
+}
+
+FindOptimalCmd_t * get_find_optimal_cmd(struct DataCenter_t * dc)
+{
+    return dc->findOptCmd;
+}
+
+DateTime_t * get_time_data(struct DataCenter_t * dc)
+{
+    return dc->timeData;
+}
+
+uint8_t check_data_update_flag(uint16_t flag, uint8_t bit)
+{
+    return (flag & (uint16_t)(1 << bit)) != 0; 
+}
+
+struct DataCenter_t * malloc_data_center(void)
+{
+		struct DataCenter_t * dc;
+	
+		dc = pvPortMalloc(sizeof(struct DataCenter_t));
+		dc->motorCmd = pvPortMalloc(sizeof(MotorCmd_t));
+		dc->findOptCmd = pvPortMalloc(sizeof(FindOptimalCmd_t));
+		dc->timeData = pvPortMalloc(sizeof(DateTime_t));
+	
+		return dc;
 }

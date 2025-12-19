@@ -1,22 +1,30 @@
+#include "main.h"
+
 #include "power_supply_task.h"
+#include "command_task.h"
+#include "dm542_task.h"
+#include "data_sum_task.h"
+#include "lwip_recv_task.h"
+#include "queues-create-task.h"
+#include "modbus-tcp-server-task.h"
+
 #include "FreeRTOS.h"
 #include "semphr.h"
 #include "task.h"
 #include "queue.h"
+#include "event_groups.h"
+
 #include "command.h"
+
 #include "bsp_power_supply.h"
 #include "bsp_power_meter.h"
-#include "command_task.h"
+#include "bsp_dm542.h"
+#include "bsp_led.h"
+
 #include <string.h>
 #include "ff.h"
 #include "file_common.h"
-#include "main.h"
-#include "bsp_led.h"
-#include "dm542_task.h"
-#include "bsp_dm542.h"
-#include "data_sum_task.h"
 #include "command_struct.h"
-#include "lwip_recv_task.h"
 
 static void power_supply_task(void * param);
 static void detect_optimal_voltage(float currentVoltage, float currentPower, int mode, int channel);
@@ -29,14 +37,13 @@ static float s_bestVoltage = 0.0f;
 static float s_bestPower = -1e30f;
 static float s_bestVoltages[4] = {0.1f, 0.1f, 0.1f, 0.1f};
 static float s_bestPowers[4] = {-1e30f, -1e30f, -1e30f, -1e30f};
-static float historyVoltages[140] = {0.0f};
-static float historyPowers[140] = {0.0f};
 static uint16_t psRegAddr[] = {0x01FE, 0x02C6, 0x032A, 0x038E};
 static float Power_Supply_Default_Voltage[] = {0.2f, 0.2f, 0.2f, 0.2f};
 static uint8_t Seek_Max_Power_Flag = 1;
+static struct SystemQueues_t * queues;
 extern SemaphoreHandle_t dm542_USART3_Mutex;
 
-static FindOptimalCmd_t findOptCmd;
+FindOptimalCmd_t g_findOptCmd;
 
 /**
   * @brief  电源任务
@@ -45,28 +52,26 @@ static FindOptimalCmd_t findOptCmd;
   **/
 static void power_supply_task(void * param)
 {
+	xEventGroupWaitBits(xSystemEventGroup, BIT_WAKE_POWER_SUPPLY_TASK, pdTRUE, pdTRUE, portMAX_DELAY);
+
 	float currentVoltage = 0.2f;
 	float currentPower = 0.0f;
 	FunctionalState enableUsart = ENABLE;
-	FRESULT res;
 	struct Optimal_v_p_t currentOptimalVP;
 	struct CurrentV_P_Ch_t currentVPCh;
 	
+	queues = get_queues();
 	/* 将 g_PowerSupplyTaskHandle 插入链表 */
 	insert_task_handle(g_PowerSupplyTaskHandle, "power_supply");
 	
 	/* 设置电源的起始电压 */
 	set_voltage_for_power(Power_Supply_Default_Voltage);
 	
-	while (1)
-	{
-		switch ((int)command->commandType)
-		{
+	while (1) {
+		switch ((int)command->commandType) {
 			case demandOne:
-//				mutual_printf("ps_demandone\r\n");
-//				command->commandType = noDemand;
-				if (enableUsart == ENABLE)
-				{
+			{
+				if (enableUsart == ENABLE) {
 					pm_usart_it_config(enableUsart);
 					enableUsart = DISABLE;
 				}
@@ -76,8 +81,7 @@ static void power_supply_task(void * param)
 				vTaskDelay(TIME_OF_FINISHING_SETTING_VOL);
 				/* 得到发送的电压对应的功率值 */
 				#if !SD_NOTE
-				if (!parse_power_from_buf(&currentPower))
-				{
+				if (!parse_power_from_buf(&currentPower)) {
 					/* 长时间没收到串口数据 */
 					command->commandType = demandFault; // 设置命令状态异常
 					enableUsart = ENABLE;
@@ -92,8 +96,7 @@ static void power_supply_task(void * param)
 			
 				/* 设置下次的发送电压 */
 				currentVoltage += VOL_STEP;
-				if (currentVoltage >= MAX_VAL)
-				{
+				if (currentVoltage >= MAX_VAL) {
 					mutual_printf("Best(P,V)=(%.3f, %.2f)\r\n", s_bestPower, s_bestVoltage);
 					enableUsart = ENABLE;
 					
@@ -114,61 +117,47 @@ static void power_supply_task(void * param)
 				}
 				
 				vTaskDelay(VOL_SENDING_TIME_INTERVAL);
-			
 				break;
+			}
 			case demandTwo:
-				if (pdPASS != xQueueReceive(g_findOptCmdQueue, &findOptCmd, 0))
-					break;
-				
+			{
 				xSemaphoreTake(dm542_USART3_Mutex, portMAX_DELAY);
+				FindOptimalCmd_t * findOptCmd = get_find_optimal_cmd(get_data_center());
+
 				Seek_Max_Power_Flag = 1;
-				for (int i = 0; (i < 4) && (Seek_Max_Power_Flag == 1); i ++)
-				{
-					// while(currentVoltage < MAX_VAL)
-					while (currentVoltage < findOptCmd.maxVol)
-					{
+				for (int i = 0; (i < 4) && (Seek_Max_Power_Flag == 1); i ++) {
+					while (currentVoltage < findOptCmd->maxVol) {
 						/* 发送电压 */
 						set_power_supply_voltage(PS_SLAVE_ADDR, PS_REG_ADDR(i), currentVoltage);
 						vTaskDelay(TIME_OF_FINISHING_SETTING_VOL);
 						currentVPCh.channel = i + 1;
 						currentVPCh.currentV = currentVoltage;
 						pm_usart_it_config(ENABLE);//设置好电压后开启串口中断接收数据
-						if (parse_power_from_buf(&currentPower))
-						{
+//						if (parse_power_from_buf(&currentPower))
+						if (1) {
 							pm_usart_it_config(DISABLE);//解析完成后关闭串口2
 							currentVPCh.currentP = currentPower;
-							xQueueSend(g_currentVPChQueue, &currentVPCh, 10);
-							if (currentPower > s_bestPowers[i])
-							{
+							xQueueSend(queues->currentVPChQueue, &currentVPCh, 10);
+							if (currentPower > s_bestPowers[i]) {
 								s_bestVoltages[i] = currentVoltage;
 								s_bestPowers[i] = currentPower;
 							}
 //							mutual_printf("channel=%d, P=%.3fW, V=%.2fV, Best(P,V)=(%.3f, %.2f)\r\n",
 //													i, currentPower, currentVoltage, s_bestPowers[i], s_bestVoltages[i]);	
-						}
-						
-						/* 未得到发送的电压对应的功率值 */
-						else if (!parse_power_from_buf(&currentPower))
-						{
+						} else if (!parse_power_from_buf(&currentPower)) { /* 未得到发送的电压对应的功率值 */
 							/* 长时间没收到串口数据 */
 							command->commandType = demandFault; // 设置命令状态异常
 							enableUsart = ENABLE;
 							mutual_printf("No serial port data received. Please check the connection between the serial port and the power meter!\r\n");
 						}
 						/* 设置下次的发送电压 */
-						currentVoltage += findOptCmd.volStepLen;
+						currentVoltage += findOptCmd->volStepLen;
 					}
 					set_power_supply_voltage(PS_SLAVE_ADDR, PS_REG_ADDR(i), s_bestVoltages[i]);
 					vTaskDelay(VOL_SENDING_TIME_INTERVAL);
 					
-					// currentVoltage = 0.1f;
-					currentVoltage = findOptCmd.initialVol;
-						
-//					/* 电压、功率值记录 */
-//					detect_optimal_voltage(currentVoltage, currentPower, MULTI_CHANNELS_SCANNING, i);
+					currentVoltage = findOptCmd->initialVol;
 				}
-				// mutual_printf("V1 = %.2fV, V2 = %.2fV, V3 = %.2fV, V4 = %.2fV, P = %.3fdBm",
-				// 			s_bestVoltages[0], s_bestVoltages[1], s_bestVoltages[2], s_bestVoltages[3], s_bestPowers[3]);
 				Seek_Max_Power_Flag = 0;//只扫描一次
 				LED2_TOGGLE;//扫描完成后绿灯闪烁
 				currentOptimalVP.optimalVs[0] = s_bestVoltages[0];
@@ -176,15 +165,15 @@ static void power_supply_task(void * param)
 				currentOptimalVP.optimalVs[2] = s_bestVoltages[2];
 				currentOptimalVP.optimalVs[3] = s_bestVoltages[3];
 				currentOptimalVP.optimalP = s_bestPowers[3];
-				xQueueSend(g_optimalVPDataQueue, &currentOptimalVP, 10);
+				xQueueSend(queues->optimalVPDataQueue, &currentOptimalVP, 10);
 				command->commandType = noDemand; // 命令完成
 				reset_ps_data(s_bestPowers);
-				float chanVols[] = {findOptCmd.initialVol, findOptCmd.initialVol, findOptCmd.initialVol, findOptCmd.initialVol};
+				float chanVols[] = {findOptCmd->initialVol, findOptCmd->initialVol, findOptCmd->initialVol, findOptCmd->initialVol};
 				set_voltage_for_power(chanVols);
 				xSemaphoreGive(dm542_USART3_Mutex);
 				vTaskDelay(1000);
 				break;
-				
+			}
 			case demandScan:
 				
 				break;

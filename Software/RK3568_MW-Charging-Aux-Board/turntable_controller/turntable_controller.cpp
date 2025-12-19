@@ -361,8 +361,8 @@ bool TurntableController::read_axis_speed(enum YawOrPitch_t axis, float * readed
     bool result;
     
     if (Yaw == axis)
-        result = read_holding_registers(0x0007, 2, speed.words);
-    result = read_holding_registers(0x0009, 2, speed.words);
+        result = read_input_registers(0x0007, 2, speed.words);
+    result = read_input_registers(0x0009, 2, speed.words);
 
     if (result) {
         /* 交换高两字节和低两字节 */
@@ -416,8 +416,8 @@ bool TurntableController::read_axis_angle(enum YawOrPitch_t axis, float * readed
     bool result;
     
     if (Yaw == axis)
-        result = read_holding_registers(0x0016, 2, angle.words);
-    result = read_holding_registers(0x0018, 2, angle.words);
+        result = read_input_registers(0x0016, 2, angle.words);
+    result = read_input_registers(0x0018, 2, angle.words);
 
     if (result) {
         /* 交换高两字节和低两字节 */

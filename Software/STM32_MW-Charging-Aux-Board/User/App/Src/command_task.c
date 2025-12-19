@@ -1,20 +1,20 @@
+#include "main.h"
+
 #include "command_task.h"
-#include "command.h"
+#include "test_task.h"
+#include "power_supply_task.h"
+#include "lwip_recv_task.h"
+#include "DM542_task.h"
+#include "queues-create-task.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
-#include "test_task.h"
-#include "bsp_led.h"
-#include "bsp_power_supply.h"
+#include "queue.h"
+#include "event_groups.h"
+
 #include <string.h>
 #include <stdlib.h>
-#include "power_supply_task.h"
-#include "attenuator_task.h"
-#include "queue.h"
-#include "lwip_recv_task.h"
-#include "DM542_task.h"
-
-#define DEBUG 0
+#include "command.h"
 
 static void command_task(void * param);
 
@@ -24,7 +24,8 @@ static TaskHandle_t g_commandTaskHandle = NULL;
 static struct CommandInfo command;
 /* 所有任务的链表 */
 static struct TaskHandleNode *g_taskNode = NULL;
-// QueueHandle_t g_commandQueue;
+/* 队列集合 */
+static struct SystemQueues_t * queues;
 
 /**
   * @brief  command_task任务主体
@@ -33,38 +34,28 @@ static struct TaskHandleNode *g_taskNode = NULL;
   **/
 static void command_task(void * param)
 {	
+  xEventGroupWaitBits(xSystemEventGroup, BIT_WAKE_COMMAND_TASK, pdTRUE, pdTRUE, portMAX_DELAY);
+  
+  queues = get_queues();
+  
   /* 注册command，使其可以在command_task.c中使用该command */
+  command.commandType = noDemand;
   register_command_for_power_supply(&command);
-  register_command_for_attenuator(&command);
   register_command_for_dm542(&command);
 	insert_task_handle(g_commandTaskHandle, "command");
-  // g_commandQueue = xQueueCreate(COMMAND_QUEUE_LENGTH, sizeof(struct CommandInfo));
-
-  #if DEBUG
-  /* 用假消息测试功能 */
-  struct CommandInfo fuckCommand = {
-    .commandType = demandTwo,
-    .psChannel = 1,
-    .attenuatorIndex = attenuator1,
-    .attNewState = ENABLE
-  };
-
-//	vTaskDelay(3000);
-  xQueueSend(g_commandQueue, &fuckCommand, 10);
-  #endif
 	
+  vTaskDelay(6000);
+  
 	while (1)
   {
-		if (pdPASS == xQueueReceive(g_commandQueue, &command, portMAX_DELAY))
-    {
-      switch ((int)(command.commandType))
-      {
+		if (pdPASS == xQueueReceive(queues->commandQueue, &command, portMAX_DELAY)) {
+      switch ((int)(command.commandType)) {
         case demandOne:
-        case demandTwo:
-          // vTaskResume(find_task_node_by_name("dm542")->taskHandle);  
+        case demandTwo: 
           vTaskResume(find_task_node_by_name("power_supply")->taskHandle);
           break;
         case demandMotorControl:
+					printf("Ready to action motors.");
           vTaskResume(find_task_node_by_name("dm542")->taskHandle);
           break;
         case demandThree:
@@ -80,8 +71,6 @@ static void command_task(void * param)
           break;
 		  }      
     }
-		
-		// xQueueSend(g_commandQueue, &fuckCommand, 10);
 		
 		vTaskDelay(1000);
   }
