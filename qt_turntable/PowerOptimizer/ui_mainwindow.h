@@ -200,7 +200,7 @@ public:
     QLabel *label_29;
     QLineEdit *line_edit_x_pos_ref;
     QLabel *label_31;
-    QComboBox *combo_box_x_track_ref;
+    QComboBox *combo_ref_mode;
     QLabel *label_30;
     QLineEdit *line_edit_y_pos_ref;
     QLabel *label_32;
@@ -1051,10 +1051,10 @@ public:
 
         horizontalLayout_25->addWidget(label_31);
 
-        combo_box_x_track_ref = new QComboBox(groupBox_9);
-        combo_box_x_track_ref->setObjectName(QString::fromUtf8("combo_box_x_track_ref"));
+        combo_ref_mode = new QComboBox(groupBox_9);
+        combo_ref_mode->setObjectName(QString::fromUtf8("combo_box_x_track_ref"));
 
-        horizontalLayout_25->addWidget(combo_box_x_track_ref);
+        horizontalLayout_25->addWidget(combo_ref_mode);
 
         label_30 = new QLabel(groupBox_9);
         label_30->setObjectName(QString::fromUtf8("label_30"));

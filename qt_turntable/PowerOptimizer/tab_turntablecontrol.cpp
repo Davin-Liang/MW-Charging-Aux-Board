@@ -8,6 +8,8 @@
 #include <QDebug>
 #include <QTimer>
 #include <QtCharts>
+#include <QFileDialog>
+#include <QJsonDocument>
 
 using namespace QtCharts;
 
@@ -55,6 +57,16 @@ void TabTurntableControl::setupConnections()
     mw->ui->combo_box_y_speed_cmd->addItem("正转");
     mw->ui->combo_box_y_speed_cmd->addItem("反转");
     mw->ui->combo_box_y_speed_cmd->setCurrentIndex(0);
+
+    // 跟踪轨迹类型
+    mw->ui->combo_ref_mode->addItem("X点位 / Y点位");
+    mw->ui->combo_ref_mode->addItem("X轨迹 / Y轨迹");
+    mw->ui->combo_ref_mode->addItem("X点位 / Y轨迹");
+    mw->ui->combo_ref_mode->addItem("X轨迹 / Y点位");
+
+    //连接参考轨迹源
+    connect(mw->ui->combo_ref_mode, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this,&TabTurntableControl::on_ref_mode_changed,Qt::UniqueConnection);
     // 按钮连接到本类槽（使用 UniqueConnection 防止重复连接）
     connect(mw->ui->btn_set_speed, &QPushButton::clicked,
             this, &TabTurntableControl::on_btn_set_speed_clicked, Qt::UniqueConnection);
@@ -298,17 +310,98 @@ void TabTurntableControl::on_controller_selection_changed(int index)
 
 }
 /**
+ * @brief 设置闭环控制的参考轨迹源
+ */
+void TabTurntableControl::on_ref_mode_changed(int index)
+{
+    int mode = mw->ui->combo_ref_mode->currentIndex();
+
+    useTrajectoryX = (mode == 1 || mode == 3);
+    useTrajectoryY = (mode == 1 || mode == 2);
+
+    mw->ui->line_edit_x_pos_ref->setEnabled(!useTrajectoryX);
+    mw->ui->line_edit_y_pos_ref->setEnabled(!useTrajectoryY);
+}
+/**
+ * @brief 闭环参考轨迹配置
+ */
+bool TabTurntableControl::loadTrajectoryJson(QJsonObject &cfg)
+{
+    QString fileName = QFileDialog::getOpenFileName(
+        mw, "选择轨迹配置文件", "", "JSON Files (*.json)");
+
+    if (fileName.isEmpty())
+        return false;
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::ReadOnly))
+        return false;
+
+    auto doc = QJsonDocument::fromJson(file.readAll());
+    if (!doc.isObject())
+        return false;
+
+    cfg = doc.object();
+    return true;
+}
+/**
  * @brief 设置闭环控制的参考点
  */
 void TabTurntableControl::on_btn_set_target_pos_clicked()
 {
-    // 读取目标并显示
-    target_x = mw->ui->line_edit_x_pos_ref->text().toDouble();
-    target_y = mw->ui->line_edit_y_pos_ref->text().toDouble();
-    QMessageBox::information(mw, "成功",
-                             QString("已设置参考坐标：X=%1, Y=%2")
-                                 .arg(target_x).arg(target_y));
+    // ===== X 轴 =====
+    if (!useTrajectoryX) {
+        target_x = mw->ui->line_edit_x_pos_ref->text().toDouble();
+        QMessageBox::information(
+            mw, "X轴点位参考设置成功",
+            QString("X=%1").arg(target_x));
+    } else {
+        if (!loadTrajectoryJson(trajConfigX)) {
+            QMessageBox::warning(mw, "错误", "X轴轨迹配置加载失败");
+            return;
+        }
+    }
+    // ===== Y 轴 =====
+    if (!useTrajectoryY) {
+        target_y = mw->ui->line_edit_y_pos_ref->text().toDouble();
+        QMessageBox::information(
+            mw, "Y轴点位参考设置成功",
+            QString("Y=%1").arg(target_y));
+    } else {
+        if (!loadTrajectoryJson(trajConfigY)) {
+            QMessageBox::warning(mw, "错误", "Y轴轨迹配置加载失败");
+            return;
+        }
+    }
+
+    traj_time = 0.0;   // 初始化轨迹时间
+    //QMessageBox::information(mw, "轨迹参考", "轨迹配置加载成功");
+
 }
+/**
+ * @brief 真正驱动轨迹
+ */
+void TabTurntableControl::updateTrajectoryTarget()
+{
+    if (useTrajectoryX) {
+        double A = trajConfigX["A"].toDouble(10.0);
+        double w = trajConfigX["w"].toDouble(1.0);
+        double bias = trajConfigX["bias"].toDouble(0.0);
+
+        target_x = bias + A * std::sin(w * traj_time);
+    }
+
+    if (useTrajectoryY) {
+        double A = trajConfigY["A"].toDouble(5.0);
+        double w = trajConfigY["w"].toDouble(0.5);
+        double bias = trajConfigY["bias"].toDouble(0.0);
+
+        target_y = bias + A * std::cos(w * traj_time);
+    }
+
+    traj_time += 0.05; // 与定时器周期一致
+}
+
 /**
  * @brief 设置 X轴 PID 参数并开启X轴闭环控制
  */
@@ -428,8 +521,11 @@ void TabTurntableControl::updateTurntableData()
     // 维持最多 10 秒数据
     if (chart_time > 10.0) {
         turntableChart->axisX()->setRange(chart_time - 10.0, chart_time);
-    }
 
+    }
+    if (useTrajectoryX || useTrajectoryY) {
+        updateTrajectoryTarget();
+    }
 }
 
 /**
@@ -441,11 +537,16 @@ void TabTurntableControl::closedLoopTickX()
     // 使用 pid 控制器的 controlLoop 接口（假定定义类似于你的实现）
     bool doneX = pidX->controlLoop(target_x, 0.01, 0.05);
 
-    if (doneX && closedLoopTimerX) {
+    if (!useTrajectoryX  && doneX && closedLoopTimerX) {
         closedLoopTimerX->stop();
         mw->ui->control_status->setText("X轴闭环控制：完成");
         mw->ui->control_status->setStyleSheet("color: blue;");
-        QMessageBox::information(mw, "完成", "转台已到达目标点（误差 ≤ 0.05）");
+        QMessageBox::information(mw, "完成", "转台已到达目标点（误差 ≤ 0.01）");
+    }
+    if (useTrajectoryX && doneX && closedLoopTimerX){
+        mw->ui->control_status->setText("X轴闭环控制：完成");
+        mw->ui->control_status->setStyleSheet("color: blue;");
+        QMessageBox::information(mw, "完成", "转台已到达目标轨迹（误差 ≤ 0.01）");
     }
 }
 /**
@@ -457,11 +558,16 @@ void TabTurntableControl::closedLoopTickY()
     if (!pidY ) return;
     // 使用 pid 控制器的 controlLoop 接口（假定定义类似于你的实现）
     bool doneY = pidY->controlLoop(target_y, 0.01, 0.05);
-    if ( closedLoopTimerY&& doneY) {
+    if ( !useTrajectoryY  && closedLoopTimerY&& doneY) {
         closedLoopTimerY->stop();
         mw->ui->control_status->setText("y轴闭环控制：完成");
         mw->ui->control_status->setStyleSheet("color: blue;");
         QMessageBox::information(mw, "完成", "转台已到达目标点（误差 ≤ 0.01）");
+    }
+    if (useTrajectoryY  && doneY && closedLoopTimerY){
+        mw->ui->control_status->setText("Y轴闭环控制：完成");
+        mw->ui->control_status->setStyleSheet("color: blue;");
+        QMessageBox::information(mw, "完成", "转台已到达目标轨迹（误差 ≤ 0.01）");
     }
 }
 
@@ -473,12 +579,12 @@ void TabTurntableControl::on_data_monitor_section_stateChanged(int state)
     }
 
     if (state == Qt::Checked) {
-        // ✅ 开始数据监控
+        //  开始数据监控
         monitorTimer->start(50);   // 200 ms，根据你之前 chart_time += 0.5 来看是合理的
         mw->ui->control_status->setText("数据监控：开启");
         mw->ui->control_status->setStyleSheet("color: green;");
     } else {
-        // ⛔ 停止数据监控
+        //  停止数据监控
         monitorTimer->stop();
         mw->ui->control_status->setText("数据监控：关闭");
         mw->ui->control_status->setStyleSheet("color: gray;");
