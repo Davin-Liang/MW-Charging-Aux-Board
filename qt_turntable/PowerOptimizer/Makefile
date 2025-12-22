@@ -53,6 +53,7 @@ OBJECTS_DIR   = build/.obj/
 ####### Files
 
 SOURCES       = PID_Controller.cpp \
+		TrajectoryJsonDialog.cpp \
 		command_transmitter.cpp \
 		tab_file_read.cpp \
 		tab_stm32.cpp \
@@ -62,6 +63,7 @@ SOURCES       = PID_Controller.cpp \
 		logindialog.cpp \
 		main.cpp \
 		mainwindow.cpp build/.rcc/qrc_qmake_qmake_qm_files.cpp \
+		build/.moc/moc_TrajectoryJsonDialog.cpp \
 		build/.moc/moc_command_transmitter.cpp \
 		build/.moc/moc_tab_file_read.cpp \
 		build/.moc/moc_tab_stm32.cpp \
@@ -70,6 +72,7 @@ SOURCES       = PID_Controller.cpp \
 		build/.moc/moc_logindialog.cpp \
 		build/.moc/moc_mainwindow.cpp
 OBJECTS       = build/.obj/PID_Controller.o \
+		build/.obj/TrajectoryJsonDialog.o \
 		build/.obj/command_transmitter.o \
 		build/.obj/tab_file_read.o \
 		build/.obj/tab_stm32.o \
@@ -80,6 +83,7 @@ OBJECTS       = build/.obj/PID_Controller.o \
 		build/.obj/main.o \
 		build/.obj/mainwindow.o \
 		build/.obj/qrc_qmake_qmake_qm_files.o \
+		build/.obj/moc_TrajectoryJsonDialog.o \
 		build/.obj/moc_command_transmitter.o \
 		build/.obj/moc_tab_file_read.o \
 		build/.obj/moc_tab_stm32.o \
@@ -183,6 +187,7 @@ DIST          = /usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/yacc.prf \
 		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/lex.prf \
 		PowerOptimizer.pro PID_Controller.h \
+		TrajectoryJsonDialog.h \
 		command_struct.h \
 		command_transmitter.h \
 		tab_file_read.h \
@@ -192,6 +197,7 @@ DIST          = /usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		turntable_controller.h \
 		logindialog.h \
 		mainwindow.h PID_Controller.cpp \
+		TrajectoryJsonDialog.cpp \
 		command_transmitter.cpp \
 		tab_file_read.cpp \
 		tab_stm32.cpp \
@@ -425,8 +431,8 @@ distdir: FORCE
 	$(COPY_FILE) --parents PowerOptimizer_zh_CN.ts $(DISTDIR)/
 	$(COPY_FILE) --parents build/.rcc/qmake_qmake_qm_files.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents PID_Controller.h command_struct.h command_transmitter.h tab_file_read.h tab_stm32.h tab_turntablecontrol.h tab_deviceconnect.h turntable_controller.h logindialog.h mainwindow.h $(DISTDIR)/
-	$(COPY_FILE) --parents PID_Controller.cpp command_transmitter.cpp tab_file_read.cpp tab_stm32.cpp tab_turntablecontrol.cpp tab_deviceconnect.cpp turntable_controller.cpp logindialog.cpp main.cpp mainwindow.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents PID_Controller.h TrajectoryJsonDialog.h command_struct.h command_transmitter.h tab_file_read.h tab_stm32.h tab_turntablecontrol.h tab_deviceconnect.h turntable_controller.h logindialog.h mainwindow.h $(DISTDIR)/
+	$(COPY_FILE) --parents PID_Controller.cpp TrajectoryJsonDialog.cpp command_transmitter.cpp tab_file_read.cpp tab_stm32.cpp tab_turntablecontrol.cpp tab_deviceconnect.cpp turntable_controller.cpp logindialog.cpp main.cpp mainwindow.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents mainwindow.ui $(DISTDIR)/
 	$(COPY_FILE) --parents PowerOptimizer_zh_CN.ts $(DISTDIR)/
 
@@ -472,9 +478,14 @@ compiler_moc_predefs_clean:
 build/.moc/moc_predefs.h: /usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 	g++ -pipe -O2 -std=gnu++1z -Wall -Wextra -dM -E -o build/.moc/moc_predefs.h /usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 
-compiler_moc_header_make_all: build/.moc/moc_command_transmitter.cpp build/.moc/moc_tab_file_read.cpp build/.moc/moc_tab_stm32.cpp build/.moc/moc_tab_turntablecontrol.cpp build/.moc/moc_tab_deviceconnect.cpp build/.moc/moc_logindialog.cpp build/.moc/moc_mainwindow.cpp
+compiler_moc_header_make_all: build/.moc/moc_TrajectoryJsonDialog.cpp build/.moc/moc_command_transmitter.cpp build/.moc/moc_tab_file_read.cpp build/.moc/moc_tab_stm32.cpp build/.moc/moc_tab_turntablecontrol.cpp build/.moc/moc_tab_deviceconnect.cpp build/.moc/moc_logindialog.cpp build/.moc/moc_mainwindow.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) build/.moc/moc_command_transmitter.cpp build/.moc/moc_tab_file_read.cpp build/.moc/moc_tab_stm32.cpp build/.moc/moc_tab_turntablecontrol.cpp build/.moc/moc_tab_deviceconnect.cpp build/.moc/moc_logindialog.cpp build/.moc/moc_mainwindow.cpp
+	-$(DEL_FILE) build/.moc/moc_TrajectoryJsonDialog.cpp build/.moc/moc_command_transmitter.cpp build/.moc/moc_tab_file_read.cpp build/.moc/moc_tab_stm32.cpp build/.moc/moc_tab_turntablecontrol.cpp build/.moc/moc_tab_deviceconnect.cpp build/.moc/moc_logindialog.cpp build/.moc/moc_mainwindow.cpp
+build/.moc/moc_TrajectoryJsonDialog.cpp: TrajectoryJsonDialog.h \
+		build/.moc/moc_predefs.h \
+		/usr/lib/qt5/bin/moc
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable/PowerOptimizer/build/.moc/moc_predefs.h -I/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable/PowerOptimizer -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable/PowerOptimizer/thirdparty -I/usr/include/modbus -I/usr/include/aarch64-linux-gnu/qt5 -I/usr/include/aarch64-linux-gnu/qt5/QtCharts -I/usr/include/aarch64-linux-gnu/qt5/QtWidgets -I/usr/include/aarch64-linux-gnu/qt5/QtGui -I/usr/include/aarch64-linux-gnu/qt5/QtNetwork -I/usr/include/aarch64-linux-gnu/qt5/QtCore -I/usr/include/c++/11 -I/usr/include/aarch64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/aarch64-linux-gnu/11/include -I/usr/local/include -I/usr/include/aarch64-linux-gnu -I/usr/include TrajectoryJsonDialog.h -o build/.moc/moc_TrajectoryJsonDialog.cpp
+
 build/.moc/moc_command_transmitter.cpp: command_transmitter.h \
 		command_struct.h \
 		build/.moc/moc_predefs.h \
@@ -545,6 +556,9 @@ compiler_clean: compiler_lrelease_clean compiler_rcc_clean compiler_moc_predefs_
 build/.obj/PID_Controller.o: PID_Controller.cpp PID_Controller.h \
 		turntable_controller.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/PID_Controller.o PID_Controller.cpp
+
+build/.obj/TrajectoryJsonDialog.o: TrajectoryJsonDialog.cpp TrajectoryJsonDialog.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/TrajectoryJsonDialog.o TrajectoryJsonDialog.cpp
 
 build/.obj/command_transmitter.o: command_transmitter.cpp command_struct.h \
 		command_transmitter.h \
@@ -676,6 +690,9 @@ build/.obj/mainwindow.o: mainwindow.cpp mainwindow.h \
 
 build/.obj/qrc_qmake_qmake_qm_files.o: build/.rcc/qrc_qmake_qmake_qm_files.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/qrc_qmake_qmake_qm_files.o build/.rcc/qrc_qmake_qmake_qm_files.cpp
+
+build/.obj/moc_TrajectoryJsonDialog.o: build/.moc/moc_TrajectoryJsonDialog.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/moc_TrajectoryJsonDialog.o build/.moc/moc_TrajectoryJsonDialog.cpp
 
 build/.obj/moc_command_transmitter.o: build/.moc/moc_command_transmitter.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/moc_command_transmitter.o build/.moc/moc_command_transmitter.cpp

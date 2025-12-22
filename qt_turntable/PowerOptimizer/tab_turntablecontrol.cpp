@@ -4,6 +4,7 @@
 #include "turntable_controller.h"
 #include "PID_Controller.h"
 #include "command_transmitter.h" 
+#include "TrajectoryJsonDialog.h"
 #include <QMessageBox>
 #include <QDebug>
 #include <QTimer>

@@ -12,7 +12,7 @@ INCLUDEPATH += /usr/include/modbus
 LIBS += -lmodbus
 SOURCES += \
     PID_Controller.cpp \
-    TrajectoryJsonDialog .cpp \
+    TrajectoryJsonDialog.cpp \
     command_transmitter.cpp \
     tab_file_read.cpp \
     tab_stm32.cpp \
@@ -25,7 +25,7 @@ SOURCES += \
 
 HEADERS += \
     PID_Controller.h \
-    TrajectoryJsonDialog .h \
+    TrajectoryJsonDialog.h \
     command_struct.h \
     command_transmitter.h \
     tab_file_read.h \
