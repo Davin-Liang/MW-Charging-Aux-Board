@@ -1247,7 +1247,17 @@
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_8">
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_25">
+        <layout class="QHBoxLayout" name="horizontalLayout_22">
+         <item>
+          <widget class="QLabel" name="label_31">
+           <property name="text">
+            <string>跟踪方式</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="combo_ref_mode"/>
+         </item>
          <item>
           <widget class="QLabel" name="label_29">
            <property name="text">
@@ -1259,16 +1269,6 @@
           <widget class="QLineEdit" name="line_edit_x_pos_ref"/>
          </item>
          <item>
-          <widget class="QLabel" name="label_31">
-           <property name="text">
-            <string>参考轨迹</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="combo_box_x_track_ref"/>
-         </item>
-         <item>
           <widget class="QLabel" name="label_30">
            <property name="text">
             <string>Y轴位置</string>
@@ -1277,16 +1277,6 @@
          </item>
          <item>
           <widget class="QLineEdit" name="line_edit_y_pos_ref"/>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_32">
-           <property name="text">
-            <string>参考轨迹</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="combo_box_y_track_ref"/>
          </item>
         </layout>
        </item>

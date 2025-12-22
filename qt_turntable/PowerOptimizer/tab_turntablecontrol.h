@@ -8,7 +8,8 @@
 #include <QtCharts/QChart>
 #include <QtCharts/QChartView>
 #include <QtCharts/QLineSeries>
-#include <QtCharts/QValueAxis> 
+#include <QtCharts/QValueAxis>
+#include <QJsonObject>
 
 class MainWindow;
 class TurntableController;
@@ -60,6 +61,8 @@ public slots:
 
     void on_data_monitor_section_stateChanged(int state);
 
+    void on_ref_mode_changed(int index); // 参考源切换
+
 private:
     MainWindow *mw;                          ///< 主窗口指针（不拥有）
     PIDController *pidX;                    ///< 指向主窗口 PID 对象（不拥有）
@@ -78,10 +81,26 @@ private:
 
     double chart_time = 0.0;   // 曲线横轴时间
     double target_x = 0, target_y = 0;
+
+
+    // ===== 轨迹相关=====
+    bool useTrajectoryX = false;
+    bool useTrajectoryY = false;
+
+    QJsonObject trajConfigX;
+    QJsonObject trajConfigY;
+
+    double traj_time = 0.0;
+
+
     //初始化
     void initializeTurntablePositionChart();
 
-    
+    // 轨迹与点位统一参考更新
+    void updateTrajectoryTarget();
+
+    //JSON 轨迹加载
+    bool loadTrajectoryJson();
 };
 
 #endif // TAB_TURNTABLE_CONTROL_H

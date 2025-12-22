@@ -24,6 +24,8 @@ TabTurntableControl::TabTurntableControl(MainWindow *mw_)
     , chart_time(0.0)
     , target_x(0.0)
     , target_y(0.0)
+    , useTrajectoryX(false)
+    , useTrajectoryY(false)
 {
     // 不 new 主资源；只引用 MainWindow 持有的对象
     if (mw) {
