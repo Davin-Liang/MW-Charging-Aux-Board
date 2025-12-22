@@ -391,58 +391,41 @@ bool TabTurntableControl::loadTrajectoryJson(
     QJsonObject &cfg,
     const QString &axisName)
 {
-    while (true) {
-        QTemporaryFile tmpFile(
-            QDir::tempPath() + QString("/trajectory_%1_XXXXXX.json").arg(axisName));
+        while (true) {
+            QString jsonTemplate = defaultTrajectoryTemplate(axisName);
 
-        tmpFile.setAutoRemove(true);
+            TrajectoryJsonDialog dlg(jsonTemplate, mw);
 
-        if (!tmpFile.open()) {
-            QMessageBox::critical(mw, "错误", "无法创建临时轨迹文件");
-            return false;
+            if (dlg.exec() != QDialog::Accepted) {
+                return false;   // 用户取消
+            }
+
+            QByteArray data = dlg.jsonText().toUtf8();
+
+            QJsonParseError err;
+            auto doc = QJsonDocument::fromJson(data, &err);
+
+            if (err.error != QJsonParseError::NoError || !doc.isObject()) {
+                QMessageBox::warning(
+                    mw, "JSON错误", "JSON 格式错误，请重新填写");
+                continue;
+            }
+
+            QString errorMsg;
+            if (!validateTrajectoryJson(doc.object(), axisName, errorMsg)) {
+                QMessageBox::warning(
+                    mw, "配置错误", errorMsg);
+                continue;
+            }
+
+            cfg = doc.object();
+
+            QMessageBox::information(
+                mw, "成功",
+                QString("%1 轴参考轨迹设置成功").arg(axisName));
+
+            return true;
         }
-
-        // 写入模板
-        QString templateText = defaultTrajectoryTemplate(axisName);
-        tmpFile.write(templateText.toUtf8());
-        tmpFile.flush();
-
-        // 打开系统默认编辑器
-        QDesktopServices::openUrl(QUrl::fromLocalFile(tmpFile.fileName()));
-
-        // 阻塞等待用户编辑完成（关闭编辑器）
-        QMessageBox::information(
-            mw,
-            "编辑轨迹",
-            QString("请编辑 %1 轴轨迹配置，完成后关闭文件窗口").arg(axisName));
-
-        // 重新读取
-        tmpFile.seek(0);
-        QByteArray data = tmpFile.readAll();
-
-        QJsonParseError err;
-        auto doc = QJsonDocument::fromJson(data, &err);
-
-        if (err.error != QJsonParseError::NoError || !doc.isObject()) {
-            QMessageBox::warning(
-                mw,
-                "JSON 错误",
-                "JSON 格式错误，请重新填写");
-            continue;
-        }
-
-        QString errorMsg;
-        if (!validateTrajectoryJson(doc.object(), axisName, errorMsg)) {
-            QMessageBox::warning(
-                mw,
-                "配置错误",
-                errorMsg + "\n请重新填写");
-            continue;
-        }
-
-        cfg = doc.object();
-        return true;
-    }
 }
 /**
  * @brief 设置闭环控制的参考点
