@@ -100,7 +100,9 @@ private:
     void updateTrajectoryTarget();
 
     //JSON 轨迹加载
-    bool loadTrajectoryJson(QJsonObject &cfg); 
+    bool loadTrajectoryJson(QJsonObject &cfg,const QString &axisName);
+    bool validateTrajectoryJson(const QJsonObject &obj,const QString &axisName,QString &errorMsg);
+    QString defaultTrajectoryTemplate(const QString &axisName);
 };
 
 #endif // TAB_TURNTABLE_CONTROL_H

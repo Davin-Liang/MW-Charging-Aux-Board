@@ -325,26 +325,124 @@ void TabTurntableControl::on_ref_mode_changed(int index)
     mw->ui->line_edit_y_pos_ref->setEnabled(!useTrajectoryY);
 }
 /**
- * @brief 闭环参考轨迹配置
+ * @brief 闭环参考轨迹配置弹出模板 JSON
  */
-bool TabTurntableControl::loadTrajectoryJson(QJsonObject &cfg)
+QString TabTurntableControl::defaultTrajectoryTemplate(const QString &axisName)
 {
-    QString fileName = QFileDialog::getOpenFileName(
-        mw, "选择轨迹配置文件", "", "JSON Files (*.json)");
+    return QString(R"({
+  "_comment": "这是 %1 轴的参考轨迹配置，请只修改数值，不要删除字段",
 
-    if (fileName.isEmpty())
+  "time": {
+    "dt": 0.05,
+    "duration": 60.0
+  },
+
+  "%1": {
+    "type": "sine",        // sine | circle
+    "offset": 0.0,
+    "amplitude": 10.0,
+    "frequency": 0.2,
+    "phase": 0.0
+  }
+})").arg(axisName);
+}
+/**
+ * @brief 闭环参考轨迹配置用户编辑后解析
+ */
+bool TabTurntableControl::validateTrajectoryJson(
+    const QJsonObject &obj,
+    const QString &axisName,
+    QString &errorMsg)
+{
+    if (!obj.contains("time") || !obj["time"].isObject()) {
+        errorMsg = "缺少 time 配置";
         return false;
+    }
 
-    QFile file(fileName);
-    if (!file.open(QIODevice::ReadOnly))
+    auto timeObj = obj["time"].toObject();
+    if (!timeObj.contains("dt") || !timeObj.contains("duration")) {
+        errorMsg = "time 中必须包含 dt 和 duration";
         return false;
+    }
 
-    auto doc = QJsonDocument::fromJson(file.readAll());
-    if (!doc.isObject())
+    if (!obj.contains(axisName) || !obj[axisName].isObject()) {
+        errorMsg = QString("缺少 %1 轴轨迹配置").arg(axisName);
         return false;
+    }
 
-    cfg = doc.object();
+    auto axisObj = obj[axisName].toObject();
+    if (!axisObj.contains("type")) {
+        errorMsg = "轨迹必须包含 type 字段";
+        return false;
+    }
+
+    QString type = axisObj["type"].toString();
+    if (type != "sine" && type != "circle") {
+        errorMsg = "type 仅支持 sine 或 circle";
+        return false;
+    }
+
     return true;
+}
+/**
+ * @brief 闭环参考轨迹配置（弹出模板 JSON，用户编辑后解析）
+ */
+bool TabTurntableControl::loadTrajectoryJson(
+    QJsonObject &cfg,
+    const QString &axisName)
+{
+    while (true) {
+        QTemporaryFile tmpFile(
+            QDir::tempPath() + QString("/trajectory_%1_XXXXXX.json").arg(axisName));
+
+        tmpFile.setAutoRemove(true);
+
+        if (!tmpFile.open()) {
+            QMessageBox::critical(mw, "错误", "无法创建临时轨迹文件");
+            return false;
+        }
+
+        // 写入模板
+        QString templateText = defaultTrajectoryTemplate(axisName);
+        tmpFile.write(templateText.toUtf8());
+        tmpFile.flush();
+
+        // 打开系统默认编辑器
+        QDesktopServices::openUrl(QUrl::fromLocalFile(tmpFile.fileName()));
+
+        // 阻塞等待用户编辑完成（关闭编辑器）
+        QMessageBox::information(
+            mw,
+            "编辑轨迹",
+            QString("请编辑 %1 轴轨迹配置，完成后关闭文件窗口").arg(axisName));
+
+        // 重新读取
+        tmpFile.seek(0);
+        QByteArray data = tmpFile.readAll();
+
+        QJsonParseError err;
+        auto doc = QJsonDocument::fromJson(data, &err);
+
+        if (err.error != QJsonParseError::NoError || !doc.isObject()) {
+            QMessageBox::warning(
+                mw,
+                "JSON 错误",
+                "JSON 格式错误，请重新填写");
+            continue;
+        }
+
+        QString errorMsg;
+        if (!validateTrajectoryJson(doc.object(), axisName, errorMsg)) {
+            QMessageBox::warning(
+                mw,
+                "配置错误",
+                errorMsg + "\n请重新填写");
+            continue;
+        }
+
+        cfg = doc.object();
+        return true;
+    }
 }
 /**
  * @brief 设置闭环控制的参考点
@@ -358,7 +456,7 @@ void TabTurntableControl::on_btn_set_target_pos_clicked()
             mw, "X轴点位参考设置成功",
             QString("X=%1").arg(target_x));
     } else {
-        if (!loadTrajectoryJson(trajConfigX)) {
+        if (!loadTrajectoryJson(trajConfigX, "yaw")) {
             QMessageBox::warning(mw, "错误", "X轴轨迹配置加载失败");
             return;
         }
@@ -370,7 +468,7 @@ void TabTurntableControl::on_btn_set_target_pos_clicked()
             mw, "Y轴点位参考设置成功",
             QString("Y=%1").arg(target_y));
     } else {
-        if (!loadTrajectoryJson(trajConfigY)) {
+        if (!loadTrajectoryJson(trajConfigY, "pitch")) {
             QMessageBox::warning(mw, "错误", "Y轴轨迹配置加载失败");
             return;
         }
