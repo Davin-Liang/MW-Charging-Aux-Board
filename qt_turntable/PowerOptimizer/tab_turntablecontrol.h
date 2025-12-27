@@ -114,8 +114,8 @@ private:
     bool closedLoopYEnabled = false;     //// 是否启用 Y 轴闭环控制
 
     //初始化
-    void initializeTurntablePositionChart();
-
+    void initializeTurntablePositionXChart();
+    void initializeTurntablePositionYChart();
     // 轨迹与点位统一参考更新
     double evaluateTrajectory(const QJsonObject &cfg,const QString &axisName,double t,bool &finished);
 

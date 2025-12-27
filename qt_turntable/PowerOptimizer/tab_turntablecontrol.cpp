@@ -16,13 +16,16 @@ using namespace QtCharts;
 
 TabTurntableControl::TabTurntableControl(MainWindow *mw_)
     : QObject(mw_), mw(mw_)
-    , turntableChart(nullptr)
-    , turntableChartView(nullptr)
-    , series_target_x(nullptr)
-    , series_target_y(nullptr)
-    , series_current_x(nullptr)
-    , series_current_y(nullptr)
-    , chart_time(0.0)
+    , chartX(nullptr)
+    , chartY(nullptr)
+    , chartViewX(nullptr)
+    , chartViewY(nullptr)
+    , seriesX_target(nullptr)
+    , seriesY_target(nullptr)
+    , seriesX_current(nullptr)
+    , seriesY_current(nullptr)
+    , chartTimeX(0.0)
+    , chartTimeY(0.0)
     , target_x(0.0)
     , target_y(0.0)
     , useTrajectoryX(false)
@@ -483,8 +486,6 @@ void TabTurntableControl::on_btn_set_target_pos_clicked()
         }
     }
 
-    traj_time = 0.0;   // 初始化轨迹时间
-    //QMessageBox::information(mw, "轨迹参考", "轨迹配置加载成功");
 
 }
 /**

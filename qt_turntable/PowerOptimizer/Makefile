@@ -619,7 +619,7 @@ build/.obj/tab_file_read.o: tab_file_read.cpp tab_file_read.h \
 		tab_turntablecontrol.h \
 		tab_stm32.h \
 		tab_deviceconnect.h \
-		ui_mainwindow.h
+		build/.ui/ui_mainwindow.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/tab_file_read.o tab_file_read.cpp
 
 build/.obj/tab_stm32.o: tab_stm32.cpp tab_stm32.h \
@@ -631,7 +631,7 @@ build/.obj/tab_stm32.o: tab_stm32.cpp tab_stm32.h \
 		tab_file_read.h \
 		tab_turntablecontrol.h \
 		tab_deviceconnect.h \
-		ui_mainwindow.h
+		build/.ui/ui_mainwindow.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/tab_stm32.o tab_stm32.cpp
 
 build/.obj/tab_turntablecontrol.o: tab_turntablecontrol.cpp tab_turntablecontrol.h \
@@ -643,7 +643,8 @@ build/.obj/tab_turntablecontrol.o: tab_turntablecontrol.cpp tab_turntablecontrol
 		tab_file_read.h \
 		tab_stm32.h \
 		tab_deviceconnect.h \
-		ui_mainwindow.h
+		build/.ui/ui_mainwindow.h \
+		TrajectoryJsonDialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/tab_turntablecontrol.o tab_turntablecontrol.cpp
 
 build/.obj/tab_deviceconnect.o: tab_deviceconnect.cpp tab_deviceconnect.h \
@@ -655,7 +656,7 @@ build/.obj/tab_deviceconnect.o: tab_deviceconnect.cpp tab_deviceconnect.h \
 		tab_file_read.h \
 		tab_turntablecontrol.h \
 		tab_stm32.h \
-		ui_mainwindow.h
+		build/.ui/ui_mainwindow.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/tab_deviceconnect.o tab_deviceconnect.cpp
 
 build/.obj/turntable_controller.o: turntable_controller.cpp turntable_controller.h
@@ -685,7 +686,7 @@ build/.obj/mainwindow.o: mainwindow.cpp mainwindow.h \
 		tab_turntablecontrol.h \
 		tab_stm32.h \
 		tab_deviceconnect.h \
-		ui_mainwindow.h
+		build/.ui/ui_mainwindow.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/mainwindow.o mainwindow.cpp
 
 build/.obj/qrc_qmake_qmake_qm_files.o: build/.rcc/qrc_qmake_qmake_qm_files.cpp 
