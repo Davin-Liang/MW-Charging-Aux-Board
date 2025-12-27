@@ -132,7 +132,8 @@ void TabTurntableControl::setupConnections()
     // 初始化转台图像与状态
     update_turntable_image();
     //初始化转台位置跟踪控制图
-    initializeTurntablePositionChart();
+    initializeTurntablePositionXChart();
+    initializeTurntablePositionYChart();
 }
 /**
  * @brief 加载并显示转台图片
@@ -154,67 +155,86 @@ void TabTurntableControl::update_turntable_image()
                    Qt::SmoothTransformation));
 }
 /**
- * @brief 初始化转台位置实时曲线图表
+ * @brief 初始化转台X轴位置实时曲线图表
  */
-void TabTurntableControl::initializeTurntablePositionChart()
+void TabTurntableControl::initializeTurntablePositionXChart()
 {
+    chartX = new QChart();
+    chartX->setTitle("X轴（Yaw）位置跟踪");
 
-    turntableChart = new QChart();
-    // turntableChart->setTitle("转台实时位置跟踪");
+    seriesX_current = new QLineSeries();
+    seriesX_target  = new QLineSeries();
 
-    // 创建四条曲线
-    series_target_x = new QLineSeries();
-    series_target_y = new QLineSeries();
-    series_current_x = new QLineSeries();
-    series_current_y = new QLineSeries();
+    seriesX_current->setName("Current X");
+    seriesX_target->setName("Target X");
 
-    series_target_x->setName("target_x");
-    series_target_y->setName("target_y");
-    series_current_x->setName("current_x");
-    series_current_y->setName("current_y");
+    chartX->addSeries(seriesX_current);
+    chartX->addSeries(seriesX_target);
 
-    turntableChart->addSeries(series_target_x);
-    turntableChart->addSeries(series_target_y);
-    turntableChart->addSeries(series_current_x);
-    turntableChart->addSeries(series_current_y);
+    auto *axisTime = new QValueAxis();
+    auto *axisPos  = new QValueAxis();
 
-    // 坐标轴
-    QValueAxis *axisX = new QValueAxis();
-    QValueAxis *axisY = new QValueAxis();
+    axisTime->setTitleText("时间 (s)");
+    axisTime->setRange(0, 10);
 
-    axisX->setTitleText("时间 (s)");
-    axisY->setTitleText("角度 (°)");
+    axisPos->setTitleText("角度 (°)");
+    axisPos->setRange(-180, 180);
 
-    axisX->setRange(0, 10);  // 显示最近 10 秒
-    axisY->setRange(-180, 180);
+    chartX->addAxis(axisTime, Qt::AlignBottom);
+    chartX->addAxis(axisPos, Qt::AlignLeft);
 
-    turntableChart->addAxis(axisX, Qt::AlignBottom);
-    turntableChart->addAxis(axisY, Qt::AlignLeft);
+    seriesX_current->attachAxis(axisTime);
+    seriesX_current->attachAxis(axisPos);
+    seriesX_target->attachAxis(axisTime);
+    seriesX_target->attachAxis(axisPos);
 
-    // 绑定轴
-    series_target_x->attachAxis(axisX);
-    series_target_x->attachAxis(axisY);
+    chartViewX = new QChartView(chartX);
+    chartViewX->setRenderHint(QPainter::Antialiasing);
 
-    series_target_y->attachAxis(axisX);
-    series_target_y->attachAxis(axisY);
-
-    series_current_x->attachAxis(axisX);
-    series_current_x->attachAxis(axisY);
-
-    series_current_y->attachAxis(axisX);
-    series_current_y->attachAxis(axisY);
-
-    // ChartView 放入 UI
-    turntableChartView = new QChartView(turntableChart, mw->ui->turntable_position_chart);
-    turntableChartView->setRenderHint(QPainter::Antialiasing);
-
-    // 将 turntable_position_chart（QWidget）替换为 ChartView
-    // QVBoxLayout *layout = new QVBoxLayout(ui->turntable_position_chart);
-    // layout->addWidget(turntableChartView);
-    auto *layout = new QVBoxLayout(mw->ui->turntable_position_chart);
-    layout->addWidget(turntableChartView);
+    auto *layout = new QVBoxLayout(mw->ui->turntable_position_x_chart);
+    layout->addWidget(chartViewX);
     layout->setContentsMargins(0, 0, 0, 0);
+}
+/**
+ * @brief 初始化转台y轴位置实时曲线图表
+ */
+void TabTurntableControl::initializeTurntablePositionYChart()
+{
+    chartY = new QChart();
+    chartY->setTitle("Y轴（Pitch）位置跟踪");
 
+    seriesY_current = new QLineSeries();
+    seriesY_target  = new QLineSeries();
+
+    seriesY_current->setName("Current Y");
+    seriesY_target->setName("Target Y");
+
+    chartY->addSeries(seriesY_current);
+    chartY->addSeries(seriesY_target);
+
+    auto *axisTime = new QValueAxis();
+    auto *axisPos  = new QValueAxis();
+
+    axisTime->setTitleText("时间 (s)");
+    axisTime->setRange(0, 10);
+
+    axisPos->setTitleText("角度 (°)");
+    axisPos->setRange(-60, 60);
+
+    chartY->addAxis(axisTime, Qt::AlignBottom);
+    chartY->addAxis(axisPos, Qt::AlignLeft);
+
+    seriesY_current->attachAxis(axisTime);
+    seriesY_current->attachAxis(axisPos);
+    seriesY_target->attachAxis(axisTime);
+    seriesY_target->attachAxis(axisPos);
+
+    chartViewY = new QChartView(chartY);
+    chartViewY->setRenderHint(QPainter::Antialiasing);
+
+    auto *layout = new QVBoxLayout(mw->ui->turntable_position_y_chart);
+    layout->addWidget(chartViewY);
+    layout->setContentsMargins(0, 0, 0, 0);
 }
 
 /**
@@ -317,10 +337,15 @@ void TabTurntableControl::on_controller_selection_changed(int index)
  */
 void TabTurntableControl::on_ref_mode_changed(int index)
 {
+    Q_UNUSED(index);
+
     int mode = mw->ui->combo_ref_mode->currentIndex();
 
     useTrajectoryX = (mode == 1 || mode == 3);
     useTrajectoryY = (mode == 1 || mode == 2);
+
+    if (useTrajectoryX) trajTimeX = 0.0;
+    if (useTrajectoryY) trajTimeY = 0.0;
 
     mw->ui->line_edit_x_pos_ref->setEnabled(!useTrajectoryX);
     mw->ui->line_edit_y_pos_ref->setEnabled(!useTrajectoryY);
@@ -463,27 +488,56 @@ void TabTurntableControl::on_btn_set_target_pos_clicked()
 
 }
 /**
- * @brief 真正驱动轨迹
+ * @brief 根据 JSON 配置和当前时间，计算某一轴的参考轨迹值
+ * @param cfg        完整的轨迹 JSON（包含 time + axis）
+ * @param axisName   轴名，如 "x" / "y" / "yaw" / "pitch"
+ * @param t          当前轨迹时间（由 PID 定时器推进）
+ * @param finished   输出：轨迹是否结束
+ * @return           当前时刻的参考值
  */
-void TabTurntableControl::updateTrajectoryTarget()
+double TabTurntableControl::evaluateTrajectory(
+    const QJsonObject &cfg,
+    const QString &axisName,
+    double t,
+    bool &finished)
 {
-    if (useTrajectoryX) {
-        double A = trajConfigX["A"].toDouble(10.0);
-        double w = trajConfigX["w"].toDouble(1.0);
-        double bias = trajConfigX["bias"].toDouble(0.0);
+    finished = false;
 
-        target_x = bias + A * std::sin(w * traj_time);
+    // ---------- time ----------
+    auto timeObj = cfg["time"].toObject();
+    double duration = timeObj["duration"].toDouble(0.0);
+
+    if (duration > 0.0 && t >= duration) {
+        finished = true;
+        t = duration;   // 防止时间越界
     }
 
-    if (useTrajectoryY) {
-        double A = trajConfigY["A"].toDouble(5.0);
-        double w = trajConfigY["w"].toDouble(0.5);
-        double bias = trajConfigY["bias"].toDouble(0.0);
+    // ---------- axis ----------
+    auto axisObj = cfg[axisName].toObject();
+    QString type = axisObj["type"].toString();
 
-        target_y = bias + A * std::cos(w * traj_time);
+    double offset    = axisObj["offset"].toDouble(0.0);
+    double amplitude = axisObj["amplitude"].toDouble(0.0);
+    double freq      = axisObj["frequency"].toDouble(0.0);
+    double phase     = axisObj["phase"].toDouble(0.0);
+
+    double w = 2.0 * M_PI * freq;
+
+    // ---------- waveform ----------
+    if (type == "sine") {
+        return offset + amplitude * std::sin(w * t + phase);
+    }
+    else if (type == "circle") {
+        // 对单轴来说，circle 只是“正弦/余弦的约定”
+        // X = cos, Y = sin（约定）
+        if (axisName.toLower().contains("x")) {
+            return offset + amplitude * std::cos(w * t + phase);
+        } else {
+            return offset + amplitude * std::sin(w * t + phase);
+        }
     }
 
-    traj_time += 0.05; // 与定时器周期一致
+    return offset;
 }
 
 /**
@@ -510,6 +564,7 @@ void TabTurntableControl::on_btn_set_x_pidcontroller_parameter_clicked()
     pidX->setController(mw->turntable_controller);
  
     if (closedLoopTimerX) {
+        closedLoopXEnabled = true;
         closedLoopTimerX->start(50);
         QMessageBox::information(mw, "PID 启动", "X轴PID 参数已设置，X轴闭环控制开始");
         mw->ui->control_status->setText("X轴闭环控制：开启");
@@ -542,6 +597,7 @@ void TabTurntableControl::on_btn_set_x_pidcontroller_parameter_clicked()
      pidY->setController(mw->turntable_controller);
   
      if (closedLoopTimerY) {
+        closedLoopYEnabled = true; 
         closedLoopTimerY->start(50);
          QMessageBox::information(mw, "PID 启动", "y轴PID 参数已设置，y轴闭环控制开始");
          mw->ui->control_status->setText("y轴闭环控制：开启");
@@ -557,6 +613,7 @@ void TabTurntableControl::on_btn_set_x_pidcontroller_parameter_clicked()
 void TabTurntableControl::on_btn_stop_x_pidcontrol_clicked()
 {
     if (closedLoopTimerX) closedLoopTimerX->stop();
+    closedLoopXEnabled = false; 
     mw->ui->control_status->setText("X轴闭环控制：停止");
     mw->ui->control_status->setStyleSheet("color: red;");
 }
@@ -567,6 +624,7 @@ void TabTurntableControl::on_btn_stop_x_pidcontrol_clicked()
  void TabTurntableControl::on_btn_stop_y_pidcontrol_clicked()
  {
      if (closedLoopTimerY) closedLoopTimerY->stop();
+     closedLoopYEnabled = false; 
      mw->ui->control_status->setText("y轴闭环控制：停止");
      mw->ui->control_status->setStyleSheet("color: red;");
  }
@@ -592,24 +650,22 @@ void TabTurntableControl::updateTurntableData()
         mw->ui->line_edit_monitor_x_speed->setText(QString::number(xSpeed, 'f', 2));
         mw->ui->line_edit_monitor_y_speed->setText(QString::number(ySpeed, 'f', 2));
     }
-    //===================  更新实时曲线 ===================//
-    chart_time += 0.5;  // update interval = 200ms
+   // ===== 图表时间推进 =====
+   chartTimeX += 0.2;
+   chartTimeY += 0.2;
+    // ===== X 轴图 =====
+    seriesX_current->append(chartTimeX, xPos);
+    seriesX_target->append(chartTimeX, target_x);
 
-    series_current_x->append(chart_time, xPos);
-    series_current_y->append(chart_time, yPos);
-
-    // target_x, target_y 来自 UI 设置
-    series_target_x->append(chart_time, target_x);
-    series_target_y->append(chart_time, target_y);
-
-    // 维持最多 10 秒数据
-    if (chart_time > 10.0) {
-        turntableChart->axisX()->setRange(chart_time - 10.0, chart_time);
-
+    if (chartTimeX > 10.0) {
+        chartX->axisX()->setRange(chartTimeX - 10.0, chartTimeX);
     }
-    if (useTrajectoryX || useTrajectoryY) {
-        updateTrajectoryTarget();
-    }
+    // ===== Y 轴图 =====
+    seriesY_current->append(chartTimeY, yPos);  
+    seriesY_target->append(chartTimeY, target_y);
+    if (chartTimeY > 10.0) {
+        chartY->axisX()->setRange(chartTimeY - 10.0, chartTimeY);
+    }    
 }
 
 /**
@@ -617,20 +673,33 @@ void TabTurntableControl::updateTurntableData()
  */
 void TabTurntableControl::closedLoopTickX()
 {
-    if (!pidX ) return;
+    if (!pidX || !closedLoopXEnabled) return;
+     // === Reference Generator（X）===
+    if (useTrajectoryX) {
+        bool trajFinished = false;
+        target_x = evaluateTrajectory(
+            trajConfigX,
+            "x",
+            trajTimeX,
+            trajFinished
+        );
+        trajTimeX += trajConfigX["time"].toObject()["dt"].toDouble(0.05);
+        if (trajFinished) {
+            closedLoopTimerX->stop();
+            closedLoopXEnabled = false;
+            QMessageBox::information(mw, "完成", "X轴轨迹跟踪完成");
+            return;
+        }
+    }
     // 使用 pid 控制器的 controlLoop 接口（假定定义类似于你的实现）
     bool doneX = pidX->controlLoop(target_x, 0.01, 0.05);
 
-    if (!useTrajectoryX  && doneX && closedLoopTimerX) {
+    if (!useTrajectoryX  && doneX) {
         closedLoopTimerX->stop();
+        closedLoopXEnabled = false;
         mw->ui->control_status->setText("X轴闭环控制：完成");
         mw->ui->control_status->setStyleSheet("color: blue;");
         QMessageBox::information(mw, "完成", "转台已到达目标点（误差 ≤ 0.01）");
-    }
-    if (useTrajectoryX && doneX && closedLoopTimerX){
-        mw->ui->control_status->setText("X轴闭环控制：完成");
-        mw->ui->control_status->setStyleSheet("color: blue;");
-        QMessageBox::information(mw, "完成", "转台已到达目标轨迹（误差 ≤ 0.01）");
     }
 }
 /**
@@ -638,23 +707,40 @@ void TabTurntableControl::closedLoopTickX()
  */
 void TabTurntableControl::closedLoopTickY()
 {
+    if (!pidY || !closedLoopYEnabled) return;
+    // === Reference Generator（Y）===
+    if (useTrajectoryY) {
+        bool trajFinished = false;
 
-    if (!pidY ) return;
-    // 使用 pid 控制器的 controlLoop 接口（假定定义类似于你的实现）
+        target_y = evaluateTrajectory(
+            trajConfigY,
+            "y",
+            trajTimeY,
+            trajFinished
+        );
+
+        trajTimeY += trajConfigY["time"].toObject()["dt"].toDouble(0.05);
+
+        if (trajFinished) {
+            closedLoopTimerY->stop();
+            closedLoopYEnabled = false;
+            QMessageBox::information(mw, "完成", "Y轴轨迹跟踪完成");
+            return;
+        }
+    }
     bool doneY = pidY->controlLoop(target_y, 0.01, 0.05);
-    if ( !useTrajectoryY  && closedLoopTimerY&& doneY) {
+
+    if ( !useTrajectoryY  && doneY) {
         closedLoopTimerY->stop();
+        closedLoopYEnabled = false;
         mw->ui->control_status->setText("y轴闭环控制：完成");
         mw->ui->control_status->setStyleSheet("color: blue;");
         QMessageBox::information(mw, "完成", "转台已到达目标点（误差 ≤ 0.01）");
     }
-    if (useTrajectoryY  && doneY && closedLoopTimerY){
-        mw->ui->control_status->setText("Y轴闭环控制：完成");
-        mw->ui->control_status->setStyleSheet("color: blue;");
-        QMessageBox::information(mw, "完成", "转台已到达目标轨迹（误差 ≤ 0.01）");
-    }
 }
-
+/**
+ * @brief 是否开启数据监控
+ */
 void TabTurntableControl::on_data_monitor_section_stateChanged(int state)
 {
     if (!monitorTimer) {

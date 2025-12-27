@@ -232,7 +232,7 @@ public:
     QPushButton *btn_stop_y_pidcontrol;
     QGroupBox *groupBox_chart_2;
     QHBoxLayout *horizontalLayout_38;
-    QWidget *turntable_position_chart;
+    QWidget *turntable_position_x_chart;
     QLabel *label_39;
 
     void setupUi(QMainWindow *MainWindow)
@@ -1205,10 +1205,10 @@ public:
         groupBox_chart_2->setFont(font1);
         horizontalLayout_38 = new QHBoxLayout(groupBox_chart_2);
         horizontalLayout_38->setObjectName(QString::fromUtf8("horizontalLayout_38"));
-        turntable_position_chart = new QWidget(groupBox_chart_2);
-        turntable_position_chart->setObjectName(QString::fromUtf8("turntable_position_chart"));
+        turntable_position_x_chart = new QWidget(groupBox_chart_2);
+        turntable_position_x_chart->setObjectName(QString::fromUtf8("turntable_position_chart"));
 
-        horizontalLayout_38->addWidget(turntable_position_chart);
+        horizontalLayout_38->addWidget(turntable_position_x_chart);
 
         tabWidget->addTab(tab_turntable_control, QString());
         label_39 = new QLabel(centralwidget);
