@@ -376,7 +376,7 @@ QString TabTurntableControl::defaultTrajectoryTemplate(const QString &axisName)
 })").arg(axisName);
 }
 /**
- * @brief 闭环参考轨迹配置用户编辑后解析
+ * @brief 闭环参考轨迹配置用户编辑后解析输入轨迹是否正确
  */
 bool TabTurntableControl::validateTrajectoryJson(
     const QJsonObject &obj,
@@ -614,6 +614,7 @@ void TabTurntableControl::on_btn_set_x_pidcontroller_parameter_clicked()
 void TabTurntableControl::on_btn_stop_x_pidcontrol_clicked()
 {
     if (closedLoopTimerX) closedLoopTimerX->stop();
+    mw->turntable_controller->set_axis_speed(Yaw, 0);
     closedLoopXEnabled = false; 
     mw->ui->control_status->setText("X轴闭环控制：停止");
     mw->ui->control_status->setStyleSheet("color: red;");
@@ -625,6 +626,7 @@ void TabTurntableControl::on_btn_stop_x_pidcontrol_clicked()
  void TabTurntableControl::on_btn_stop_y_pidcontrol_clicked()
  {
      if (closedLoopTimerY) closedLoopTimerY->stop();
+     mw->turntable_controller->set_axis_speed(Pitch, 0);
      closedLoopYEnabled = false; 
      mw->ui->control_status->setText("y轴闭环控制：停止");
      mw->ui->control_status->setStyleSheet("color: red;");
@@ -680,14 +682,16 @@ void TabTurntableControl::closedLoopTickX()
         bool trajFinished = false;
         target_x = evaluateTrajectory(
             trajConfigX,
-            "x",
+            "yaw",
             trajTimeX,
             trajFinished
         );
+        qDebug() << "计算结果 target_x:" << target_x;
         trajTimeX += trajConfigX["time"].toObject()["dt"].toDouble(0.05);
         if (trajFinished) {
             closedLoopTimerX->stop();
             closedLoopXEnabled = false;
+            mw->turntable_controller->set_axis_speed(Yaw, 0);
             QMessageBox::information(mw, "完成", "X轴轨迹跟踪完成");
             return;
         }
@@ -698,6 +702,7 @@ void TabTurntableControl::closedLoopTickX()
     if (!useTrajectoryX  && doneX) {
         closedLoopTimerX->stop();
         closedLoopXEnabled = false;
+        mw->turntable_controller->set_axis_speed(Yaw, 0);
         mw->ui->control_status->setText("X轴闭环控制：完成");
         mw->ui->control_status->setStyleSheet("color: blue;");
         QMessageBox::information(mw, "完成", "转台已到达目标点（误差 ≤ 0.01）");
@@ -712,10 +717,10 @@ void TabTurntableControl::closedLoopTickY()
     // === Reference Generator（Y）===
     if (useTrajectoryY) {
         bool trajFinished = false;
-
+       
         target_y = evaluateTrajectory(
             trajConfigY,
-            "y",
+            "pitch",
             trajTimeY,
             trajFinished
         );
@@ -725,6 +730,7 @@ void TabTurntableControl::closedLoopTickY()
         if (trajFinished) {
             closedLoopTimerY->stop();
             closedLoopYEnabled = false;
+            mw->turntable_controller->set_axis_speed(Pitch, 0);
             QMessageBox::information(mw, "完成", "Y轴轨迹跟踪完成");
             return;
         }
@@ -734,6 +740,7 @@ void TabTurntableControl::closedLoopTickY()
     if ( !useTrajectoryY  && doneY) {
         closedLoopTimerY->stop();
         closedLoopYEnabled = false;
+        mw->turntable_controller->set_axis_speed(Pitch, 0);
         mw->ui->control_status->setText("y轴闭环控制：完成");
         mw->ui->control_status->setStyleSheet("color: blue;");
         QMessageBox::information(mw, "完成", "转台已到达目标点（误差 ≤ 0.01）");

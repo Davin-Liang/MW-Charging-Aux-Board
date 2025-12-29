@@ -41,7 +41,7 @@ bool TurntableController::connect(int baudrate, char parity, int dataBit, int st
     }
     /* 创建 RTU 模式的 Modbus 上下文 */
     m_ctx = modbus_new_rtu(m_port, baudrate, parity, dataBit, stopBit);
-    modbus_set_debug(m_ctx, TRUE);
+    modbus_set_debug(m_ctx, false);
     
     /* 检查上下文是否创建成功 */
     if (m_ctx == nullptr) {
