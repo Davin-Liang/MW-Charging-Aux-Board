@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1011</width>
-    <height>770</height>
+    <width>1024</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="font">
@@ -22,10 +22,10 @@
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>40</y>
-      <width>991</width>
-      <height>721</height>
+      <x>0</x>
+      <y>30</y>
+      <width>1015</width>
+      <height>561</height>
      </rect>
     </property>
     <property name="font">
@@ -35,7 +35,7 @@
      </font>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>0</number>
     </property>
     <property name="iconSize">
      <size>
@@ -183,7 +183,7 @@
      <widget class="QGroupBox" name="turntable_connection">
       <property name="geometry">
        <rect>
-        <x>460</x>
+        <x>470</x>
         <y>10</y>
         <width>521</width>
         <height>231</height>
@@ -373,8 +373,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>981</width>
-        <height>81</height>
+        <width>1001</width>
+        <height>61</height>
        </rect>
       </property>
       <property name="font">
@@ -436,8 +436,8 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>80</y>
-        <width>981</width>
+        <y>61</y>
+        <width>1001</width>
         <height>121</height>
        </rect>
       </property>
@@ -548,9 +548,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>380</y>
-        <width>341</width>
-        <height>181</height>
+        <y>353</y>
+        <width>241</width>
+        <height>171</height>
        </rect>
       </property>
       <property name="font">
@@ -628,9 +628,9 @@
      <widget class="QGroupBox" name="groupBox_chart">
       <property name="geometry">
        <rect>
-        <x>340</x>
-        <y>210</y>
-        <width>641</width>
+        <x>562</x>
+        <y>180</y>
+        <width>441</width>
         <height>341</height>
        </rect>
       </property>
@@ -649,125 +649,12 @@
        </item>
       </layout>
      </widget>
-     <widget class="QGroupBox" name="groupBox_6">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>560</y>
-        <width>981</width>
-        <height>131</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>宋体</family>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
-      <property name="title">
-       <string>寻优结果显示</string>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_15">
-         <item>
-          <widget class="QLabel" name="label_21">
-           <property name="font">
-            <font>
-             <family>宋体</family>
-             <pointsize>12</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string>Channel1_Vmax</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="lineEdit_read_channel1voltagemax"/>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_22">
-           <property name="font">
-            <font>
-             <family>宋体</family>
-             <pointsize>12</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string>Channel2_Vmax</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="lineEdit_read_channel2voltagemax"/>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_16">
-         <item>
-          <widget class="QLabel" name="label_23">
-           <property name="font">
-            <font>
-             <family>宋体</family>
-             <pointsize>12</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string>Channel3_Vmax</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="lineEdit_read_channel3voltagemax"/>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_24">
-           <property name="font">
-            <font>
-             <family>宋体</family>
-             <pointsize>12</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string>Channel4_Vmax</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="lineEdit_read_channel4voltagemax"/>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_17">
-         <item>
-          <widget class="QLabel" name="label_25">
-           <property name="font">
-            <font>
-             <family>宋体</family>
-             <pointsize>12</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string>Pmax</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="lineEdit_read_powermax"/>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </widget>
      <widget class="QGroupBox" name="groupBox_5">
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>210</y>
-        <width>341</width>
+        <y>182</y>
+        <width>241</width>
         <height>171</height>
        </rect>
       </property>
@@ -844,6 +731,127 @@
        </item>
       </layout>
      </widget>
+     <widget class="QGroupBox" name="groupBox_6">
+      <property name="geometry">
+       <rect>
+        <x>241</x>
+        <y>182</y>
+        <width>321</width>
+        <height>341</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>宋体</family>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="title">
+       <string>寻优结果显示</string>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_15">
+         <item>
+          <widget class="QLabel" name="label_21">
+           <property name="font">
+            <font>
+             <family>宋体</family>
+             <pointsize>12</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Channel1_Vmax</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_read_channel1voltagemax"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_16">
+         <item>
+          <widget class="QLabel" name="label_22">
+           <property name="font">
+            <font>
+             <family>宋体</family>
+             <pointsize>12</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Channel2_Vmax</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_read_channel2voltagemax"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_40">
+         <item>
+          <widget class="QLabel" name="label_23">
+           <property name="font">
+            <font>
+             <family>宋体</family>
+             <pointsize>12</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Channel3_Vmax</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_read_channel3voltagemax"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_41">
+         <item>
+          <widget class="QLabel" name="label_24">
+           <property name="font">
+            <font>
+             <family>宋体</family>
+             <pointsize>12</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Channel4_Vmax</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_read_channel4voltagemax"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_17">
+         <item>
+          <widget class="QLabel" name="label_25">
+           <property name="font">
+            <font>
+             <family>宋体</family>
+             <pointsize>12</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Pmax</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_read_powermax"/>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
     </widget>
     <widget class="QWidget" name="tab_file_read">
      <attribute name="title">
@@ -852,10 +860,10 @@
      <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
-        <x>22</x>
+        <x>12</x>
         <y>12</y>
-        <width>941</width>
-        <height>671</height>
+        <width>981</width>
+        <height>511</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -923,10 +931,10 @@
      <widget class="QGroupBox" name="group_box_turntable_shape">
       <property name="geometry">
        <rect>
-        <x>1</x>
-        <y>1</y>
-        <width>251</width>
-        <height>191</height>
+        <x>0</x>
+        <y>0</y>
+        <width>151</width>
+        <height>121</height>
        </rect>
       </property>
       <property name="title">
@@ -935,11 +943,20 @@
       <layout class="QVBoxLayout" name="verticalLayout_7">
        <item>
         <widget class="QLabel" name="label_turntable_img">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="text">
           <string/>
          </property>
          <property name="pixmap">
           <pixmap>:/i18n/PowerOptimizer_zh_CN.qm</pixmap>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignCenter</set>
          </property>
         </widget>
        </item>
@@ -949,9 +966,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>200</y>
+        <y>121</y>
         <width>251</width>
-        <height>491</height>
+        <height>421</height>
        </rect>
       </property>
       <property name="title">
@@ -1118,128 +1135,72 @@
      <widget class="QGroupBox" name="groupBox_8">
       <property name="geometry">
        <rect>
-        <x>260</x>
-        <y>270</y>
-        <width>721</width>
-        <height>71</height>
+        <x>251</x>
+        <y>222</y>
+        <width>751</width>
+        <height>58</height>
        </rect>
       </property>
       <property name="title">
        <string>数据监控区域</string>
       </property>
-      <widget class="QLabel" name="label">
-       <property name="geometry">
-        <rect>
-         <x>170</x>
-         <y>30</y>
-         <width>56</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>X轴位置</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="line_edit_monitor_x_pos">
-       <property name="geometry">
-        <rect>
-         <x>240</x>
-         <y>30</y>
-         <width>71</width>
-         <height>22</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_27">
-       <property name="geometry">
-        <rect>
-         <x>330</x>
-         <y>30</y>
-         <width>56</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>X轴速度</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="line_edit_monitor_x_speed">
-       <property name="geometry">
-        <rect>
-         <x>400</x>
-         <y>30</y>
-         <width>51</width>
-         <height>22</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_3">
-       <property name="geometry">
-        <rect>
-         <x>460</x>
-         <y>30</y>
-         <width>56</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Y轴位置</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="line_edit_monitor_y_pos">
-       <property name="geometry">
-        <rect>
-         <x>520</x>
-         <y>30</y>
-         <width>51</width>
-         <height>22</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_28">
-       <property name="geometry">
-        <rect>
-         <x>580</x>
-         <y>30</y>
-         <width>56</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Y轴速度</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="line_edit_monitor_y_speed">
-       <property name="geometry">
-        <rect>
-         <x>640</x>
-         <y>32</y>
-         <width>71</width>
-         <height>22</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QCheckBox" name="data_monitor_section">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>20</y>
-         <width>121</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>开始数据监控</string>
-       </property>
-      </widget>
+      <layout class="QHBoxLayout" name="horizontalLayout_38">
+       <item>
+        <widget class="QCheckBox" name="data_monitor_section">
+         <property name="text">
+          <string>开始数据监控</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>X轴位置</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="line_edit_monitor_x_pos"/>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_27">
+         <property name="text">
+          <string>X轴速度</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="line_edit_monitor_x_speed"/>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>Y轴位置</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="line_edit_monitor_y_pos"/>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_28">
+         <property name="text">
+          <string>Y轴速度</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="line_edit_monitor_y_speed"/>
+       </item>
+      </layout>
      </widget>
      <widget class="QGroupBox" name="groupBox_9">
       <property name="geometry">
        <rect>
-        <x>260</x>
-        <y>1</y>
-        <width>721</width>
-        <height>131</height>
+        <x>151</x>
+        <y>0</y>
+        <width>851</width>
+        <height>121</height>
        </rect>
       </property>
       <property name="title">
@@ -1313,10 +1274,10 @@
      <widget class="QGroupBox" name="groupBox_10">
       <property name="geometry">
        <rect>
-        <x>260</x>
-        <y>130</y>
-        <width>721</width>
-        <height>141</height>
+        <x>251</x>
+        <y>121</y>
+        <width>751</width>
+        <height>101</height>
        </rect>
       </property>
       <property name="title">
@@ -1424,10 +1385,10 @@
      <widget class="QGroupBox" name="groupBox_11">
       <property name="geometry">
        <rect>
-        <x>260</x>
-        <y>340</y>
-        <width>721</width>
-        <height>351</height>
+        <x>251</x>
+        <y>280</y>
+        <width>751</width>
+        <height>251</height>
        </rect>
       </property>
       <property name="title">
@@ -1462,7 +1423,6 @@
      <zorder>groupBox_8</zorder>
      <zorder>groupBox_9</zorder>
      <zorder>groupBox_10</zorder>
-     <zorder>widget</zorder>
     </widget>
    </widget>
    <widget class="QLabel" name="label_39">
@@ -1470,14 +1430,15 @@
      <rect>
       <x>20</x>
       <y>10</y>
-      <width>191</width>
-      <height>21</height>
+      <width>141</width>
+      <height>16</height>
      </rect>
     </property>
     <property name="font">
      <font>
-      <family>Times New Roman</family>
-      <pointsize>16</pointsize>
+      <family>宋体</family>
+      <pointsize>12</pointsize>
+      <bold>true</bold>
      </font>
     </property>
     <property name="text">

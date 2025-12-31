@@ -7,8 +7,8 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     // 设置应用程序信息
-    QApplication::setApplicationName("转台控制中心");
-    QApplication::setApplicationVersion("1.0");
+    QApplication::setApplicationName("各类设备控制中心");
+    QApplication::setApplicationVersion("2.0");
     QApplication::setOrganizationName("YourCompany");
 
     // 设置现代风格

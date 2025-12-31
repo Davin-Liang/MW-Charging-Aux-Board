@@ -41,7 +41,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     tabFileRead          = new TabFileRead(this);
     tabFileRead->setupConnections();
-
+    //解决最大化按钮存在的情况或者直接使用 this->show()这行代码
+    // setWindowFlags(windowFlags() & ~Qt::WindowMaximizeButtonHint);
+    // show();
 }
 /**
  * @brief 初始化 UI 的通用设置，例如状态栏、只读框、样式等
@@ -51,6 +53,10 @@ void MainWindow::setupUI()
     ui->tabWidget->setCurrentIndex(0);   //显示第0页
     setWindowTitle("各类设备控制中心");
     applyModernStyle();
+    // 固定大小
+    setFixedSize(size());
+    // 禁用最大化按钮（视觉更专业）
+    setWindowFlags(windowFlags() & ~Qt::WindowMaximizeButtonHint);
 
    // 初始化转台 PID 控制器
     pid_x = new PIDController(Yaw, turntable_controller);
