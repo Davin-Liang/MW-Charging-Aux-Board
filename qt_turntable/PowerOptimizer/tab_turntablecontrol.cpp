@@ -152,10 +152,19 @@ void TabTurntableControl::update_turntable_image()
         return;
     }
 
-    mw->ui->label_turntable_img->setPixmap(
-        pix.scaled(mw->ui->label_turntable_img->size(),
-                   Qt::KeepAspectRatio,
-                   Qt::SmoothTransformation));
+    // mw->ui->label_turntable_img->setPixmap(
+    //     pix.scaled(mw->ui->label_turntable_img->size(),
+    //                Qt::KeepAspectRatio,
+    //                Qt::SmoothTransformation));
+
+    // 等布局完成后再缩放一次
+    QTimer::singleShot(0, this, [this, pix]() {
+        mw->ui->label_turntable_img->setPixmap(
+            pix.scaled(
+                mw->ui->label_turntable_img->size(),
+                Qt::KeepAspectRatio,
+                Qt::SmoothTransformation));
+    });
 }
 /**
  * @brief 初始化转台X轴位置实时曲线图表
