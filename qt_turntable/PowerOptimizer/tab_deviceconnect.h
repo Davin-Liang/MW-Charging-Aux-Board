@@ -43,7 +43,7 @@ private slots:
     void on_pushButton_connect_clicked();
     void on_pushButton_disconnect_clicked();
     // socket 错误回调（可连接到 CommandTransmitter 的 error 信号）
-    void onSocketError(QAbstractSocket::SocketError error);
+    // void onSocketError(QAbstractSocket::SocketError error);
 
     // —— 转台连接 —— //
     void on_pushButton_connection_clicked();

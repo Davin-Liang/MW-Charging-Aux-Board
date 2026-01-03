@@ -136,9 +136,9 @@ void MainWindow::applyModernStyle()
  */
 MainWindow::~MainWindow()
 {
-    if (commandTransmitter != nullptr) {
-        commandTransmitter->stop_server();
-    }
+    // if (commandTransmitter != nullptr) {
+    //     commandTransmitter->stop_server();
+    // }
 
     if (stm32_mb_ctx != nullptr) {
         modbus_close(stm32_mb_ctx);

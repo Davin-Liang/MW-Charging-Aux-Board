@@ -7,6 +7,9 @@
 #include <QVBoxLayout>
 #include <QDebug>
 #include <QtCharts/QValueAxis>
+#include <QFile>
+#include <QTextStream>
+#include <QDateTime>
 
 #include <fstream>
 #include <iostream>
@@ -538,7 +541,7 @@ void TabSTM32::setUpdateFlag(uint16_t bitMask)
 /**
  * @brief 获取实时数据，实现数据监控
  */
-void TabStm32::onStm32MonitorTimeout()
+void TabSTM32::onStm32MonitorTimeout()
 {
     if (!mw || !mw->stm32_mb_ctx)
         return;
@@ -588,14 +591,17 @@ void TabStm32::onStm32MonitorTimeout()
     mw->ui->lineEdit_read_channel4voltagemax->setText(QString::number(modbus_get_float_abcd(&regs[12]), 'f', 2));
 
 
-    QString message = QString("收到电机数据 - X: %1, Y: %2, 速度: %3")
-                          .arg(motor_x).arg(motor_y).arg(speed);
-    QString message = QString("收到通道信息 - 通道: %1, 电压: %2V, 功率: %3W")
-                          .arg(channel).arg(voltage).arg(power);
-    QString message = QString("收到优化结果 - 最大功率: %1W, 电压: [%2, %3, %4, %5]V")
-                          .arg(opt_pwr)
-                          .arg(modbus_get_float_abcd(&regs[9])).arg(modbus_get_float_abcd(&regs[10]))
-                          .arg(modbus_get_float_abcd(&regs[11])).arg(modbus_get_float_abcd(&regs[12]));
+
+    QString message = QString("收到电机数据 - X: %1, Y: %2, 速度: %3; "
+                            "收到通道信息 - 通道: %4, 电压: %5V, 功率: %6W; "
+                            "收到优化结果 - 最大功率: %7W, 电压: [%8, %9, %10, %11]V")
+                        .arg(motor_x).arg(motor_y).arg(speed)
+                        .arg(channel).arg(voltage, 0, 'f', 2).arg(power, 0, 'f', 2)
+                        .arg(opt_pwr, 0, 'f', 2)
+                        .arg(modbus_get_float_abcd(&regs[9]), 0, 'f', 2)
+                        .arg(modbus_get_float_abcd(&regs[10]), 0, 'f', 2)
+                        .arg(modbus_get_float_abcd(&regs[11]), 0, 'f', 2)
+                        .arg(modbus_get_float_abcd(&regs[12]), 0, 'f', 2);
     qDebug()<<message;
     // 填充电机数据结构
     motorData.motorX = motor_x;

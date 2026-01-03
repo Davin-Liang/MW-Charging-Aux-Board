@@ -37,9 +37,9 @@ public slots:
     void trajTypeChanged(int index);
 
 
-    void onMotorDataReceived(const MotorData_t &data);
-    void onChannelDataReceived(const CurrentVPCh_t &data);
-    void onOptResDataReceived(const OptResData_t &data);
+    // void onMotorDataReceived(const MotorData_t &data);
+    // void onChannelDataReceived(const CurrentVPCh_t &data);
+    // void onOptResDataReceived(const OptResData_t &data);
 
     void onStm32MonitorTimeout();
 

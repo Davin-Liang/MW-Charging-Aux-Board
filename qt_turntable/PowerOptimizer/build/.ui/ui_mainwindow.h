@@ -11,6 +11,7 @@
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
@@ -130,6 +131,10 @@ public:
     QHBoxLayout *horizontalLayout_17;
     QLabel *label_25;
     QLineEdit *lineEdit_read_powermax;
+    QLabel *label_41;
+    QLineEdit *lineEdit_opt_motor_x;
+    QLabel *label_52;
+    QLineEdit *lineEdit_opt_motor_y;
     QGroupBox *groupBox_5;
     QVBoxLayout *verticalLayout;
     QHBoxLayout *horizontalLayout_12;
@@ -184,6 +189,8 @@ public:
     QPushButton *btn_x_zero;
     QPushButton *btn_y_zero;
     QGroupBox *groupBox_8;
+    QHBoxLayout *horizontalLayout_22;
+    QCheckBox *data_monitor_section;
     QLabel *label;
     QLineEdit *line_edit_monitor_x_pos;
     QLabel *label_27;
@@ -737,6 +744,28 @@ public:
 
         horizontalLayout_17->addWidget(lineEdit_read_powermax);
 
+        label_41 = new QLabel(groupBox_6);
+        label_41->setObjectName(QString::fromUtf8("label_41"));
+        label_41->setFont(font1);
+
+        horizontalLayout_17->addWidget(label_41);
+
+        lineEdit_opt_motor_x = new QLineEdit(groupBox_6);
+        lineEdit_opt_motor_x->setObjectName(QString::fromUtf8("lineEdit_opt_motor_x"));
+
+        horizontalLayout_17->addWidget(lineEdit_opt_motor_x);
+
+        label_52 = new QLabel(groupBox_6);
+        label_52->setObjectName(QString::fromUtf8("label_52"));
+        label_52->setFont(font1);
+
+        horizontalLayout_17->addWidget(label_52);
+
+        lineEdit_opt_motor_y = new QLineEdit(groupBox_6);
+        lineEdit_opt_motor_y->setObjectName(QString::fromUtf8("lineEdit_opt_motor_y"));
+
+        horizontalLayout_17->addWidget(lineEdit_opt_motor_y);
+
 
         verticalLayout_3->addLayout(horizontalLayout_17);
 
@@ -1000,30 +1029,53 @@ public:
         groupBox_8 = new QGroupBox(tab_turntable_control);
         groupBox_8->setObjectName(QString::fromUtf8("groupBox_8"));
         groupBox_8->setGeometry(QRect(260, 270, 721, 71));
+        horizontalLayout_22 = new QHBoxLayout(groupBox_8);
+        horizontalLayout_22->setObjectName(QString::fromUtf8("horizontalLayout_22"));
+        data_monitor_section = new QCheckBox(groupBox_8);
+        data_monitor_section->setObjectName(QString::fromUtf8("data_monitor_section"));
+
+        horizontalLayout_22->addWidget(data_monitor_section);
+
         label = new QLabel(groupBox_8);
         label->setObjectName(QString::fromUtf8("label"));
-        label->setGeometry(QRect(170, 30, 56, 16));
+
+        horizontalLayout_22->addWidget(label);
+
         line_edit_monitor_x_pos = new QLineEdit(groupBox_8);
         line_edit_monitor_x_pos->setObjectName(QString::fromUtf8("line_edit_monitor_x_pos"));
-        line_edit_monitor_x_pos->setGeometry(QRect(240, 30, 71, 22));
+
+        horizontalLayout_22->addWidget(line_edit_monitor_x_pos);
+
         label_27 = new QLabel(groupBox_8);
         label_27->setObjectName(QString::fromUtf8("label_27"));
-        label_27->setGeometry(QRect(330, 30, 56, 16));
+
+        horizontalLayout_22->addWidget(label_27);
+
         line_edit_monitor_x_speed = new QLineEdit(groupBox_8);
         line_edit_monitor_x_speed->setObjectName(QString::fromUtf8("line_edit_monitor_x_speed"));
-        line_edit_monitor_x_speed->setGeometry(QRect(400, 30, 51, 22));
+
+        horizontalLayout_22->addWidget(line_edit_monitor_x_speed);
+
         label_3 = new QLabel(groupBox_8);
         label_3->setObjectName(QString::fromUtf8("label_3"));
-        label_3->setGeometry(QRect(460, 30, 56, 16));
+
+        horizontalLayout_22->addWidget(label_3);
+
         line_edit_monitor_y_pos = new QLineEdit(groupBox_8);
         line_edit_monitor_y_pos->setObjectName(QString::fromUtf8("line_edit_monitor_y_pos"));
-        line_edit_monitor_y_pos->setGeometry(QRect(520, 30, 51, 22));
+
+        horizontalLayout_22->addWidget(line_edit_monitor_y_pos);
+
         label_28 = new QLabel(groupBox_8);
         label_28->setObjectName(QString::fromUtf8("label_28"));
-        label_28->setGeometry(QRect(580, 30, 56, 16));
+
+        horizontalLayout_22->addWidget(label_28);
+
         line_edit_monitor_y_speed = new QLineEdit(groupBox_8);
         line_edit_monitor_y_speed->setObjectName(QString::fromUtf8("line_edit_monitor_y_speed"));
-        line_edit_monitor_y_speed->setGeometry(QRect(640, 32, 71, 22));
+
+        horizontalLayout_22->addWidget(line_edit_monitor_y_speed);
+
         groupBox_9 = new QGroupBox(tab_turntable_control);
         groupBox_9->setObjectName(QString::fromUtf8("groupBox_9"));
         groupBox_9->setGeometry(QRect(260, 1, 721, 131));
@@ -1218,7 +1270,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        tabWidget->setCurrentIndex(3);
+        tabWidget->setCurrentIndex(1);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -1270,6 +1322,9 @@ public:
         label_23->setText(QCoreApplication::translate("MainWindow", "Channel3_Vmax", nullptr));
         label_24->setText(QCoreApplication::translate("MainWindow", "Channel4_Vmax", nullptr));
         label_25->setText(QCoreApplication::translate("MainWindow", "Pmax", nullptr));
+        label_41->setText(QCoreApplication::translate("MainWindow", "X\345\235\220\346\240\207", nullptr));
+        label_52->setText(QCoreApplication::translate("MainWindow", "Y\345\235\220\346\240\207", nullptr));
+        lineEdit_opt_motor_y->setText(QString());
         groupBox_5->setTitle(QCoreApplication::translate("MainWindow", "\347\224\265\346\234\272\345\275\223\345\211\215\347\212\266\346\200\201\350\257\273\345\217\226", nullptr));
         label_6->setText(QCoreApplication::translate("MainWindow", "x\345\235\220\346\240\207", nullptr));
         label_12->setText(QCoreApplication::translate("MainWindow", "y\345\235\220\346\240\207", nullptr));
@@ -1296,6 +1351,7 @@ public:
         btn_x_zero->setText(QCoreApplication::translate("MainWindow", "X\350\275\264\346\270\205\351\233\266", nullptr));
         btn_y_zero->setText(QCoreApplication::translate("MainWindow", "Y\350\275\264\346\270\205\351\233\266", nullptr));
         groupBox_8->setTitle(QCoreApplication::translate("MainWindow", "\346\225\260\346\215\256\347\233\221\346\216\247\345\214\272\345\237\237", nullptr));
+        data_monitor_section->setText(QCoreApplication::translate("MainWindow", "\345\274\200\345\247\213\346\225\260\346\215\256\347\233\221\346\216\247", nullptr));
         label->setText(QCoreApplication::translate("MainWindow", "X\350\275\264\344\275\215\347\275\256", nullptr));
         label_27->setText(QCoreApplication::translate("MainWindow", "X\350\275\264\351\200\237\345\272\246", nullptr));
         label_3->setText(QCoreApplication::translate("MainWindow", "Y\350\275\264\344\275\215\347\275\256", nullptr));

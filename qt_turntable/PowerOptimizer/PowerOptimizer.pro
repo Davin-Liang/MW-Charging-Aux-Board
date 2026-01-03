@@ -37,9 +37,6 @@ HEADERS += \
 FORMS += \
     mainwindow.ui
 
-TRANSLATIONS += \
-    PowerOptimizer_zh_CN.ts
-
 CONFIG += lrelease
 CONFIG += embed_translations
 
@@ -48,10 +45,30 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-# 设置构建目录为项目目录下的build文件夹
-DESTDIR = $$PWD/build
+# 设置构建目录
+DESTDIR = $$PWD/build  # 最终可执行文件的输出目录
+OBJECTS_DIR = build/.obj  # 对象文件(.o)的输出目录
+MOC_DIR = build/.moc      # moc文件的输出目录
+RCC_DIR = build/.rcc      # 资源文件(rcc)的输出目录
+UI_DIR = build/.ui        # UI头文件的输出目录
 
 # 确保构建目录存在
 !exists($$DESTDIR) {
     mkpath($$DESTDIR)
+}
+
+!exists($$OBJECTS_DIR) {
+    mkpath($$OBJECTS_DIR)
+}
+
+!exists($$MOC_DIR) {
+    mkpath($$MOC_DIR)
+}
+
+!exists($$RCC_DIR) {
+    mkpath($$RCC_DIR)
+}
+
+!exists($$UI_DIR) {
+    mkpath($$UI_DIR)
 }
