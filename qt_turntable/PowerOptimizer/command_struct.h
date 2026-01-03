@@ -47,8 +47,8 @@ typedef struct __attribute__((packed)) {
 
 // 电机控制命令  
 typedef struct __attribute__((packed)) {
-    float x; // 接收天线 X 坐标[m]
-    float y; // 接收天线 Y 坐标[m]
+    uint16_t x; // 接收天线 X 坐标[m]
+    uint16_t y; // 接收天线 Y 坐标[m]
     uint16_t speed; // 接收天线移动速度——0 表示不设置速度/ >0 表示设置速度
 } MotorCmd_t;
 
@@ -59,13 +59,14 @@ typedef enum {
 } ThajType_t;
 
 typedef struct __attribute__((packed)) {
-    float motorX;
-    float motorY;
-    int motorSpeed;
+    int16_t motorX;
+    int16_t motorY;
+    uint16_t motorSpeed;
 } MotorData_t;
 
 typedef struct __attribute__((packed)) {
-    MotorData_t motorData;
+    int16_t optimalx;
+    int16_t optimaly;
     float optimalPower;
     float optimalVs[4]; 
 } OptResData_t;
@@ -78,10 +79,10 @@ typedef struct __attribute__((packed)) {
 
 // 寻优控制命令
 typedef struct __attribute__((packed)) {
-    uint8_t whichThaj; // 哪种轨迹
-    float cirTrajRad; // 圆形轨迹半径[m]
-    float squThajLen; // 方形轨迹边长[mm]
-    uint8_t squThajStepLen; // 执行方形轨迹的步长[mm]
+    uint16_t whichThaj; // 哪种轨迹
+    uint16_t cirTrajRad; // 圆形轨迹半径[m]
+    uint16_t squThajLen; // 方形轨迹边长[mm]
+    uint16_t squThajStepLen; // 执行方形轨迹的步长[mm]
     float maxVol; // 通道可设置的最大电压[v]
     float volStepLen; // 设置电压时电压跳变的步长[v]
     float initialVol;//通道初始电压

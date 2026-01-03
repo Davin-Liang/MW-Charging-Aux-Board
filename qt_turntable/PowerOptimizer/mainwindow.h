@@ -46,7 +46,7 @@ private:
     modbus_t *stm32_mb_ctx = nullptr;
   
     // 主通信服务端
-    CommandTransmitter *commandTransmitter;
+   // CommandTransmitter *commandTransmitter;
 
     // 转台控制器（仍然在 MainWindow 中管理）
     TurntableController *turntable_controller;

@@ -8,11 +8,24 @@
 #include <QDebug>
 #include <QtCharts/QValueAxis>
 
+#include <fstream>
+#include <iostream>
+// JSON 库
+#include "thirdparty/nlohmann/json.hpp"
+
+using json = nlohmann::json;
+
 TabSTM32::TabSTM32(MainWindow *mw_)
     : QObject(mw_), mw(mw_)
 {
-    transmitter = mw->commandTransmitter;
-    stm32_MonitorTimer = mw.stm32MonitorTimer;
+    stm32_MonitorTimer = mw->stm32MonitorTimer;
+
+    // 初始化记录状态
+    isMotorRecording = false;
+    isOptimizationRecording = false;
+    isChannelRecording = false;
+    channelInfoIndex = 0;
+
 }
 
 TabSTM32::~TabSTM32()
@@ -20,7 +33,6 @@ TabSTM32::~TabSTM32()
         // 主图表视图资源显式释放（其父对象未托管）
         delete chartView;
         chartView = nullptr;
-    // 不 delete transmitter（由 MainWindow 管理）
 }
 
 void TabSTM32::setupConnections()
@@ -43,7 +55,7 @@ void TabSTM32::setupConnections()
 
 
     connect(stm32_MonitorTimer, &QTimer::timeout,
-            this, &TabStm32::onStm32MonitorTimeout);
+            this, &TabSTM32::onStm32MonitorTimeout);
 
 }
 /**
@@ -83,20 +95,102 @@ void TabSTM32::setupReadOnlyDataMonitoring()
 
 }
 /**
+  * @brief 从JSON文件初始化参数
+  * @param filename JSON文件名
+  * @return true 成功 \ false 失败
+  **/
+bool TabSTM32::readConfigFromJSON(const std::string &filename)
+{
+    try {
+        // 打开并解析 JSON 文件
+        std::ifstream file(filename);
+        if (!file.is_open()) {
+            std::cerr << "无法打开文件 " << filename << std::endl;
+            return false;
+        }
+
+        json config;
+        file >> config;
+        file.close();
+
+        // 初始化电机配置
+        if (config.contains("motorCmd")) {
+            json motorConfig = config["motorCmd"];
+            motorCmd.x = motorConfig["x"];
+            motorCmd.y = motorConfig["y"];
+            motorCmd.speed = motorConfig["speed"];
+        } else {
+            std::cerr << "错误: JSON 中缺少 motorCmd 部分" << std::endl;
+            return false;
+        }
+
+        // 初始化寻优配置
+        if (config.contains("findOptCmd")) {
+            json optConfig = config["findOptCmd"];
+            findOptCmd.whichThaj = optConfig["whichThaj"];
+            findOptCmd.cirTrajRad = optConfig["cirTrajRad"];
+            findOptCmd.squThajLen = optConfig["squThajLen"];// 方形轨迹边长[mm]
+            findOptCmd.squThajStepLen =  optConfig["squThajStepLen"];// 执行方形轨迹的步长[mm]
+            findOptCmd.maxVol = optConfig["maxVol"];
+            findOptCmd.volStepLen = optConfig["volStepLen"];
+            findOptCmd.initialVol = optConfig["initialVol"];
+        } else {
+            std::cerr << "错误: JSON 中缺少 findOptCmd 部分" << std::endl;
+            return false;
+        }
+
+        std::cout << "参数初始化成功！" << std::endl;
+        return true;
+
+    } catch (const std::exception &e) {
+        std::cerr << "参数初始化异常: " << e.what() << std::endl;
+        return false;
+    }
+}
+/**
+  * @brief 将 readConfigFromJSON 读取到的配置参数映射到 Modbus 寄存器
+  **/
+void TabSTM32::writeConfigToModbus()
+{
+    if (!mw || !mw->stm32_mb_ctx) {
+        std::cerr << "Modbus 未连接！" << std::endl;
+        return;
+    }
+
+    // 写电机配置到 Modbus
+    modbus_write_register(mw->stm32_mb_ctx, 0x0001, motorCmd.x);
+    modbus_write_register(mw->stm32_mb_ctx, 0x0002, motorCmd.y);
+    modbus_write_register(mw->stm32_mb_ctx, 0x0003, motorCmd.speed);
+
+    // 写寻优配置到 Modbus
+    modbus_write_register(mw->stm32_mb_ctx, 0x0004, findOptCmd.whichThaj);
+    modbus_write_register(mw->stm32_mb_ctx, 0x0005, (findOptCmd.cirTrajRad));
+    modbus_write_register(mw->stm32_mb_ctx, 0x0006, findOptCmd.squThajLen);
+    modbus_write_register(mw->stm32_mb_ctx, 0x0007, findOptCmd.squThajStepLen);
+
+
+    modbus_write_register(mw->stm32_mb_ctx, 0x0008, static_cast<uint16_t>(findOptCmd.maxVol));
+    modbus_write_register(mw->stm32_mb_ctx, 0x000A, static_cast<uint16_t>(findOptCmd.volStepLen));// 如果是float类型，可以转为uint16处理
+    modbus_write_register(mw->stm32_mb_ctx, 0x000C, static_cast<uint16_t>(findOptCmd.initialVol));
+    std::cout << "配置已成功写入 Modbus 寄存器" << std::endl;
+}
+/**
  * @brief 初始化 UI 中的电机参数与寻优参数
  */
 void TabSTM32::initializeUIWithConfig()
 {
-    if (!transmitter) return;
+    // 读取配置文件（JSON 格式）
+    if (!readConfigFromJSON("config.json")) {
+        std::cerr << "读取配置失败" << std::endl;
+        return;
+    }
+    // 将配置写入 Modbus 寄存器
+    writeConfigToModbus();
 
     // 获取电机配置
-    MotorCmd_t motorCmd = transmitter->getMotorCmd();
     mw->ui->lineEdit_motor_x->setText(QString::number(motorCmd.x, 'f', 2));
     mw->ui->lineEdit_motor_y->setText(QString::number(motorCmd.y, 'f', 2));
     mw->ui->lineEdit_motor_speed->setText(QString::number(motorCmd.speed));
-
-    // 获取寻优配置
-    FindOptimalCmd_t findOptCmd = transmitter->getFindOptCmd();
 
     // 默认轨迹类型
     mw->ui->comboBox_traj_type->clear();
@@ -105,7 +199,6 @@ void TabSTM32::initializeUIWithConfig()
 
     // 设置轨迹类型
     mw->ui->comboBox_traj_type->setCurrentIndex(findOptCmd.whichThaj == SQU_TRAJ ? 0 : 1);
-
 
     mw->ui->lineEdit_square_step_2->setText(QString::number(findOptCmd.squThajLen, 'f', 2));
     mw->ui->lineEdit_square_step->setText(QString::number(findOptCmd.squThajStepLen));
@@ -272,16 +365,38 @@ void TabSTM32::on_pushButton_motor_control_clicked()
         QMessageBox::warning(mw, "错误", "Modbus 未连接");
         return;
     }
-    // ===== 1. 写电机参数（保持寄存器）=====
+    // ===== 1. 生成新的电机数据文件名 =====
+    time_t now = time(nullptr);
+    tm *lt = localtime(&now);
+    DateTime_t dt;
+    dt.year = lt->tm_year + 1900;
+    dt.month = lt->tm_mon + 1;
+    dt.day = lt->tm_mday;
+    dt.hour = lt->tm_hour;
+    dt.minute = lt->tm_min;
+    dt.week_day = lt->tm_wday;
+
+    currentMotorFile = generate_file_name("motor_data.csv", &dt);
+    isMotorRecording = true;  // 开始记录电机数据
+
+    // ===== 2. 创建文件并写入表头 =====
+    std::ofstream motorFile(currentMotorFile, std::ios::out);
+    if (motorFile.is_open()) {
+        motorFile << "X,Y,Speed\n";
+        motorFile.close();
+        qDebug() << "开始记录电机数据到文件：" << QString::fromStdString(currentMotorFile);
+    }
+
+     // ===== 3. 写电机参数（保持寄存器）=====
     writeMotorRegisters();
 
-    // ===== 2. 打开电机控制线圈 =====
+    // ===== 4. 打开电机控制线圈 =====
     modbus_write_bit(mw->stm32_mb_ctx, 0x0002, 1);
 
-    // ===== 3. 写时间 =====
+    // ===== 5. 写时间 =====
     writeTimeRegisters();
 
-    // ===== 4. 更新标志位：bit0(电机) + bit2(时间) =====
+    // ===== 6. 更新标志位：bit0(电机) + bit2(时间) =====
     setUpdateFlag((1 << 0) | (1 << 2));
 
     qDebug() << "电机控制参数已发送";
@@ -309,16 +424,49 @@ void TabSTM32::on_pushButton_find_optimal_clicked()
         QMessageBox::warning(mw, "错误", "Modbus 未连接");
         return;
     }
-    // ===== 1. 写寻优参数 =====
+    // ===== 1. 生成新的寻优文件名 =====
+    time_t now = time(nullptr);
+    tm *lt = localtime(&now);
+    DateTime_t dt;
+    dt.year = lt->tm_year + 1900;
+    dt.month = lt->tm_mon + 1;
+    dt.day = lt->tm_mday;
+    dt.hour = lt->tm_hour;
+    dt.minute = lt->tm_min;
+    dt.week_day = lt->tm_wday;
+
+    currentOptResultFile = generate_file_name("optimal_result.csv", &dt);
+    currentChannelFile = generate_file_name("channel_info.csv", &dt);
+    isOptimizationRecording = true;  // 开始记录寻优结果
+    isChannelRecording = true;       // 开始记录通道信息
+    channelInfoIndex = 0;            // 重置索引
+
+
+    // ===== 2. 创建文件并写入表头 =====
+    std::ofstream optFile(currentOptResultFile, std::ios::out);
+    if (optFile.is_open()) {
+        optFile << "X,Y,P,V1,V2,V3,V4\n";
+        optFile.close();
+        qDebug() << "开始记录寻优结果到文件：" << QString::fromStdString(currentOptResultFile);
+    }
+
+    std::ofstream channelFile(currentChannelFile, std::ios::out);
+    if (channelFile.is_open()) {
+        channelFile << "Index,Voltage,Power,Channel\n";
+        channelFile.close();
+        qDebug() << "开始记录通道信息到文件：" << QString::fromStdString(currentChannelFile);
+    }
+
+    // ===== 3. 写寻优参数 =====
     writeFindOptRegisters();
 
-    // ===== 2. 打开寻优控制线圈 =====
+    // ===== 4. 打开寻优控制线圈 =====
     modbus_write_bit(mw->stm32_mb_ctx, 0x0001, 1);
 
-    // ===== 3. 写时间 =====
+    // ===== 5. 写时间 =====
     writeTimeRegisters();
 
-    // ===== 4. 更新标志位：bit1(寻优) + bit2(时间) =====
+    // ===== 6. 更新标志位：bit1(寻优) + bit2(时间) =====
     setUpdateFlag((1 << 1) | (1 << 2));
 
     qDebug() << "寻优控制参数已发送";
@@ -395,6 +543,7 @@ void TabStm32::onStm32MonitorTimeout()
     if (!mw || !mw->stm32_mb_ctx)
         return;
 
+
     uint16_t regs[20] = {0};
 
     // 从 0x0001 连续读 0x0013
@@ -448,6 +597,153 @@ void TabStm32::onStm32MonitorTimeout()
                           .arg(modbus_get_float_abcd(&regs[9])).arg(modbus_get_float_abcd(&regs[10]))
                           .arg(modbus_get_float_abcd(&regs[11])).arg(modbus_get_float_abcd(&regs[12]));
     qDebug()<<message;
+    // 填充电机数据结构
+    motorData.motorX = motor_x;
+    motorData.motorY = motor_y;
+    motorData.motorSpeed = speed;
+  // 填充优化结果数据结构
+    optResData.optimalx = opt_x;
+    optResData.optimaly = opt_y;
+    optResData.optimalPower = opt_pwr;
+    optResData.optimalVs[0] = modbus_get_float_abcd(&regs[9]);
+    optResData.optimalVs[1] = modbus_get_float_abcd(&regs[10]);
+    optResData.optimalVs[2] = modbus_get_float_abcd(&regs[11]);
+    optResData.optimalVs[3] = modbus_get_float_abcd(&regs[12]);
+    // 填充通道数据结构
+    currentVPCh.currentChannel = channel;
+    currentVPCh.currentV = voltage;
+    currentVPCh.currentP = power;
+
+
+    // 保存读取的数据到文件（只追加，不创建新文件）
+    if (isMotorRecording) {
+        write_motor_data_to_csv(currentMotorFile, &motorData);
+    }
+
+    if (isOptimizationRecording) {
+        write_opt_res_to_csv(currentOptResultFile, &optResData);
+    }
+
+    if (isChannelRecording) {
+        write_cur_channel_info_to_csv(currentChannelFile, &currentVPCh);
+    }
 }
 
+/**
+ * @brief 将电机数据追加写入CSV文件（不写表头，只追加数据）
+ * @param filename CSV文件名（含路径）
+ * @param motorData 电机数据结构体指针
+ * @return true 写入成功 \ false 写入失败
+ */
+bool TabSTM32::write_motor_data_to_csv(const std::string& filename, const MotorData_t * motorData)
+{
+    // 打开文件，追加写入
+    std::ofstream file(filename, std::ios::app);
 
+    if (!file.is_open())
+        return false; // 文件打开失败
+
+    // 设置浮点数输出精度
+    file << std::fixed << std::setprecision(6);
+
+    // 写入数据
+    file << motorData->motorX << ","
+         << motorData->motorY << ","
+         << motorData->motorSpeed << "\n";
+
+    file.close();
+    return true;
+}
+
+/**
+ * @brief 将寻优结果数据追加写入CSV文件（不写表头，只追加数据）
+ * @param filename CSV文件名（含路径）
+ * @param optData 寻优结果数据结构体指针
+ * @return true 写入成功 \ false 写入失败
+ */
+bool TabSTM32::write_opt_res_to_csv(const std::string& filename, const OptResData_t * optData)
+{
+    std::ofstream file(filename, std::ios::app);
+
+    if (!file.is_open())
+        return false; // 文件打开失败
+
+    file << std::fixed << std::setprecision(6);
+
+    file << optData->optimalx << ","
+         << optData->optimaly << ","
+         << optData->optimalPower << ","
+         << optData->optimalVs[0] << ","
+         << optData->optimalVs[1] << ","
+         << optData->optimalVs[2] << ","
+         << optData->optimalVs[3] << "\n";
+
+    file.close();
+    return true;
+}
+
+/**
+ * @brief 将通道信息数据追加写入CSV文件（不写表头，只追加数据）
+ * @param filename CSV文件名（含路径）
+ * @param channelData 通道信息数据结构体指针
+ * @return true 写入成功 \ false 写入失败
+ */
+bool TabSTM32::write_cur_channel_info_to_csv(const std::string& filename, const CurrentVPCh_t * channelData)
+{
+    std::ofstream file(filename, std::ios::app);
+
+    if (!file.is_open())
+        return false; // 文件打开失败
+
+    file << std::fixed << std::setprecision(6);
+
+    file << channelInfoIndex << ","
+         << channelData->currentV << ","
+         << channelData->currentP << ","
+         << static_cast<int>(channelData->currentChannel) << "\n";
+
+    file.close();
+    channelInfoIndex++;  // 递增索引
+    return true;
+}
+/**
+ * @brief 根据时间戳和文件后缀生成唯一的文件名
+ * @param fileSuffix 文件后缀（如："motor_data.csv"）
+ * @param datetime 时间结构体指针，包含年月日时分和星期信息
+ * @return string 生成的文件名，格式："YYYYMMDD_HHMM_Weekday_filesuffix"
+ */
+std::string TabSTM32::generate_file_name(const std::string& fileSuffix, const DateTime_t* datetime)
+{
+    if (!datetime)
+        return "default_" + fileSuffix;
+
+    const char* weekDays[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+
+    std::ostringstream filename;
+
+    filename << std::setw(4) << std::setfill('0') << datetime->year
+             << std::setw(2) << std::setfill('0') << static_cast<int>(datetime->month)
+             << std::setw(2) << std::setfill('0') << static_cast<int>(datetime->day)
+             << "_"
+             << std::setw(2) << std::setfill('0') << static_cast<int>(datetime->hour)
+             << std::setw(2) << std::setfill('0') << static_cast<int>(datetime->minute)
+             << "_"
+             << weekDays[datetime->week_day % 7];
+
+    filename << "_" << fileSuffix;
+
+    return filename.str();
+}
+
+// void TabSTM32::stopMotorRecording()
+// {
+//     isMotorRecording = false;
+//     qDebug() << "停止记录电机数据";
+// }
+
+// void TabSTM32::stopOptimizationRecording()
+// {
+//     isOptimizationRecording = false;
+//     isChannelRecording = false;
+//     qDebug() << "停止记录寻优数据和通道信息";
+// }
