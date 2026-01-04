@@ -16,7 +16,7 @@
 
 
 class MainWindow;
-class CommandTransmitter;
+//class CommandTransmitter;
 
 class TabSTM32 : public QObject
 {

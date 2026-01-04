@@ -40,25 +40,25 @@ private:
   
     // 主通信服务端
     //CommandTransmitter *commandTransmitter;
-
-    // 转台控制器（仍然在 MainWindow 中管理）
-    TurntableController *turntable_controller;
-
-    // 全局 PID（各 Tab 可访问）
-    PIDController *pid_x;
-    PIDController *pid_y;
     QTimer *turntableMonitorTimer;
     QTimer *closedLoopTimer_x;
     QTimer *closedLoopTimer_y;
-
     //stm32数据监控定时器
     QTimer *stm32MonitorTimer;
+    // 转台控制器（仍然在 MainWindow 中管理）
+    TurntableController *turntable_controller;
      // 四个 Tab 页面对象
     TabDeviceConnect *tabDeviceConnect;
     TabSTM32 *tabSTM32;
     TabTurntableControl *tabTurntableControl;
     TabFileRead *tabFileRead;
-    
+
+    // 全局 PID（各 Tab 可访问）
+    PIDController *pid_x;
+    PIDController *pid_y;
+
+
+ 
 private:
     void setupUI();
     void applyModernStyle();

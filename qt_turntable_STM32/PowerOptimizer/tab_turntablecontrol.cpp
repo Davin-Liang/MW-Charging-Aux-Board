@@ -69,7 +69,11 @@ void TabTurntableControl::setupConnections()
     mw->ui->combo_ref_mode->addItem("X轨迹 / Y轨迹");
     mw->ui->combo_ref_mode->addItem("X点位 / Y轨迹");
     mw->ui->combo_ref_mode->addItem("X轨迹 / Y点位");
-
+    //设置只读
+    mw->ui->line_edit_monitor_x_pos->setReadOnly(true);
+    mw->ui->line_edit_monitor_y_pos->setReadOnly(true);
+    mw->ui->line_edit_monitor_x_speed->setReadOnly(true);
+    mw->ui->line_edit_monitor_y_speed->setReadOnly(true);
     //连接参考轨迹源
     connect(mw->ui->combo_ref_mode, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this,&TabTurntableControl::on_ref_mode_changed,Qt::UniqueConnection);
@@ -172,8 +176,6 @@ void TabTurntableControl::update_turntable_image()
 void TabTurntableControl::initializeTurntablePositionXChart()
 {
     chartX = new QChart();
-    chartX->setTitle("X轴（Yaw）位置跟踪");
-
     seriesX_current = new QLineSeries();
     seriesX_target  = new QLineSeries();
 
@@ -213,7 +215,6 @@ void TabTurntableControl::initializeTurntablePositionXChart()
 void TabTurntableControl::initializeTurntablePositionYChart()
 {
     chartY = new QChart();
-    chartY->setTitle("Y轴（Pitch）位置跟踪");
 
     seriesY_current = new QLineSeries();
     seriesY_target  = new QLineSeries();

@@ -12,9 +12,9 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
-   // , commandTransmitter(nullptr)
     , turntable_controller(nullptr)
     ,turntableMonitorTimer(new QTimer(this))
+    ,stm32MonitorTimer(new QTimer(this))
     ,closedLoopTimer_x(new QTimer(this))
     ,closedLoopTimer_y(new QTimer(this))
     ,pid_x(nullptr)
@@ -142,7 +142,6 @@ MainWindow::~MainWindow()
     //if (commandTransmitter != nullptr) {
     //    commandTransmitter->stop_server();
     //}
-
 
     // PID 控制器资源释放
     delete pid_x;

@@ -20,22 +20,30 @@ using json = nlohmann::json;
 
 TabSTM32::TabSTM32(MainWindow *mw_)
     : QObject(mw_), mw(mw_)
+    ,isMotorRecording(false)
+    ,isOptimizationRecording(false)
+    ,isChannelRecording(false)
+    ,channelInfoIndex(0)
+    ,motorChart(nullptr)
+    ,motorTrajectorySeries(nullptr)
+    ,currentPositionSeries(nullptr)
+    ,axisX(nullptr)
+    ,axisY(nullptr)
+    ,chartView(nullptr)
 {
     stm32_MonitorTimer = mw->stm32MonitorTimer;
-
-    // 初始化记录状态
-    isMotorRecording = false;
-    isOptimizationRecording = false;
-    isChannelRecording = false;
-    channelInfoIndex = 0;
 
 }
 
 TabSTM32::~TabSTM32()
 {
     // 主图表视图资源显式释放（其父对象未托管）
-    delete chartView;
-    chartView = nullptr;
+    // 添加空指针检查
+    if (chartView) {
+        delete chartView;
+        chartView = nullptr;
+    }
+    
 }
 
 void TabSTM32::setupConnections()
