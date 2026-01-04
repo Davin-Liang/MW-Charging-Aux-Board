@@ -4,8 +4,8 @@
 #include <QMainWindow>
 #include <QTcpSocket>
 #include <QTimer>
-
-#include "command_transmitter.h"
+#include <modbus/modbus.h>
+//#include "command_transmitter.h"
 #include "turntable_controller.h"
 #include "PID_Controller.h"
 
@@ -35,10 +35,11 @@ public:
 private:
     Ui::MainWindow *ui;
     QTcpSocket *tcpSocket;                     // TCP套接字（保留用于兼容性）
-
+    // ===== STM32 Modbus TCP =====
+    modbus_t *stm32_mb_ctx = nullptr;
   
     // 主通信服务端
-    CommandTransmitter *commandTransmitter;
+    //CommandTransmitter *commandTransmitter;
 
     // 转台控制器（仍然在 MainWindow 中管理）
     TurntableController *turntable_controller;
@@ -50,7 +51,8 @@ private:
     QTimer *closedLoopTimer_x;
     QTimer *closedLoopTimer_y;
 
-
+    //stm32数据监控定时器
+    QTimer *stm32MonitorTimer;
      // 四个 Tab 页面对象
     TabDeviceConnect *tabDeviceConnect;
     TabSTM32 *tabSTM32;

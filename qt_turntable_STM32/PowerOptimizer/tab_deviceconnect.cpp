@@ -2,7 +2,7 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include "turntable_controller.h"
-#include "command_transmitter.h" 
+//#include "command_transmitter.h"
 #include <QMessageBox>
 #include <QNetworkProxy>
 #include <QNetworkProxyFactory>
@@ -14,7 +14,7 @@ TabDeviceConnect::TabDeviceConnect(MainWindow *mw_)
     : QObject(mw_), mw(mw_)
 {
     // 从 MainWindow 提取控制对象，使本类实现真正的模块化
-    transmitter = mw->commandTransmitter;
+    //transmitter = mw->commandTransmitter;
     MonitorTimer = mw->turntableMonitorTimer;
 
 }
@@ -74,59 +74,76 @@ void TabDeviceConnect::setupConnections()
  */
 void TabDeviceConnect::on_pushButton_connect_clicked()
 {
-     if (!mw || !mw->ui) return;
+    if (!mw || !mw->ui) return;
     // 获取用户输入的IP地址和端口
-    QString ipText = mw->ui->lineEdit_local_ip->text().trimmed();
-    QString portText = mw->ui->lineEdit_local_port->text().trimmed();
+    QString ip = mw->ui->lineEdit_local_ip->text().trimmed();
+    // QString portText = mw->ui->lineEdit_local_port->text().trimmed();
+    const quint16 port = 8080;
 
     // 验证输入
-    if (ipText.isEmpty()) {
+    if (ip.isEmpty()) {
         QMessageBox::warning(mw, "输入错误", "请输入服务器IP地址");
         return;
     }
 
-    const quint16 serverPort = portText.toUShort();
-    if (serverPort == 0) {
-        QMessageBox::warning(mw, "输入错误", "请输入正确的服务器端口");
-        return;
-    }
+    // const quint16 serverPort = portText.toUShort();
+    // if (serverPort == 0) {
+    //     QMessageBox::warning(mw, "输入错误", "请输入正确的服务器端口");
+    //     return;
+    // }
 
-    const QHostAddress serverAddress(ipText);
+    const QHostAddress serverAddress(ip);
     if (serverAddress.isNull()) {
         QMessageBox::warning(mw, "输入错误", "请输入正确的IP地址格式");
         return;
     }
 
-    qDebug() << "尝试启动服务器，IP:" << ipText << "端口:" << serverPort;
+    qDebug() << "尝试启动服务器，IP:" << ip << "端口:" << port;
 
-    // 启动服务器：使用 MainWindow 中的 transmitter（必须已经在 MainWindow 中创建）
-    if (!transmitter) {
-        QMessageBox::critical(mw, "错误", "CommandTransmitter 未初始化！");
+    // 已存在则先断开
+    if (mw->stm32_mb_ctx) {
+        modbus_close(mw->stm32_mb_ctx);
+        modbus_free(mw->stm32_mb_ctx);
+        mw->stm32_mb_ctx = nullptr;
+    }
+    //  创建 Modbus TCP Client
+    mw->stm32_mb_ctx = modbus_new_tcp(ip.toStdString().c_str(), port);
+    if (!mw->stm32_mb_ctx) {
+        QMessageBox::critical(mw, "错误", "modbus_new_tcp 失败");
+        return;
+    }
+    //  连接 STM32（Server）
+    if (modbus_connect(mw->stm32_mb_ctx) == -1) {
+        QMessageBox::critical(
+            mw,
+            "连接失败",
+            QString("Modbus 连接失败: %1")
+                .arg(modbus_strerror(errno))
+            );
+        modbus_free(mw->stm32_mb_ctx);
+        mw->stm32_mb_ctx = nullptr;
+        updateConnectionStatus(false);
         return;
     }
 
-    // 启动服务器
-    if (transmitter->start_server(serverPort, serverAddress)) {
-        isSTM32ServerRunning = true;
-        updateConnectionStatus(true);
-        
-    } else {
-        isSTM32ServerRunning = false;
-        updateConnectionStatus(false);
-        QMessageBox::critical(mw, "错误", "无法启动服务器");
-        qDebug() << "服务器启动失败";
-    }
+    qDebug() << "STM32 Modbus TCP 已连接";
+    isSTM32Connected = true;
+    updateConnectionStatus(true);
+
 }
 /**
  * @brief “断开连接”按钮点击事件。
  */
 void TabDeviceConnect::on_pushButton_disconnect_clicked()
 {
-    if (transmitter) {
-        transmitter->stop_server();
-        isSTM32ServerRunning = false;
+    if (mw->stm32_mb_ctx) {
+        modbus_close(mw->stm32_mb_ctx);
+        modbus_free(mw->stm32_mb_ctx);
+        mw->stm32_mb_ctx = nullptr;
     }
 
+    isSTM32Connected = false;
+    qDebug() << "STM32 Modbus TCP 已断开";
     updateConnectionStatus(false);
     qDebug() << "服务器已停止";
 }
@@ -148,36 +165,7 @@ void TabDeviceConnect::updateConnectionStatus(bool connected)
         mw->ui->label_status->setStyleSheet("color: red;");
     }
 }
-/**
- * @brief TCP Socket 错误处理回调
- * @param error 套接字错误类型（QAbstractSocket::SocketError）
- *
- * 根据 Qt 提供的错误类型，生成对应的错误提示并弹出提示框，
- * 同时更新连接状态为断开状态。
- */
-void TabDeviceConnect::onSocketError(QAbstractSocket::SocketError error)
-{
-    QString errorMsg;
-    switch (error) {
-    case QAbstractSocket::ConnectionRefusedError:
-        errorMsg = "连接被拒绝";
-        break;
-    case QAbstractSocket::RemoteHostClosedError:
-        errorMsg = "远程主机关闭连接";
-        break;
-    case QAbstractSocket::HostNotFoundError:
-        errorMsg = "找不到主机";
-        break;
-    case QAbstractSocket::SocketTimeoutError:
-        errorMsg = "连接超时";
-        break;
-    default:
-        errorMsg = "连接错误";
-    }
 
-    QMessageBox::critical(mw, "连接错误", errorMsg);
-    updateConnectionStatus(false);
-}
 /****************************************************
  *                转台连接
  ****************************************************/

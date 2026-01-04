@@ -7,7 +7,7 @@
 #include <QTimer>
 class MainWindow;
 class TurntableController;
-class CommandTransmitter;
+//class CommandTransmitter;
 
 /**
  * @brief 负责“设备连接”Tab 页面的逻辑控制类。
@@ -43,7 +43,7 @@ private slots:
     void on_pushButton_connect_clicked();
     void on_pushButton_disconnect_clicked();
     // socket 错误回调（可连接到 CommandTransmitter 的 error 信号）
-    void onSocketError(QAbstractSocket::SocketError error);
+    //void onSocketError(QAbstractSocket::SocketError error);
 
     // —— 转台连接 —— //
     void on_pushButton_connection_clicked();
@@ -57,7 +57,7 @@ private:
     MainWindow *mw;  // 非拥有：指向主窗口（用于访问 ui 与全局对象）
 
     // —— 外部核心对象（由 MainWindow 创建和销毁） —— //
-    CommandTransmitter *transmitter; // 缓存指针（不拥有），等于 mw->commandTransmitter
+   // CommandTransmitter *transmitter; // 缓存指针（不拥有），等于 mw->commandTransmitter
     QTimer *MonitorTimer;  // 监控转台数据的定时器
 
     // —— 本类内部状态 —— //

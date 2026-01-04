@@ -12,7 +12,7 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
-    , commandTransmitter(nullptr)
+   // , commandTransmitter(nullptr)
     , turntable_controller(nullptr)
     ,turntableMonitorTimer(new QTimer(this))
     ,closedLoopTimer_x(new QTimer(this))
@@ -26,8 +26,9 @@ MainWindow::MainWindow(QWidget *parent)
     //初始化界面设置
     setupUI();
     // 创建核心通信对象（服务器）
-    commandTransmitter = new CommandTransmitter(this);
-
+    //commandTransmitter = new CommandTransmitter(this);
+    // 这里只初始化为空，不连接
+    stm32_mb_ctx = nullptr;
     // 创建并初始化四个 Tab 页面模块
     tabDeviceConnect     = new TabDeviceConnect(this);
     tabDeviceConnect->setupConnections();
@@ -139,9 +140,9 @@ void MainWindow::applyModernStyle()
  */
 MainWindow::~MainWindow()
 {
-    if (commandTransmitter != nullptr) {
-        commandTransmitter->stop_server();
-    }
+    //if (commandTransmitter != nullptr) {
+    //    commandTransmitter->stop_server();
+    //}
 
 
     // PID 控制器资源释放
