@@ -64,7 +64,6 @@ SOURCES       = PID_Controller.cpp \
 		main.cpp \
 		mainwindow.cpp build/.rcc/qrc_qmake_qmake_qm_files.cpp \
 		build/.moc/moc_TrajectoryJsonDialog.cpp \
-		build/.moc/moc_command_transmitter.cpp \
 		build/.moc/moc_tab_file_read.cpp \
 		build/.moc/moc_tab_stm32.cpp \
 		build/.moc/moc_tab_turntablecontrol.cpp \
@@ -84,7 +83,6 @@ OBJECTS       = build/.obj/PID_Controller.o \
 		build/.obj/mainwindow.o \
 		build/.obj/qrc_qmake_qmake_qm_files.o \
 		build/.obj/moc_TrajectoryJsonDialog.o \
-		build/.obj/moc_command_transmitter.o \
 		build/.obj/moc_tab_file_read.o \
 		build/.obj/moc_tab_stm32.o \
 		build/.obj/moc_tab_turntablecontrol.o \
@@ -478,19 +476,13 @@ compiler_moc_predefs_clean:
 build/.moc/moc_predefs.h: /usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 	g++ -pipe -O2 -std=gnu++1z -Wall -Wextra -dM -E -o build/.moc/moc_predefs.h /usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 
-compiler_moc_header_make_all: build/.moc/moc_TrajectoryJsonDialog.cpp build/.moc/moc_command_transmitter.cpp build/.moc/moc_tab_file_read.cpp build/.moc/moc_tab_stm32.cpp build/.moc/moc_tab_turntablecontrol.cpp build/.moc/moc_tab_deviceconnect.cpp build/.moc/moc_logindialog.cpp build/.moc/moc_mainwindow.cpp
+compiler_moc_header_make_all: build/.moc/moc_TrajectoryJsonDialog.cpp build/.moc/moc_tab_file_read.cpp build/.moc/moc_tab_stm32.cpp build/.moc/moc_tab_turntablecontrol.cpp build/.moc/moc_tab_deviceconnect.cpp build/.moc/moc_logindialog.cpp build/.moc/moc_mainwindow.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) build/.moc/moc_TrajectoryJsonDialog.cpp build/.moc/moc_command_transmitter.cpp build/.moc/moc_tab_file_read.cpp build/.moc/moc_tab_stm32.cpp build/.moc/moc_tab_turntablecontrol.cpp build/.moc/moc_tab_deviceconnect.cpp build/.moc/moc_logindialog.cpp build/.moc/moc_mainwindow.cpp
+	-$(DEL_FILE) build/.moc/moc_TrajectoryJsonDialog.cpp build/.moc/moc_tab_file_read.cpp build/.moc/moc_tab_stm32.cpp build/.moc/moc_tab_turntablecontrol.cpp build/.moc/moc_tab_deviceconnect.cpp build/.moc/moc_logindialog.cpp build/.moc/moc_mainwindow.cpp
 build/.moc/moc_TrajectoryJsonDialog.cpp: TrajectoryJsonDialog.h \
 		build/.moc/moc_predefs.h \
 		/usr/lib/qt5/bin/moc
 	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/build/.moc/moc_predefs.h -I/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/thirdparty -I/usr/include/modbus -I/usr/include/aarch64-linux-gnu/qt5 -I/usr/include/aarch64-linux-gnu/qt5/QtCharts -I/usr/include/aarch64-linux-gnu/qt5/QtWidgets -I/usr/include/aarch64-linux-gnu/qt5/QtGui -I/usr/include/aarch64-linux-gnu/qt5/QtNetwork -I/usr/include/aarch64-linux-gnu/qt5/QtCore -I/usr/include/c++/11 -I/usr/include/aarch64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/aarch64-linux-gnu/11/include -I/usr/local/include -I/usr/include/aarch64-linux-gnu -I/usr/include TrajectoryJsonDialog.h -o build/.moc/moc_TrajectoryJsonDialog.cpp
-
-build/.moc/moc_command_transmitter.cpp: command_transmitter.h \
-		command_struct.h \
-		build/.moc/moc_predefs.h \
-		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/build/.moc/moc_predefs.h -I/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/thirdparty -I/usr/include/modbus -I/usr/include/aarch64-linux-gnu/qt5 -I/usr/include/aarch64-linux-gnu/qt5/QtCharts -I/usr/include/aarch64-linux-gnu/qt5/QtWidgets -I/usr/include/aarch64-linux-gnu/qt5/QtGui -I/usr/include/aarch64-linux-gnu/qt5/QtNetwork -I/usr/include/aarch64-linux-gnu/qt5/QtCore -I/usr/include/c++/11 -I/usr/include/aarch64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/aarch64-linux-gnu/11/include -I/usr/local/include -I/usr/include/aarch64-linux-gnu -I/usr/include command_transmitter.h -o build/.moc/moc_command_transmitter.cpp
 
 build/.moc/moc_tab_file_read.cpp: tab_file_read.h \
 		build/.moc/moc_predefs.h \
@@ -558,54 +550,7 @@ build/.obj/PID_Controller.o: PID_Controller.cpp PID_Controller.h \
 build/.obj/TrajectoryJsonDialog.o: TrajectoryJsonDialog.cpp TrajectoryJsonDialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/TrajectoryJsonDialog.o TrajectoryJsonDialog.cpp
 
-build/.obj/command_transmitter.o: command_transmitter.cpp command_struct.h \
-		command_transmitter.h \
-		thirdparty/nlohmann/json.hpp \
-		thirdparty/nlohmann/adl_serializer.hpp \
-		thirdparty/nlohmann/detail/abi_macros.hpp \
-		thirdparty/nlohmann/detail/conversions/from_json.hpp \
-		thirdparty/nlohmann/detail/exceptions.hpp \
-		thirdparty/nlohmann/detail/value_t.hpp \
-		thirdparty/nlohmann/detail/macro_scope.hpp \
-		thirdparty/nlohmann/detail/meta/detected.hpp \
-		thirdparty/nlohmann/detail/meta/void_t.hpp \
-		thirdparty/nlohmann/thirdparty/hedley/hedley.hpp \
-		thirdparty/nlohmann/detail/string_escape.hpp \
-		thirdparty/nlohmann/detail/input/position_t.hpp \
-		thirdparty/nlohmann/detail/meta/cpp_future.hpp \
-		thirdparty/nlohmann/detail/meta/type_traits.hpp \
-		thirdparty/nlohmann/detail/iterators/iterator_traits.hpp \
-		thirdparty/nlohmann/detail/meta/call_std/begin.hpp \
-		thirdparty/nlohmann/detail/meta/call_std/end.hpp \
-		thirdparty/nlohmann/json_fwd.hpp \
-		thirdparty/nlohmann/detail/string_concat.hpp \
-		thirdparty/nlohmann/detail/meta/identity_tag.hpp \
-		thirdparty/nlohmann/detail/meta/std_fs.hpp \
-		thirdparty/nlohmann/detail/conversions/to_json.hpp \
-		thirdparty/nlohmann/detail/iterators/iteration_proxy.hpp \
-		thirdparty/nlohmann/detail/string_utils.hpp \
-		thirdparty/nlohmann/byte_container_with_subtype.hpp \
-		thirdparty/nlohmann/detail/hash.hpp \
-		thirdparty/nlohmann/detail/input/binary_reader.hpp \
-		thirdparty/nlohmann/detail/input/input_adapters.hpp \
-		thirdparty/nlohmann/detail/input/json_sax.hpp \
-		thirdparty/nlohmann/detail/input/lexer.hpp \
-		thirdparty/nlohmann/detail/meta/is_sax.hpp \
-		thirdparty/nlohmann/detail/input/parser.hpp \
-		thirdparty/nlohmann/detail/iterators/internal_iterator.hpp \
-		thirdparty/nlohmann/detail/iterators/primitive_iterator.hpp \
-		thirdparty/nlohmann/detail/iterators/iter_impl.hpp \
-		thirdparty/nlohmann/detail/iterators/json_reverse_iterator.hpp \
-		thirdparty/nlohmann/detail/json_custom_base_class.hpp \
-		thirdparty/nlohmann/detail/json_pointer.hpp \
-		thirdparty/nlohmann/detail/json_ref.hpp \
-		thirdparty/nlohmann/detail/output/binary_writer.hpp \
-		thirdparty/nlohmann/detail/output/output_adapters.hpp \
-		thirdparty/nlohmann/detail/output/serializer.hpp \
-		thirdparty/nlohmann/detail/conversions/to_chars.hpp \
-		thirdparty/nlohmann/ordered_map.hpp \
-		thirdparty/nlohmann/detail/macro_unscope.hpp \
-		thirdparty/nlohmann/thirdparty/hedley/hedley_undef.hpp
+build/.obj/command_transmitter.o: command_transmitter.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/command_transmitter.o command_transmitter.cpp
 
 build/.obj/tab_file_read.o: tab_file_read.cpp tab_file_read.h \
@@ -733,9 +678,6 @@ build/.obj/qrc_qmake_qmake_qm_files.o: build/.rcc/qrc_qmake_qmake_qm_files.cpp
 
 build/.obj/moc_TrajectoryJsonDialog.o: build/.moc/moc_TrajectoryJsonDialog.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/moc_TrajectoryJsonDialog.o build/.moc/moc_TrajectoryJsonDialog.cpp
-
-build/.obj/moc_command_transmitter.o: build/.moc/moc_command_transmitter.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/moc_command_transmitter.o build/.moc/moc_command_transmitter.cpp
 
 build/.obj/moc_tab_file_read.o: build/.moc/moc_tab_file_read.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/moc_tab_file_read.o build/.moc/moc_tab_file_read.cpp

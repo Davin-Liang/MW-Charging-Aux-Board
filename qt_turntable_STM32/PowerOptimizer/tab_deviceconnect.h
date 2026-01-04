@@ -6,7 +6,7 @@
 #include <QAbstractSocket>
 #include <QTimer>
 class MainWindow;
-class TurntableController;
+//class TurntableController;
 //class CommandTransmitter;
 
 /**
@@ -62,7 +62,7 @@ private:
 
     // —— 本类内部状态 —— //
     bool isTurntableConnected = false;
-    bool isSTM32ServerRunning = false;
+    bool isSTM32Connected = false;
 
 private:
     // —— UI 更新 —— //

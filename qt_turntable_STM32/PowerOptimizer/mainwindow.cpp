@@ -19,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent)
     ,closedLoopTimer_y(new QTimer(this))
     ,pid_x(nullptr)
     ,pid_y(nullptr)
+    ,stm32_mb_ctx(nullptr)
 
 {
     ui->setupUi(this);
@@ -27,19 +28,17 @@ MainWindow::MainWindow(QWidget *parent)
     setupUI();
     // 创建核心通信对象（服务器）
     //commandTransmitter = new CommandTransmitter(this);
-    // 这里只初始化为空，不连接
-    stm32_mb_ctx = nullptr;
     // 创建并初始化四个 Tab 页面模块
     tabDeviceConnect     = new TabDeviceConnect(this);
     tabDeviceConnect->setupConnections();
 
+    tabTurntableControl  = new TabTurntableControl(this);
+    tabTurntableControl->setupConnections();
     
     tabSTM32             = new TabSTM32(this);
     tabSTM32->setupConnections();
 
-    tabTurntableControl  = new TabTurntableControl(this);
-    tabTurntableControl->setupConnections();
-
+   
     tabFileRead          = new TabFileRead(this);
     tabFileRead->setupConnections();
     //解决最大化按钮存在的情况或者直接使用 this->show()这行代码
