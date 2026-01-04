@@ -1,0 +1,28 @@
+/{
+	&i2c1 {
+		status = "okay"; // 启用硬件i2c1
+
+		myft5x06 : my-ft5x06@38 {
+			compatible = "my-ft5x06";
+			reg = <0x38>; // 从设备地址
+			reset-gpio = <&gpio0 RK_PB6 GPIO_ACTIVE_LOW>;
+			interrupt-parent = <&gpio3>;
+			interrupt-gpio = <&gpio3 RK_PA5 GPIO_ACTIVE_LOW>;
+			interrupts = <RK_PA5 IRQ_TYPE_LEVEL_LOW>; // GPIO3的PA5引脚低电平触发
+			pinctrl-names = "default";
+			pinctrl-0 = "&myft5x06_pins";
+			touchscreen-size-x = <800>;
+			touchscreen-size-y = <1280>;
+		};
+	};
+
+	&pinctrl {
+		myft5x06 { // 功能
+			myft5x06_pins: myft5x06-pins { // 引脚组
+				rockchip,pins =
+					<0 RK_PB6 RK_FUNC_GPIO &pcfg_pull_none>,
+					<0 RK_PB6 RK_FUNC_GPIO &pcfg_pull_none>;
+	};
+};
+
+
