@@ -25,14 +25,69 @@ static const struct v4l2_file_operations vvd_fops = {
 	.unlocked_ioctl           = video_ioctl2,
 };
 
+/* 查询能力IOCTL */
+static int vvd_querycap(struct file *file, void *fh,
+		struct v4l2_capability *cap)
+{
+	strlcpy(cap->driver, "L1ang_virtual_video", sizeof(cap->driver));
+	strlcpy(cap->card, "no-card", sizeof(cap->card));
+	cap->device_caps = V4L2_CAP_VIDEO_CAPTURE | V4L2_CAP_STREAMING | V4L2_CAP_READWRITE;
+	cap->capabilities = cap->device_caps | V4L2_CAP_DEVICE_CAPS;
+
+	return 0;
+}
+
+/* 枚举格式IOCTL */
+static int vvd_enum_fmt_vid_cap(struct file *file, void *priv,
+struct v4l2_fmtdesc *f)
+{
+	if (f->index > 0)
+		return -EINVAL;
+
+	strlcpy(f->description, "Motion JPEG", sizeof(f->description));
+	f->pixelformat = V4L2_PIX_FMT_MJPEG;
+
+	return 0;
+}
+
+/* 设置参数IOCTL */
+static int vvd_s_fmt_vid_cap(struct file *file, void *priv,
+		struct v4l2_format *f)
+{
+	/*
+	 * 分辩用户传入的参数是否可用
+	 * 如果不可用，给APP传入最接近的、硬件支持的参数
+     */
+	if (f->type != V4L2_BUF_TYPE_VIDEO_CAPTURE)
+		return -EINVAL;
+	if (f->fmt.pix.pixelformat != V4L2_PIX_FMT_MJPEG)
+		return -EINVAL;
+    f.fmt.pix.width = 800;
+    f.fmt.pix.height = 600;
+
+	return 0;
+}
+
+/* 枚举设备支持的格式对应的帧大小IOCTL */
+static int vvd_enum_framesizes(struct file *file, void *fh,
+				   struct v4l2_frmsizeenum *fsize)
+{
+	if (fsize->index > 0)
+		return -EINVAL;
+
+	fsize->type = V4L2_FRMSIZE_TYPE_DISCRETE;
+	fsize->discrete.width = 800;
+	fsize->discrete.height = 600;
+	return 0;
+}
+
 /* 这个结构体中的大部分函数也是内核已经提供好了的 */
 static const struct v4l2_ioctl_ops vvd_ops = {
-	.vidioc_querycap          = airspy_querycap,
+	.vidioc_querycap          = vvd_querycap,
 
-	.vidioc_enum_fmt_sdr_cap  = airspy_enum_fmt_sdr_cap,
-	.vidioc_g_fmt_sdr_cap     = airspy_g_fmt_sdr_cap,
-	.vidioc_s_fmt_sdr_cap     = airspy_s_fmt_sdr_cap,
-	.vidioc_try_fmt_sdr_cap   = airspy_try_fmt_sdr_cap,
+	.vidioc_enum_fmt_vid_cap  = vvd_enum_fmt_vid_cap,
+	.vidioc_s_fmt_vid_cap     = vvd_s_fmt_vid_cap,
+	.vidioc_enum_framesizes	  = vvd_enum_framesizes,
 
 	.vidioc_reqbufs           = vb2_ioctl_reqbufs,
 	.vidioc_create_bufs       = vb2_ioctl_create_bufs,
@@ -43,17 +98,6 @@ static const struct v4l2_ioctl_ops vvd_ops = {
 
 	.vidioc_streamon          = vb2_ioctl_streamon,
 	.vidioc_streamoff         = vb2_ioctl_streamoff,
-
-	.vidioc_g_tuner           = airspy_g_tuner,
-	.vidioc_s_tuner           = airspy_s_tuner,
-
-	.vidioc_g_frequency       = airspy_g_frequency,
-	.vidioc_s_frequency       = airspy_s_frequency,
-	.vidioc_enum_freq_bands   = airspy_enum_freq_bands,
-
-	.vidioc_subscribe_event   = v4l2_ctrl_subscribe_event,
-	.vidioc_unsubscribe_event = v4l2_event_unsubscribe,
-	.vidioc_log_status        = v4l2_ctrl_log_status,
 };
 
 /* 这个结构体中的大部分函数也是内核已经提供好了的 */
