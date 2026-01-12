@@ -32,7 +32,7 @@ TabSTM32::TabSTM32(MainWindow *mw_)
     ,chartView(nullptr)
 {
     stm32_MonitorTimer = mw->stm32MonitorTimer;
-
+     
 }
 
 TabSTM32::~TabSTM32()
@@ -67,6 +67,7 @@ void TabSTM32::setupConnections()
 
     connect(stm32_MonitorTimer, &QTimer::timeout,
             this, &TabSTM32::onStm32MonitorTimeout);
+    stm32_MonitorTimer->start(150); 
 
 }
 /**
@@ -417,14 +418,26 @@ void TabSTM32::on_pushButton_motor_control_clicked()
  */
 void TabSTM32::writeMotorRegisters()
 {
-    int16_t regs[3];
+    uint16_t regs[3];
 
-    regs[0] = static_cast<int16_t>(mw->ui->lineEdit_motor_x->text().toInt());
-    regs[1] = static_cast<int16_t>(mw->ui->lineEdit_motor_y->text().toInt());
-    regs[2] = static_cast<uint16_t>(mw->ui->lineEdit_motor_speed->text().toUInt());
+    int x = mw->ui->lineEdit_motor_x->text().toInt();
+    int y = mw->ui->lineEdit_motor_y->text().toInt();
+    uint16_t speed = mw->ui->lineEdit_motor_speed->text().toUInt();
 
-    modbus_write_registers(mw->stm32_mb_ctx,0x0001,3,reinterpret_cast<uint16_t*>(regs));
+    // 显式转换成 int16，再映射到 uint16
+    regs[0] = static_cast<uint16_t>(static_cast<int16_t>(x));
+    regs[1] = static_cast<uint16_t>(static_cast<int16_t>(y));
+    regs[2] = speed;
+
+    qDebug() << "X =" <<  regs[0]
+             << "Y =" << regs[1]
+             << "Speed =" << regs[2];
+
+
+
+    modbus_write_registers(mw->stm32_mb_ctx, 0x0001, 3, regs);
 }
+
 
 /**
  * @brief “寻优控制”按钮点击事件。根据用户选择的轨迹类型读取参数并发送寻优控制命令。
@@ -500,21 +513,31 @@ void TabSTM32::writeFindOptRegisters()
     modbus_write_register(mw->stm32_mb_ctx, 0x0006, static_cast<uint16_t>(mw->ui->lineEdit_square_step_2->text().toUInt()));
     modbus_write_register(mw->stm32_mb_ctx, 0x0007, static_cast<uint16_t>(mw->ui->lineEdit_square_step->text().toUInt()));
 
+    // ================= float 参数转换为大端序 =================
+    auto floatToBigEndianRegs = [](float value, uint16_t buf[2]){
+        uint32_t temp;
+        std::memcpy(&temp, &value, sizeof(float));  // 把 float 按位复制到 uint32_t
+        buf[0] = static_cast<uint16_t>((temp >> 16) & 0xFFFF); // 高 16 位 -> 寄存器 0
+        buf[1] = static_cast<uint16_t>(temp & 0xFFFF);         // 低 16 位 -> 寄存器 1
+    };
     // float 参数
     float v;
     uint16_t fbuf[2];
 
     v = mw->ui->lineEdit_max_voltage->text().toFloat();
-    modbus_set_float_abcd(v, fbuf);
+    floatToBigEndianRegs(v, fbuf);
     modbus_write_registers(mw->stm32_mb_ctx, 0x0008, 2, fbuf);
-
+    
     v = mw->ui->lineEdit_voltage_step->text().toFloat();
-    modbus_set_float_abcd(v, fbuf);
+    floatToBigEndianRegs(v, fbuf);
     modbus_write_registers(mw->stm32_mb_ctx, 0x000A, 2, fbuf);
-
+    
     v = mw->ui->lineEdit_initial_voltage->text().toFloat();
-    modbus_set_float_abcd(v, fbuf);
+    floatToBigEndianRegs(v, fbuf);
     modbus_write_registers(mw->stm32_mb_ctx, 0x000C, 2, fbuf);
+    
+
+
 }
 /**
  * @brief 获取时间并写入

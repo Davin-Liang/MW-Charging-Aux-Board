@@ -77,8 +77,9 @@ void TabDeviceConnect::on_pushButton_connect_clicked()
     if (!mw || !mw->ui) return;
     // 获取用户输入的IP地址和端口
     QString ip = mw->ui->lineEdit_local_ip->text().trimmed();
-    // QString portText = mw->ui->lineEdit_local_port->text().trimmed();
-    const quint16 port = 8080;
+    QString portText = mw->ui->lineEdit_local_port->text().trimmed();
+    int port = portText.toInt();
+    //const quint16 port = 8080;
 
     // 验证输入
     if (ip.isEmpty()) {
@@ -107,7 +108,8 @@ void TabDeviceConnect::on_pushButton_connect_clicked()
         mw->stm32_mb_ctx = nullptr;
     }
     //  创建 Modbus TCP Client
-    mw->stm32_mb_ctx = modbus_new_tcp(ip.toStdString().c_str(), port);
+    // mw->stm32_mb_ctx = modbus_new_tcp(ip.toStdString().c_str(), port);
+    mw->stm32_mb_ctx = modbus_new_tcp("192.168.1.30", 8080);
     if (!mw->stm32_mb_ctx) {
         QMessageBox::critical(mw, "错误", "modbus_new_tcp 失败");
         return;
