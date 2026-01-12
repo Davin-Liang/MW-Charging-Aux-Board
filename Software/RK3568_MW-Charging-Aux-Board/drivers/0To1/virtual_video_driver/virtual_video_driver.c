@@ -100,9 +100,24 @@ static const struct v4l2_ioctl_ops vvd_ops = {
 	.vidioc_streamoff         = vb2_ioctl_streamoff,
 };
 
+static int vvd_queue_setup(struct vb2_queue *vq,
+		unsigned int *nbuffers, unsigned int *nplanes, 
+		unsigned int sizes[], struct device *alloc_devs[])
+{
+	/* 假设：至少需要8个buffer，每个buffer只有1个plane */
+	if (vq->num_buffers + *nbuffers < 8)
+		*nbuffers = 8 - vq->num_buffers; // 如果当前申请的buffer加上当前已有buffer不够8个，就调整当前申请的buffer个数
+	*nplanes = 1; // 直接设定每个buffer只有1个plane
+	sizes[0] = PAGE_ALIGN(800 * 600 * 2);
+
+	dev_dbg(s->dev, "nbuffers=%d sizes[0]=%d\n", *nbuffers, sizes[0]);
+	return 0;
+}
+
+
 /* 这个结构体中的大部分函数也是内核已经提供好了的 */
 static const struct vb2_ops vvd_vb2_ops = {
-	.queue_setup            = airspy_queue_setup,
+	.queue_setup            = vvd_queue_setup,
 	.buf_queue              = airspy_buf_queue,
 	.start_streaming        = airspy_start_streaming,
 	.stop_streaming         = airspy_stop_streaming,
@@ -164,7 +179,6 @@ static int vvd_init(void)
 	}
 
 	return 0;
-
 }
 
 static void vvd_exit(void)
