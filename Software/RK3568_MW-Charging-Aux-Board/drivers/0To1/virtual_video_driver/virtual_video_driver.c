@@ -14,6 +14,20 @@
 #include <media/videobuf2-v4l2.h>
 #include <media/videobuf2-vmalloc.h>
 
+struct vvd_frame_buf {
+	/* common v4l buffer stuff -- must be first */
+	struct vb2_v4l2_buffer vb;
+	struct list_head list;
+};
+
+extern unsigned char red[];
+extern unsigned char blue[];
+extern unsigned char green[];
+
+static struct list_head queued_bufs;
+static struct timer_list vvd_timer;
+static int copy_cnt;
+
 /* 这个结构体中的函数都不需要自己提供 */
 static const struct v4l2_file_operations vvd_fops = {
 	.owner                    = THIS_MODULE,
@@ -114,13 +128,97 @@ static int vvd_queue_setup(struct vb2_queue *vq,
 	return 0;
 }
 
+static void vvd_buf_queue(struct vb2_buffer *vb)
+{	
+	/* 结构体转换：vb2_buffer --> vb2_v4l2_buffer     */
+	struct vb2_v4l2_buffer *vbuf = to_vb2_v4l2_buffer(vb);
+	struct vvd_frame_buf *buf = container_of(vbuf, struct vvd_frame_buf, vb);
+	// unsigned long flags;
+	/* 将申请到的buffer添加到队列中 */
+	// spin_lock_irqsave(&s->queued_bufs_lock, flags);
+	list_add_tail(&buf->list, &queued_bufs);
+	//spin_unlock_irqrestore(&s->queued_bufs_lock, flags);
+}
+
+static struct vvd_frame_buf *vvd_get_next_fill_buf(void)
+{
+	unsigned long flags;
+	struct vvd_frame_buf *buf = NULL;
+
+	// spin_lock_irqsave(&s->queued_bufs_lock, flags);
+	if (list_empty(&queued_bufs))
+		goto leave;
+
+	buf = list_entry(queued_bufs.next, struct vvd_frame_buf, list); // 从空闲链表中的得到空闲buffer
+	list_del(&buf->list); // 从空闲链表中移除
+leave:
+	// spin_unlock_irqrestore(&s->queued_bufs_lock, flags);
+	return buf;
+}
+
+
+static void vvd_timer_expire(struct timer_list *t)
+{
+	struct vvd_frame_buf *buf;
+	void *ptr;
+
+	/* 从硬件上读到数据，使用（red/green/blue来模拟，构造（伪造）数据） */
+	/* 写入空闲buffer */
+	buf = vvd_get_next_fill_buf(); // 得到空闲buffer
+
+	if (buf) {
+		ptr = vb2_plane_vaddr(&buf->vb.vb2_buffer, 0); // 得到 struct vb2_buffer 指针
+
+		/* 每60帧（2s）拷贝不同颜色  */
+		if (copy_cnt < 60) {
+			memcpy(ptr, red, sizeof(red));
+			vb2_set_plane_payload(&buf->vb.vb2_buffer, 0, sizeof(red)); // 设置每次拷贝的数据，因为可能数据每次的长度可能不一样
+		} else if (copy_cnt >= 60 & copy_cnt < 120) {
+			memcpy(ptr, green, sizeof(green));
+			vb2_set_plane_payload(&buf->vb.vb2_buffer, 0, sizeof(green)); // 设置每次拷贝的数据，因为可能数据每次的长度可能不一样
+		} else if (copy_cnt >= 120 & copy_cnt < 180) {
+			memcpy(ptr, blue, sizeof(blue));
+			vb2_set_plane_payload(&buf->vb.vb2_buffer, 0, sizeof(blue)); // 设置每次拷贝的数据，因为可能数据每次的长度可能不一样
+		}
+
+		/* 将buffer放入完成链表：vb2_buffer_done */
+		vb2_buffer_done(&buf->vb.vb2_buffer, VB2_BUF_STATE_DONE);
+	}
+
+	copy_cnt += 1;
+	if (copy_cnt >= 180)
+		copy_cnt = 0;
+	/* 再次设置 timer 的超时时间       */
+	mod_timer(&vvd_timer, jiffies + HZ / 30); // 期望每秒钟产生30帧数据
+}
+
+static int vvd_start_streaming(struct vb2_queue *vq, unsigned int count)
+{
+	/* 启动硬件传输 */
+	/* 使用 timer 来模拟硬件中断 */
+	// 设置 timer
+	timer_setup(&vvd_timer, vvd_timer_expire, 0); // 4.19.232使用该版本函数
+
+	// 启动timer
+	printk(KERN_INFO "Starting timer...\n");
+	mod_timer(&vvd_timer, jiffies + HZ / 30); // 期望每秒钟产生30帧数据
+	
+	return 0;
+}
+
+static void vvd_stop_streaming(struct vb2_queue *vq)
+{
+	/* 停止硬件传输 */
+	del_timer(&vvd_timer);
+}
+
 
 /* 这个结构体中的大部分函数也是内核已经提供好了的 */
 static const struct vb2_ops vvd_vb2_ops = {
 	.queue_setup            = vvd_queue_setup,
-	.buf_queue              = airspy_buf_queue,
-	.start_streaming        = airspy_start_streaming,
-	.stop_streaming         = airspy_stop_streaming,
+	.buf_queue              = vvd_buf_queue,
+	.start_streaming        = vvd_start_streaming,
+	.stop_streaming         = vvd_stop_streaming,
 	.wait_prepare           = vb2_ops_wait_prepare,
 	.wait_finish            = vb2_ops_wait_finish,
 };
@@ -149,7 +247,7 @@ static int vvd_init(void)
 	vvd_vb2_queue.type = V4L2_BUF_TYPE_SDR_CAPTURE;
 	vvd_vb2_queue.io_modes = VB2_MMAP | VB2_USERPTR | VB2_READ;
 	vvd_vb2_queue.drv_priv = NULL;
-	vvd_vb2_queue.buf_struct_size = sizeof(struct airspy_frame_buf);
+	vvd_vb2_queue.buf_struct_size = sizeof(struct vvd_frame_buf); // 分配vb时，分配的空间大小为buf_struct_size
 	vvd_vb2_queue.ops = &vvd_vb2_ops; // 使用自己提供的结构体
 	vvd_vb2_queue.mem_ops = &vb2_vmalloc_memops; // 使用内核提供好的结构体
 	vvd_vb2_queue.timestamp_flags = V4L2_BUF_FLAG_TIMESTAMP_MONOTONIC;
@@ -177,6 +275,9 @@ static int vvd_init(void)
 		printk("Failed to register as video device (%d)\n", ret);
 		return -1;
 	}
+
+	/* 初始化链表 */
+	INIT_LIST_HEAD(&queued_bufs);
 
 	return 0;
 }
