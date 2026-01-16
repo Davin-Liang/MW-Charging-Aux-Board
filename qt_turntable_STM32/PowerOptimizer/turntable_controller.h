@@ -7,7 +7,7 @@
 #ifndef TURNTABLE_CONTROLLER_H
 #define TURNTABLE_CONTROLLER_H
 
-#include <modbus/modbus.h>
+#include <modbus.h>
 #include <iostream>         // 输入输出流
 #include <cstring>          // 字符串操作
 #include <unistd.h>         // Unix 标准函数，如 usleep

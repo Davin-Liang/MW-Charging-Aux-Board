@@ -82,16 +82,16 @@ private:
     // double chart_time = 0.0;   // 曲线横轴时间
 
     // ===== X 轴图 =====
-    QtCharts::QChart *chartX = nullptr;
-    QtCharts::QChartView *chartViewX = nullptr;
-    QtCharts::QLineSeries *seriesX_current = nullptr;
-    QtCharts::QLineSeries *seriesX_target  = nullptr;
+    QChart *chartX = nullptr;
+    QChartView *chartViewX = nullptr;
+    QLineSeries *seriesX_current = nullptr;
+    QLineSeries *seriesX_target  = nullptr;
 
     // ===== Y 轴图 =====
-    QtCharts::QChart *chartY = nullptr;
-    QtCharts::QChartView *chartViewY = nullptr;
-    QtCharts::QLineSeries *seriesY_current = nullptr;
-    QtCharts::QLineSeries *seriesY_target  = nullptr;
+    QChart *chartY = nullptr;
+    QChartView *chartViewY = nullptr;
+    QLineSeries *seriesY_current = nullptr;
+    QLineSeries *seriesY_target  = nullptr;
 
     double chartTimeX = 0.0;// 曲线横轴时间
     double chartTimeY = 0.0;

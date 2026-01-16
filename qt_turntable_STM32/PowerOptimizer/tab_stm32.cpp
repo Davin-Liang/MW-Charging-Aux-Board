@@ -228,21 +228,21 @@ void TabSTM32::initializeUIWithConfig()
 void TabSTM32::initializeMotorChart()
 {
     // 创建图表
-    motorChart = new QtCharts::QChart();
+    motorChart = new QChart();
     motorChart->setTitle("");  // 不显示标题
-    motorChart->setAnimationOptions(QtCharts::QChart::NoAnimation);
+    motorChart->setAnimationOptions(QChart::NoAnimation);
     motorChart->legend()->hide();
     motorChart->setMargins(QMargins(0, 0, 0, 0)); // 去除图表边距
     motorChart->setBackgroundRoundness(0);   // 设置图表边距为0，使其完全填充
 
     // 创建轨迹曲线（蓝色线条）
-    motorTrajectorySeries = new QtCharts::QLineSeries();
+    motorTrajectorySeries = new QLineSeries();
     // 移除名称设置，不显示图例
     motorTrajectorySeries->setColor(Qt::blue);
     motorTrajectorySeries->setPointsVisible(false);  // 不显示轨迹上的点，只显示线条
 
     // 创建当前位置点（红色散点）
-    currentPositionSeries = new QtCharts::QScatterSeries();
+    currentPositionSeries = new QScatterSeries();
     // 移除名称设置，不显示图例
     currentPositionSeries->setColor(Qt::red);
     currentPositionSeries->setBorderColor(Qt::darkRed);
@@ -253,7 +253,7 @@ void TabSTM32::initializeMotorChart()
     motorChart->addSeries(currentPositionSeries);
 
     // 坐标轴 X
-    axisX = new QtCharts::QValueAxis();
+    axisX = new QValueAxis();
     axisX->setTitleText("x (mm)");
     axisX->setTitleFont(QFont("宋体", 8));
     axisX->setLabelsFont(QFont("宋体", 8));
@@ -261,7 +261,7 @@ void TabSTM32::initializeMotorChart()
     axisX->setTickCount(11);
 
     // 坐标轴 Y
-    axisY = new QtCharts::QValueAxis();
+    axisY = new QValueAxis();
     axisY->setTitleText("y (mm)");
     axisY->setTitleFont(QFont("宋体", 8));
     axisY->setLabelsFont(QFont("宋体", 8));
@@ -279,7 +279,7 @@ void TabSTM32::initializeMotorChart()
 
 
     // 创建图表视图
-    chartView = new QtCharts::QChartView(motorChart);
+    chartView = new QChartView(motorChart);
     chartView->setRenderHint(QPainter::Antialiasing);
     chartView->setContentsMargins(0, 0, 0, 0);  // 设置图表视图的边距为0
 

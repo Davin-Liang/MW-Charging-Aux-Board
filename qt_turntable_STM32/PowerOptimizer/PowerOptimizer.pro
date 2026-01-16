@@ -1,4 +1,4 @@
-QT       += core gui network widgets charts
+QT       += core gui network widgets charts serialport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -6,10 +6,13 @@ CONFIG += c++17
 
 # 包含第三方库路径
 INCLUDEPATH += $$PWD/thirdparty
-INCLUDEPATH += /usr/include/modbus
+# INCLUDEPATH += /usr/include/modbus
 
-# 链接libmodbus库
-LIBS += -lmodbus
+# # 链接libmodbus库
+# LIBS += -lmodbus
+# libmodbus 源码路径
+INCLUDEPATH += $$PWD/modbus/src
+
 SOURCES += \
     PID_Controller.cpp \
     TrajectoryJsonDialog.cpp \
@@ -36,14 +39,28 @@ HEADERS += \
     logindialog.h \
     mainwindow.h
 
+
+# ================= libmodbus sources =================
+SOURCES += \
+    $$PWD/modbus/src/modbus.c \
+    $$PWD/modbus/src/modbus-data.c \
+    $$PWD/modbus/src/modbus-rtu.c \
+    $$PWD/modbus/src/modbus-tcp.c
+
+HEADERS += \
+    $$PWD/modbus/src/modbus.h \
+    $$PWD/modbus/src/modbus-data.h \
+    $$PWD/modbus/src/modbus-rtu.h \
+    $$PWD/modbus/src/modbus-tcp.h
+
 FORMS += \
     mainwindow.ui
 
-TRANSLATIONS += \
-    PowerOptimizer_zh_CN.ts
+# TRANSLATIONS += \
+#     PowerOptimizer_zh_CN.ts
 
-CONFIG += lrelease
-CONFIG += embed_translations
+# CONFIG += lrelease
+# CONFIG += embed_translations
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -76,4 +93,7 @@ UI_DIR = build/.ui        # UI头文件的输出目录
 
 !exists($$UI_DIR) {
     mkpath($$UI_DIR)
+}
+win32 {
+    LIBS += -lws2_32
 }

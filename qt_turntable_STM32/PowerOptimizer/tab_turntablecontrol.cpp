@@ -12,7 +12,6 @@
 #include <QFileDialog>
 #include <QJsonDocument>
 
-using namespace QtCharts;
 
 TabTurntableControl::TabTurntableControl(MainWindow *mw_)
     : QObject(mw_), mw(mw_)

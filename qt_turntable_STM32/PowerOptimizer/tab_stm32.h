@@ -58,12 +58,12 @@ private:
     // 通道信息索引（每次新文件从0开始）
     uint32_t channelInfoIndex;
     // 电机轨迹显示图相关
-    QtCharts::QChart *motorChart;
-    QtCharts::QLineSeries *motorTrajectorySeries;
-    QtCharts::QScatterSeries *currentPositionSeries;
-    QtCharts::QValueAxis *axisX;
-    QtCharts::QValueAxis *axisY;
-    QtCharts::QChartView *chartView;
+    QChart *motorChart;
+    QLineSeries *motorTrajectorySeries;
+    QScatterSeries *currentPositionSeries;
+    QValueAxis *axisX;
+    QValueAxis *axisY;
+    QChartView *chartView;
     QVector<QPointF> positionHistory;
 
     MotorCmd_t motorCmd;
