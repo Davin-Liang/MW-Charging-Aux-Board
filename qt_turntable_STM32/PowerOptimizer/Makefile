@@ -16,8 +16,8 @@ CC            = gcc
 CXX           = g++
 DEFINES       = -DQT_NO_DEBUG -DQT_CHARTS_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -O2 -Wall -Wextra -D_REENTRANT -fPIC $(DEFINES)
-CXXFLAGS      = -pipe -O2 -std=gnu++1z -Wall -Wextra -D_REENTRANT -fPIC $(DEFINES)
-INCPATH       = -I. -Ithirdparty -I/usr/include/modbus -I/usr/include/aarch64-linux-gnu/qt5 -I/usr/include/aarch64-linux-gnu/qt5/QtCharts -I/usr/include/aarch64-linux-gnu/qt5/QtWidgets -I/usr/include/aarch64-linux-gnu/qt5/QtGui -I/usr/include/aarch64-linux-gnu/qt5/QtNetwork -I/usr/include/aarch64-linux-gnu/qt5/QtCore -Ibuild/.moc -Ibuild/.ui -I/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++
+CXXFLAGS      = -pipe -O2 -std=gnu++1y -Wall -Wextra -D_REENTRANT -fPIC $(DEFINES)
+INCPATH       = -I. -Ithirdparty -Ithirdparty/libmodbus/src -Isrc -Iinclude -I/usr/include/aarch64-linux-gnu/qt5 -I/usr/include/aarch64-linux-gnu/qt5/QtCharts -I/usr/include/aarch64-linux-gnu/qt5/QtWidgets -I/usr/include/aarch64-linux-gnu/qt5/QtGui -I/usr/include/aarch64-linux-gnu/qt5/QtNetwork -I/usr/include/aarch64-linux-gnu/qt5/QtCore -Ibuild/.moc -Ibuild/.ui -I/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++
 QMAKE         = /usr/lib/qt5/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -40,7 +40,7 @@ DISTNAME      = PowerOptimizer1.0.0
 DISTDIR = /home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/build/.obj/PowerOptimizer1.0.0
 LINK          = g++
 LFLAGS        = -Wl,-O1
-LIBS          = $(SUBLIBS) -lmodbus /usr/lib/aarch64-linux-gnu/libQt5Charts.so /usr/lib/aarch64-linux-gnu/libQt5Widgets.so /usr/lib/aarch64-linux-gnu/libQt5Gui.so /usr/lib/aarch64-linux-gnu/libQt5Network.so /usr/lib/aarch64-linux-gnu/libQt5Core.so -lGL -lpthread   
+LIBS          = $(SUBLIBS) /usr/lib/aarch64-linux-gnu/libQt5Charts.so /usr/lib/aarch64-linux-gnu/libQt5Widgets.so /usr/lib/aarch64-linux-gnu/libQt5Gui.so /usr/lib/aarch64-linux-gnu/libQt5Network.so /usr/lib/aarch64-linux-gnu/libQt5Core.so -lGL -lpthread   
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -52,18 +52,21 @@ OBJECTS_DIR   = build/.obj/
 
 ####### Files
 
-SOURCES       = PID_Controller.cpp \
-		TrajectoryJsonDialog.cpp \
-		command_transmitter.cpp \
-		tab_file_read.cpp \
-		tab_stm32.cpp \
-		tab_turntablecontrol.cpp \
-		tab_deviceconnect.cpp \
-		turntable_controller.cpp \
-		logindialog.cpp \
-		main.cpp \
-		mainwindow.cpp build/.rcc/qrc_qmake_qmake_qm_files.cpp \
-		build/.moc/moc_TrajectoryJsonDialog.cpp \
+SOURCES       = src/PID_Controller.cpp \
+		src/TrajectoryJsonDialog.cpp \
+		src/command_transmitter.cpp \
+		src/tab_file_read.cpp \
+		src/tab_stm32.cpp \
+		src/tab_turntablecontrol.cpp \
+		src/tab_deviceconnect.cpp \
+		src/turntable_controller.cpp \
+		src/logindialog.cpp \
+		src/main.cpp \
+		src/mainwindow.cpp \
+		thirdparty/libmodbus/src/modbus.c \
+		thirdparty/libmodbus/src/modbus-data.c \
+		thirdparty/libmodbus/src/modbus-rtu.c \
+		thirdparty/libmodbus/src/modbus-tcp.c build/.moc/moc_TrajectoryJsonDialog.cpp \
 		build/.moc/moc_tab_file_read.cpp \
 		build/.moc/moc_tab_stm32.cpp \
 		build/.moc/moc_tab_turntablecontrol.cpp \
@@ -81,7 +84,10 @@ OBJECTS       = build/.obj/PID_Controller.o \
 		build/.obj/logindialog.o \
 		build/.obj/main.o \
 		build/.obj/mainwindow.o \
-		build/.obj/qrc_qmake_qmake_qm_files.o \
+		build/.obj/modbus.o \
+		build/.obj/modbus-data.o \
+		build/.obj/modbus-rtu.o \
+		build/.obj/modbus-tcp.o \
 		build/.obj/moc_TrajectoryJsonDialog.o \
 		build/.obj/moc_tab_file_read.o \
 		build/.obj/moc_tab_stm32.o \
@@ -169,7 +175,6 @@ DIST          = /usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/default_pre.prf \
 		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/resolve_config.prf \
 		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/default_post.prf \
-		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/lrelease.prf \
 		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/warn_on.prf \
 		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/qt.prf \
 		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/resources_functions.prf \
@@ -184,27 +189,34 @@ DIST          = /usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/exceptions.prf \
 		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/yacc.prf \
 		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/lex.prf \
-		PowerOptimizer.pro PID_Controller.h \
-		TrajectoryJsonDialog.h \
-		command_struct.h \
-		command_transmitter.h \
-		tab_file_read.h \
-		tab_stm32.h \
-		tab_turntablecontrol.h \
-		tab_deviceconnect.h \
-		turntable_controller.h \
-		logindialog.h \
-		mainwindow.h PID_Controller.cpp \
-		TrajectoryJsonDialog.cpp \
-		command_transmitter.cpp \
-		tab_file_read.cpp \
-		tab_stm32.cpp \
-		tab_turntablecontrol.cpp \
-		tab_deviceconnect.cpp \
-		turntable_controller.cpp \
-		logindialog.cpp \
-		main.cpp \
-		mainwindow.cpp
+		PowerOptimizer.pro include/PID_Controller.h \
+		include/TrajectoryJsonDialog.h \
+		include/command_struct.h \
+		include/command_transmitter.h \
+		include/tab_file_read.h \
+		include/tab_stm32.h \
+		include/tab_turntablecontrol.h \
+		include/tab_deviceconnect.h \
+		include/turntable_controller.h \
+		include/logindialog.h \
+		include/mainwindow.h \
+		thirdparty/libmodbus/src/modbus.h \
+		thirdparty/libmodbus/src/modbus-rtu.h \
+		thirdparty/libmodbus/src/modbus-tcp.h src/PID_Controller.cpp \
+		src/TrajectoryJsonDialog.cpp \
+		src/command_transmitter.cpp \
+		src/tab_file_read.cpp \
+		src/tab_stm32.cpp \
+		src/tab_turntablecontrol.cpp \
+		src/tab_deviceconnect.cpp \
+		src/turntable_controller.cpp \
+		src/logindialog.cpp \
+		src/main.cpp \
+		src/mainwindow.cpp \
+		thirdparty/libmodbus/src/modbus.c \
+		thirdparty/libmodbus/src/modbus-data.c \
+		thirdparty/libmodbus/src/modbus-rtu.c \
+		thirdparty/libmodbus/src/modbus-tcp.c
 QMAKE_TARGET  = PowerOptimizer
 DESTDIR       = build/
 TARGET        = build/PowerOptimizer
@@ -297,7 +309,6 @@ Makefile: PowerOptimizer.pro /usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++/qm
 		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/default_pre.prf \
 		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/resolve_config.prf \
 		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/default_post.prf \
-		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/lrelease.prf \
 		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/warn_on.prf \
 		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/qt.prf \
 		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/resources_functions.prf \
@@ -312,8 +323,7 @@ Makefile: PowerOptimizer.pro /usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++/qm
 		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/exceptions.prf \
 		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/yacc.prf \
 		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/lex.prf \
-		PowerOptimizer.pro \
-		build/.rcc/qmake_qmake_qm_files.qrc
+		PowerOptimizer.pro
 	$(QMAKE) -o Makefile PowerOptimizer.pro
 /usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/spec_pre.prf:
 /usr/lib/aarch64-linux-gnu/qt5/mkspecs/common/unix.conf:
@@ -395,7 +405,6 @@ Makefile: PowerOptimizer.pro /usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++/qm
 /usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/default_pre.prf:
 /usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/resolve_config.prf:
 /usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/default_post.prf:
-/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/lrelease.prf:
 /usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/warn_on.prf:
 /usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/qt.prf:
 /usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/resources_functions.prf:
@@ -411,7 +420,6 @@ Makefile: PowerOptimizer.pro /usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++/qm
 /usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/yacc.prf:
 /usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/lex.prf:
 PowerOptimizer.pro:
-build/.rcc/qmake_qmake_qm_files.qrc:
 qmake: FORCE
 	@$(QMAKE) -o Makefile PowerOptimizer.pro
 
@@ -426,13 +434,10 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents PowerOptimizer_zh_CN.ts $(DISTDIR)/
-	$(COPY_FILE) --parents build/.rcc/qmake_qmake_qm_files.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents PID_Controller.h TrajectoryJsonDialog.h command_struct.h command_transmitter.h tab_file_read.h tab_stm32.h tab_turntablecontrol.h tab_deviceconnect.h turntable_controller.h logindialog.h mainwindow.h $(DISTDIR)/
-	$(COPY_FILE) --parents PID_Controller.cpp TrajectoryJsonDialog.cpp command_transmitter.cpp tab_file_read.cpp tab_stm32.cpp tab_turntablecontrol.cpp tab_deviceconnect.cpp turntable_controller.cpp logindialog.cpp main.cpp mainwindow.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents include/PID_Controller.h include/TrajectoryJsonDialog.h include/command_struct.h include/command_transmitter.h include/tab_file_read.h include/tab_stm32.h include/tab_turntablecontrol.h include/tab_deviceconnect.h include/turntable_controller.h include/logindialog.h include/mainwindow.h thirdparty/libmodbus/src/modbus.h thirdparty/libmodbus/src/modbus-rtu.h thirdparty/libmodbus/src/modbus-tcp.h $(DISTDIR)/
+	$(COPY_FILE) --parents src/PID_Controller.cpp src/TrajectoryJsonDialog.cpp src/command_transmitter.cpp src/tab_file_read.cpp src/tab_stm32.cpp src/tab_turntablecontrol.cpp src/tab_deviceconnect.cpp src/turntable_controller.cpp src/logindialog.cpp src/main.cpp src/mainwindow.cpp thirdparty/libmodbus/src/modbus.c thirdparty/libmodbus/src/modbus-data.c thirdparty/libmodbus/src/modbus-rtu.c thirdparty/libmodbus/src/modbus-tcp.c $(DISTDIR)/
 	$(COPY_FILE) --parents mainwindow.ui $(DISTDIR)/
-	$(COPY_FILE) --parents PowerOptimizer_zh_CN.ts $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -456,71 +461,63 @@ check: first
 
 benchmark: first
 
-compiler_lrelease_make_all: .qm/PowerOptimizer_zh_CN.qm
-compiler_lrelease_clean:
-	-$(DEL_FILE) .qm/PowerOptimizer_zh_CN.qm
-.qm/PowerOptimizer_zh_CN.qm: PowerOptimizer_zh_CN.ts
-	/usr/lib/qt5/bin/lrelease PowerOptimizer_zh_CN.ts -qm .qm/PowerOptimizer_zh_CN.qm
-
-compiler_rcc_make_all: build/.rcc/qrc_qmake_qmake_qm_files.cpp
+compiler_rcc_make_all:
 compiler_rcc_clean:
-	-$(DEL_FILE) build/.rcc/qrc_qmake_qmake_qm_files.cpp
-build/.rcc/qrc_qmake_qmake_qm_files.cpp: build/.rcc/qmake_qmake_qm_files.qrc \
-		/usr/lib/qt5/bin/rcc \
-		.qm/PowerOptimizer_zh_CN.qm
-	/usr/lib/qt5/bin/rcc -name qmake_qmake_qm_files build/.rcc/qmake_qmake_qm_files.qrc -o build/.rcc/qrc_qmake_qmake_qm_files.cpp
-
 compiler_moc_predefs_make_all: build/.moc/moc_predefs.h
 compiler_moc_predefs_clean:
 	-$(DEL_FILE) build/.moc/moc_predefs.h
 build/.moc/moc_predefs.h: /usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
-	g++ -pipe -O2 -std=gnu++1z -Wall -Wextra -dM -E -o build/.moc/moc_predefs.h /usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
+	g++ -pipe -O2 -std=gnu++1y -Wall -Wextra -dM -E -o build/.moc/moc_predefs.h /usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 
 compiler_moc_header_make_all: build/.moc/moc_TrajectoryJsonDialog.cpp build/.moc/moc_tab_file_read.cpp build/.moc/moc_tab_stm32.cpp build/.moc/moc_tab_turntablecontrol.cpp build/.moc/moc_tab_deviceconnect.cpp build/.moc/moc_logindialog.cpp build/.moc/moc_mainwindow.cpp
 compiler_moc_header_clean:
 	-$(DEL_FILE) build/.moc/moc_TrajectoryJsonDialog.cpp build/.moc/moc_tab_file_read.cpp build/.moc/moc_tab_stm32.cpp build/.moc/moc_tab_turntablecontrol.cpp build/.moc/moc_tab_deviceconnect.cpp build/.moc/moc_logindialog.cpp build/.moc/moc_mainwindow.cpp
-build/.moc/moc_TrajectoryJsonDialog.cpp: TrajectoryJsonDialog.h \
+build/.moc/moc_TrajectoryJsonDialog.cpp: include/TrajectoryJsonDialog.h \
 		build/.moc/moc_predefs.h \
 		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/build/.moc/moc_predefs.h -I/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/thirdparty -I/usr/include/modbus -I/usr/include/aarch64-linux-gnu/qt5 -I/usr/include/aarch64-linux-gnu/qt5/QtCharts -I/usr/include/aarch64-linux-gnu/qt5/QtWidgets -I/usr/include/aarch64-linux-gnu/qt5/QtGui -I/usr/include/aarch64-linux-gnu/qt5/QtNetwork -I/usr/include/aarch64-linux-gnu/qt5/QtCore -I/usr/include/c++/11 -I/usr/include/aarch64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/aarch64-linux-gnu/11/include -I/usr/local/include -I/usr/include/aarch64-linux-gnu -I/usr/include TrajectoryJsonDialog.h -o build/.moc/moc_TrajectoryJsonDialog.cpp
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/build/.moc/moc_predefs.h -I/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/thirdparty -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/thirdparty/libmodbus/src -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/src -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/include -I/usr/include/aarch64-linux-gnu/qt5 -I/usr/include/aarch64-linux-gnu/qt5/QtCharts -I/usr/include/aarch64-linux-gnu/qt5/QtWidgets -I/usr/include/aarch64-linux-gnu/qt5/QtGui -I/usr/include/aarch64-linux-gnu/qt5/QtNetwork -I/usr/include/aarch64-linux-gnu/qt5/QtCore -I/usr/include/c++/11 -I/usr/include/aarch64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/aarch64-linux-gnu/11/include -I/usr/local/include -I/usr/include/aarch64-linux-gnu -I/usr/include include/TrajectoryJsonDialog.h -o build/.moc/moc_TrajectoryJsonDialog.cpp
 
-build/.moc/moc_tab_file_read.cpp: tab_file_read.h \
+build/.moc/moc_tab_file_read.cpp: include/tab_file_read.h \
 		build/.moc/moc_predefs.h \
 		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/build/.moc/moc_predefs.h -I/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/thirdparty -I/usr/include/modbus -I/usr/include/aarch64-linux-gnu/qt5 -I/usr/include/aarch64-linux-gnu/qt5/QtCharts -I/usr/include/aarch64-linux-gnu/qt5/QtWidgets -I/usr/include/aarch64-linux-gnu/qt5/QtGui -I/usr/include/aarch64-linux-gnu/qt5/QtNetwork -I/usr/include/aarch64-linux-gnu/qt5/QtCore -I/usr/include/c++/11 -I/usr/include/aarch64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/aarch64-linux-gnu/11/include -I/usr/local/include -I/usr/include/aarch64-linux-gnu -I/usr/include tab_file_read.h -o build/.moc/moc_tab_file_read.cpp
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/build/.moc/moc_predefs.h -I/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/thirdparty -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/thirdparty/libmodbus/src -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/src -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/include -I/usr/include/aarch64-linux-gnu/qt5 -I/usr/include/aarch64-linux-gnu/qt5/QtCharts -I/usr/include/aarch64-linux-gnu/qt5/QtWidgets -I/usr/include/aarch64-linux-gnu/qt5/QtGui -I/usr/include/aarch64-linux-gnu/qt5/QtNetwork -I/usr/include/aarch64-linux-gnu/qt5/QtCore -I/usr/include/c++/11 -I/usr/include/aarch64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/aarch64-linux-gnu/11/include -I/usr/local/include -I/usr/include/aarch64-linux-gnu -I/usr/include include/tab_file_read.h -o build/.moc/moc_tab_file_read.cpp
 
-build/.moc/moc_tab_stm32.cpp: tab_stm32.h \
-		command_struct.h \
+build/.moc/moc_tab_stm32.cpp: include/tab_stm32.h \
+		include/command_struct.h \
 		build/.moc/moc_predefs.h \
 		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/build/.moc/moc_predefs.h -I/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/thirdparty -I/usr/include/modbus -I/usr/include/aarch64-linux-gnu/qt5 -I/usr/include/aarch64-linux-gnu/qt5/QtCharts -I/usr/include/aarch64-linux-gnu/qt5/QtWidgets -I/usr/include/aarch64-linux-gnu/qt5/QtGui -I/usr/include/aarch64-linux-gnu/qt5/QtNetwork -I/usr/include/aarch64-linux-gnu/qt5/QtCore -I/usr/include/c++/11 -I/usr/include/aarch64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/aarch64-linux-gnu/11/include -I/usr/local/include -I/usr/include/aarch64-linux-gnu -I/usr/include tab_stm32.h -o build/.moc/moc_tab_stm32.cpp
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/build/.moc/moc_predefs.h -I/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/thirdparty -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/thirdparty/libmodbus/src -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/src -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/include -I/usr/include/aarch64-linux-gnu/qt5 -I/usr/include/aarch64-linux-gnu/qt5/QtCharts -I/usr/include/aarch64-linux-gnu/qt5/QtWidgets -I/usr/include/aarch64-linux-gnu/qt5/QtGui -I/usr/include/aarch64-linux-gnu/qt5/QtNetwork -I/usr/include/aarch64-linux-gnu/qt5/QtCore -I/usr/include/c++/11 -I/usr/include/aarch64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/aarch64-linux-gnu/11/include -I/usr/local/include -I/usr/include/aarch64-linux-gnu -I/usr/include include/tab_stm32.h -o build/.moc/moc_tab_stm32.cpp
 
-build/.moc/moc_tab_turntablecontrol.cpp: tab_turntablecontrol.h \
+build/.moc/moc_tab_turntablecontrol.cpp: include/tab_turntablecontrol.h \
 		build/.moc/moc_predefs.h \
 		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/build/.moc/moc_predefs.h -I/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/thirdparty -I/usr/include/modbus -I/usr/include/aarch64-linux-gnu/qt5 -I/usr/include/aarch64-linux-gnu/qt5/QtCharts -I/usr/include/aarch64-linux-gnu/qt5/QtWidgets -I/usr/include/aarch64-linux-gnu/qt5/QtGui -I/usr/include/aarch64-linux-gnu/qt5/QtNetwork -I/usr/include/aarch64-linux-gnu/qt5/QtCore -I/usr/include/c++/11 -I/usr/include/aarch64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/aarch64-linux-gnu/11/include -I/usr/local/include -I/usr/include/aarch64-linux-gnu -I/usr/include tab_turntablecontrol.h -o build/.moc/moc_tab_turntablecontrol.cpp
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/build/.moc/moc_predefs.h -I/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/thirdparty -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/thirdparty/libmodbus/src -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/src -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/include -I/usr/include/aarch64-linux-gnu/qt5 -I/usr/include/aarch64-linux-gnu/qt5/QtCharts -I/usr/include/aarch64-linux-gnu/qt5/QtWidgets -I/usr/include/aarch64-linux-gnu/qt5/QtGui -I/usr/include/aarch64-linux-gnu/qt5/QtNetwork -I/usr/include/aarch64-linux-gnu/qt5/QtCore -I/usr/include/c++/11 -I/usr/include/aarch64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/aarch64-linux-gnu/11/include -I/usr/local/include -I/usr/include/aarch64-linux-gnu -I/usr/include include/tab_turntablecontrol.h -o build/.moc/moc_tab_turntablecontrol.cpp
 
-build/.moc/moc_tab_deviceconnect.cpp: tab_deviceconnect.h \
+build/.moc/moc_tab_deviceconnect.cpp: include/tab_deviceconnect.h \
 		build/.moc/moc_predefs.h \
 		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/build/.moc/moc_predefs.h -I/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/thirdparty -I/usr/include/modbus -I/usr/include/aarch64-linux-gnu/qt5 -I/usr/include/aarch64-linux-gnu/qt5/QtCharts -I/usr/include/aarch64-linux-gnu/qt5/QtWidgets -I/usr/include/aarch64-linux-gnu/qt5/QtGui -I/usr/include/aarch64-linux-gnu/qt5/QtNetwork -I/usr/include/aarch64-linux-gnu/qt5/QtCore -I/usr/include/c++/11 -I/usr/include/aarch64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/aarch64-linux-gnu/11/include -I/usr/local/include -I/usr/include/aarch64-linux-gnu -I/usr/include tab_deviceconnect.h -o build/.moc/moc_tab_deviceconnect.cpp
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/build/.moc/moc_predefs.h -I/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/thirdparty -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/thirdparty/libmodbus/src -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/src -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/include -I/usr/include/aarch64-linux-gnu/qt5 -I/usr/include/aarch64-linux-gnu/qt5/QtCharts -I/usr/include/aarch64-linux-gnu/qt5/QtWidgets -I/usr/include/aarch64-linux-gnu/qt5/QtGui -I/usr/include/aarch64-linux-gnu/qt5/QtNetwork -I/usr/include/aarch64-linux-gnu/qt5/QtCore -I/usr/include/c++/11 -I/usr/include/aarch64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/aarch64-linux-gnu/11/include -I/usr/local/include -I/usr/include/aarch64-linux-gnu -I/usr/include include/tab_deviceconnect.h -o build/.moc/moc_tab_deviceconnect.cpp
 
-build/.moc/moc_logindialog.cpp: logindialog.h \
+build/.moc/moc_logindialog.cpp: include/logindialog.h \
 		build/.moc/moc_predefs.h \
 		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/build/.moc/moc_predefs.h -I/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/thirdparty -I/usr/include/modbus -I/usr/include/aarch64-linux-gnu/qt5 -I/usr/include/aarch64-linux-gnu/qt5/QtCharts -I/usr/include/aarch64-linux-gnu/qt5/QtWidgets -I/usr/include/aarch64-linux-gnu/qt5/QtGui -I/usr/include/aarch64-linux-gnu/qt5/QtNetwork -I/usr/include/aarch64-linux-gnu/qt5/QtCore -I/usr/include/c++/11 -I/usr/include/aarch64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/aarch64-linux-gnu/11/include -I/usr/local/include -I/usr/include/aarch64-linux-gnu -I/usr/include logindialog.h -o build/.moc/moc_logindialog.cpp
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/build/.moc/moc_predefs.h -I/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/thirdparty -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/thirdparty/libmodbus/src -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/src -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/include -I/usr/include/aarch64-linux-gnu/qt5 -I/usr/include/aarch64-linux-gnu/qt5/QtCharts -I/usr/include/aarch64-linux-gnu/qt5/QtWidgets -I/usr/include/aarch64-linux-gnu/qt5/QtGui -I/usr/include/aarch64-linux-gnu/qt5/QtNetwork -I/usr/include/aarch64-linux-gnu/qt5/QtCore -I/usr/include/c++/11 -I/usr/include/aarch64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/aarch64-linux-gnu/11/include -I/usr/local/include -I/usr/include/aarch64-linux-gnu -I/usr/include include/logindialog.h -o build/.moc/moc_logindialog.cpp
 
-build/.moc/moc_mainwindow.cpp: mainwindow.h \
-		turntable_controller.h \
-		PID_Controller.h \
-		tab_file_read.h \
-		tab_turntablecontrol.h \
-		tab_stm32.h \
-		command_struct.h \
-		tab_deviceconnect.h \
+build/.moc/moc_mainwindow.cpp: include/mainwindow.h \
+		thirdparty/libmodbus/src/modbus.h \
+		thirdparty/libmodbus/src/modbus-version.h \
+		thirdparty/libmodbus/src/modbus-rtu.h \
+		thirdparty/libmodbus/src/modbus-tcp.h \
+		include/turntable_controller.h \
+		include/PID_Controller.h \
+		include/tab_file_read.h \
+		include/tab_turntablecontrol.h \
+		include/tab_stm32.h \
+		include/command_struct.h \
+		include/tab_deviceconnect.h \
 		build/.moc/moc_predefs.h \
 		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/build/.moc/moc_predefs.h -I/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/thirdparty -I/usr/include/modbus -I/usr/include/aarch64-linux-gnu/qt5 -I/usr/include/aarch64-linux-gnu/qt5/QtCharts -I/usr/include/aarch64-linux-gnu/qt5/QtWidgets -I/usr/include/aarch64-linux-gnu/qt5/QtGui -I/usr/include/aarch64-linux-gnu/qt5/QtNetwork -I/usr/include/aarch64-linux-gnu/qt5/QtCore -I/usr/include/c++/11 -I/usr/include/aarch64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/aarch64-linux-gnu/11/include -I/usr/local/include -I/usr/include/aarch64-linux-gnu -I/usr/include mainwindow.h -o build/.moc/moc_mainwindow.cpp
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/build/.moc/moc_predefs.h -I/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/thirdparty -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/thirdparty/libmodbus/src -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/src -I/home/nvidia/MyProject/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/include -I/usr/include/aarch64-linux-gnu/qt5 -I/usr/include/aarch64-linux-gnu/qt5/QtCharts -I/usr/include/aarch64-linux-gnu/qt5/QtWidgets -I/usr/include/aarch64-linux-gnu/qt5/QtGui -I/usr/include/aarch64-linux-gnu/qt5/QtNetwork -I/usr/include/aarch64-linux-gnu/qt5/QtCore -I/usr/include/c++/11 -I/usr/include/aarch64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/aarch64-linux-gnu/11/include -I/usr/local/include -I/usr/include/aarch64-linux-gnu -I/usr/include include/mainwindow.h -o build/.moc/moc_mainwindow.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
@@ -539,39 +536,51 @@ compiler_yacc_impl_make_all:
 compiler_yacc_impl_clean:
 compiler_lex_make_all:
 compiler_lex_clean:
-compiler_clean: compiler_lrelease_clean compiler_rcc_clean compiler_moc_predefs_clean compiler_moc_header_clean compiler_uic_clean 
+compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean compiler_uic_clean 
 
 ####### Compile
 
-build/.obj/PID_Controller.o: PID_Controller.cpp PID_Controller.h \
-		turntable_controller.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/PID_Controller.o PID_Controller.cpp
+build/.obj/PID_Controller.o: src/PID_Controller.cpp include/PID_Controller.h \
+		include/turntable_controller.h \
+		thirdparty/libmodbus/src/modbus.h \
+		thirdparty/libmodbus/src/modbus-version.h \
+		thirdparty/libmodbus/src/modbus-rtu.h \
+		thirdparty/libmodbus/src/modbus-tcp.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/PID_Controller.o src/PID_Controller.cpp
 
-build/.obj/TrajectoryJsonDialog.o: TrajectoryJsonDialog.cpp TrajectoryJsonDialog.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/TrajectoryJsonDialog.o TrajectoryJsonDialog.cpp
+build/.obj/TrajectoryJsonDialog.o: src/TrajectoryJsonDialog.cpp include/TrajectoryJsonDialog.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/TrajectoryJsonDialog.o src/TrajectoryJsonDialog.cpp
 
-build/.obj/command_transmitter.o: command_transmitter.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/command_transmitter.o command_transmitter.cpp
+build/.obj/command_transmitter.o: src/command_transmitter.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/command_transmitter.o src/command_transmitter.cpp
 
-build/.obj/tab_file_read.o: tab_file_read.cpp tab_file_read.h \
-		mainwindow.h \
-		turntable_controller.h \
-		PID_Controller.h \
-		tab_turntablecontrol.h \
-		tab_stm32.h \
-		command_struct.h \
-		tab_deviceconnect.h \
+build/.obj/tab_file_read.o: src/tab_file_read.cpp include/tab_file_read.h \
+		include/mainwindow.h \
+		thirdparty/libmodbus/src/modbus.h \
+		thirdparty/libmodbus/src/modbus-version.h \
+		thirdparty/libmodbus/src/modbus-rtu.h \
+		thirdparty/libmodbus/src/modbus-tcp.h \
+		include/turntable_controller.h \
+		include/PID_Controller.h \
+		include/tab_turntablecontrol.h \
+		include/tab_stm32.h \
+		include/command_struct.h \
+		include/tab_deviceconnect.h \
 		build/.ui/ui_mainwindow.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/tab_file_read.o tab_file_read.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/tab_file_read.o src/tab_file_read.cpp
 
-build/.obj/tab_stm32.o: tab_stm32.cpp tab_stm32.h \
-		command_struct.h \
-		mainwindow.h \
-		turntable_controller.h \
-		PID_Controller.h \
-		tab_file_read.h \
-		tab_turntablecontrol.h \
-		tab_deviceconnect.h \
+build/.obj/tab_stm32.o: src/tab_stm32.cpp include/tab_stm32.h \
+		include/command_struct.h \
+		include/mainwindow.h \
+		thirdparty/libmodbus/src/modbus.h \
+		thirdparty/libmodbus/src/modbus-version.h \
+		thirdparty/libmodbus/src/modbus-rtu.h \
+		thirdparty/libmodbus/src/modbus-tcp.h \
+		include/turntable_controller.h \
+		include/PID_Controller.h \
+		include/tab_file_read.h \
+		include/tab_turntablecontrol.h \
+		include/tab_deviceconnect.h \
 		build/.ui/ui_mainwindow.h \
 		thirdparty/nlohmann/json.hpp \
 		thirdparty/nlohmann/adl_serializer.hpp \
@@ -619,62 +628,112 @@ build/.obj/tab_stm32.o: tab_stm32.cpp tab_stm32.h \
 		thirdparty/nlohmann/ordered_map.hpp \
 		thirdparty/nlohmann/detail/macro_unscope.hpp \
 		thirdparty/nlohmann/thirdparty/hedley/hedley_undef.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/tab_stm32.o tab_stm32.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/tab_stm32.o src/tab_stm32.cpp
 
-build/.obj/tab_turntablecontrol.o: tab_turntablecontrol.cpp tab_turntablecontrol.h \
-		mainwindow.h \
-		turntable_controller.h \
-		PID_Controller.h \
-		tab_file_read.h \
-		tab_stm32.h \
-		command_struct.h \
-		tab_deviceconnect.h \
+build/.obj/tab_turntablecontrol.o: src/tab_turntablecontrol.cpp include/tab_turntablecontrol.h \
+		include/mainwindow.h \
+		thirdparty/libmodbus/src/modbus.h \
+		thirdparty/libmodbus/src/modbus-version.h \
+		thirdparty/libmodbus/src/modbus-rtu.h \
+		thirdparty/libmodbus/src/modbus-tcp.h \
+		include/turntable_controller.h \
+		include/PID_Controller.h \
+		include/tab_file_read.h \
+		include/tab_stm32.h \
+		include/command_struct.h \
+		include/tab_deviceconnect.h \
 		build/.ui/ui_mainwindow.h \
-		command_transmitter.h \
-		TrajectoryJsonDialog.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/tab_turntablecontrol.o tab_turntablecontrol.cpp
+		include/command_transmitter.h \
+		include/TrajectoryJsonDialog.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/tab_turntablecontrol.o src/tab_turntablecontrol.cpp
 
-build/.obj/tab_deviceconnect.o: tab_deviceconnect.cpp tab_deviceconnect.h \
-		mainwindow.h \
-		turntable_controller.h \
-		PID_Controller.h \
-		tab_file_read.h \
-		tab_turntablecontrol.h \
-		tab_stm32.h \
-		command_struct.h \
+build/.obj/tab_deviceconnect.o: src/tab_deviceconnect.cpp include/tab_deviceconnect.h \
+		include/mainwindow.h \
+		thirdparty/libmodbus/src/modbus.h \
+		thirdparty/libmodbus/src/modbus-version.h \
+		thirdparty/libmodbus/src/modbus-rtu.h \
+		thirdparty/libmodbus/src/modbus-tcp.h \
+		include/turntable_controller.h \
+		include/PID_Controller.h \
+		include/tab_file_read.h \
+		include/tab_turntablecontrol.h \
+		include/tab_stm32.h \
+		include/command_struct.h \
 		build/.ui/ui_mainwindow.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/tab_deviceconnect.o tab_deviceconnect.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/tab_deviceconnect.o src/tab_deviceconnect.cpp
 
-build/.obj/turntable_controller.o: turntable_controller.cpp turntable_controller.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/turntable_controller.o turntable_controller.cpp
+build/.obj/turntable_controller.o: src/turntable_controller.cpp include/turntable_controller.h \
+		thirdparty/libmodbus/src/modbus.h \
+		thirdparty/libmodbus/src/modbus-version.h \
+		thirdparty/libmodbus/src/modbus-rtu.h \
+		thirdparty/libmodbus/src/modbus-tcp.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/turntable_controller.o src/turntable_controller.cpp
 
-build/.obj/logindialog.o: logindialog.cpp logindialog.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/logindialog.o logindialog.cpp
+build/.obj/logindialog.o: src/logindialog.cpp include/logindialog.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/logindialog.o src/logindialog.cpp
 
-build/.obj/main.o: main.cpp mainwindow.h \
-		turntable_controller.h \
-		PID_Controller.h \
-		tab_file_read.h \
-		tab_turntablecontrol.h \
-		tab_stm32.h \
-		command_struct.h \
-		tab_deviceconnect.h \
-		logindialog.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/main.o main.cpp
+build/.obj/main.o: src/main.cpp include/mainwindow.h \
+		thirdparty/libmodbus/src/modbus.h \
+		thirdparty/libmodbus/src/modbus-version.h \
+		thirdparty/libmodbus/src/modbus-rtu.h \
+		thirdparty/libmodbus/src/modbus-tcp.h \
+		include/turntable_controller.h \
+		include/PID_Controller.h \
+		include/tab_file_read.h \
+		include/tab_turntablecontrol.h \
+		include/tab_stm32.h \
+		include/command_struct.h \
+		include/tab_deviceconnect.h \
+		include/logindialog.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/main.o src/main.cpp
 
-build/.obj/mainwindow.o: mainwindow.cpp mainwindow.h \
-		turntable_controller.h \
-		PID_Controller.h \
-		tab_file_read.h \
-		tab_turntablecontrol.h \
-		tab_stm32.h \
-		command_struct.h \
-		tab_deviceconnect.h \
+build/.obj/mainwindow.o: src/mainwindow.cpp include/mainwindow.h \
+		thirdparty/libmodbus/src/modbus.h \
+		thirdparty/libmodbus/src/modbus-version.h \
+		thirdparty/libmodbus/src/modbus-rtu.h \
+		thirdparty/libmodbus/src/modbus-tcp.h \
+		include/turntable_controller.h \
+		include/PID_Controller.h \
+		include/tab_file_read.h \
+		include/tab_turntablecontrol.h \
+		include/tab_stm32.h \
+		include/command_struct.h \
+		include/tab_deviceconnect.h \
 		build/.ui/ui_mainwindow.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/mainwindow.o mainwindow.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/mainwindow.o src/mainwindow.cpp
 
-build/.obj/qrc_qmake_qmake_qm_files.o: build/.rcc/qrc_qmake_qmake_qm_files.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/qrc_qmake_qmake_qm_files.o build/.rcc/qrc_qmake_qmake_qm_files.cpp
+build/.obj/modbus.o: thirdparty/libmodbus/src/modbus.c thirdparty/libmodbus/src/config.h \
+		thirdparty/libmodbus/src/modbus-private.h \
+		thirdparty/libmodbus/src/modbus.h \
+		thirdparty/libmodbus/src/modbus-version.h \
+		thirdparty/libmodbus/src/modbus-rtu.h \
+		thirdparty/libmodbus/src/modbus-tcp.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o build/.obj/modbus.o thirdparty/libmodbus/src/modbus.c
+
+build/.obj/modbus-data.o: thirdparty/libmodbus/src/modbus-data.c thirdparty/libmodbus/src/config.h \
+		thirdparty/libmodbus/src/modbus.h \
+		thirdparty/libmodbus/src/modbus-version.h \
+		thirdparty/libmodbus/src/modbus-rtu.h \
+		thirdparty/libmodbus/src/modbus-tcp.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o build/.obj/modbus-data.o thirdparty/libmodbus/src/modbus-data.c
+
+build/.obj/modbus-rtu.o: thirdparty/libmodbus/src/modbus-rtu.c thirdparty/libmodbus/src/modbus-private.h \
+		thirdparty/libmodbus/src/config.h \
+		thirdparty/libmodbus/src/modbus.h \
+		thirdparty/libmodbus/src/modbus-version.h \
+		thirdparty/libmodbus/src/modbus-rtu.h \
+		thirdparty/libmodbus/src/modbus-tcp.h \
+		thirdparty/libmodbus/src/modbus-rtu-private.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o build/.obj/modbus-rtu.o thirdparty/libmodbus/src/modbus-rtu.c
+
+build/.obj/modbus-tcp.o: thirdparty/libmodbus/src/modbus-tcp.c thirdparty/libmodbus/src/modbus-private.h \
+		thirdparty/libmodbus/src/config.h \
+		thirdparty/libmodbus/src/modbus.h \
+		thirdparty/libmodbus/src/modbus-version.h \
+		thirdparty/libmodbus/src/modbus-rtu.h \
+		thirdparty/libmodbus/src/modbus-tcp.h \
+		thirdparty/libmodbus/src/modbus-tcp-private.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o build/.obj/modbus-tcp.o thirdparty/libmodbus/src/modbus-tcp.c
 
 build/.obj/moc_TrajectoryJsonDialog.o: build/.moc/moc_TrajectoryJsonDialog.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/moc_TrajectoryJsonDialog.o build/.moc/moc_TrajectoryJsonDialog.cpp

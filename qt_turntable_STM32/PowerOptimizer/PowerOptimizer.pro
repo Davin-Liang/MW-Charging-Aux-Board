@@ -1,57 +1,59 @@
-QT       += core gui network widgets charts serialport
+QT       += core gui network widgets charts 
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-CONFIG += c++17
+CONFIG += c++14
 
 # 包含第三方库路径
 INCLUDEPATH += $$PWD/thirdparty
-# INCLUDEPATH += /usr/include/modbus
+#INCLUDEPATH += /usr/include/modbus
 
 # # 链接libmodbus库
-# LIBS += -lmodbus
+#LIBS += -lmodbus
 # libmodbus 源码路径
-INCLUDEPATH += $$PWD/modbus/src
+INCLUDEPATH += $$PWD/thirdparty/libmodbus/src
+INCLUDEPATH += src 
+INCLUDEPATH += include 
 
 SOURCES += \
-    PID_Controller.cpp \
-    TrajectoryJsonDialog.cpp \
-    command_transmitter.cpp \
-    tab_file_read.cpp \
-    tab_stm32.cpp \
-    tab_turntablecontrol.cpp \
-    tab_deviceconnect.cpp \
-    turntable_controller.cpp\
-    logindialog.cpp \
-    main.cpp \
-    mainwindow.cpp
+    src/PID_Controller.cpp \
+    src/TrajectoryJsonDialog.cpp \
+    src/command_transmitter.cpp \
+    src/tab_file_read.cpp \
+    src/tab_stm32.cpp \
+    src/tab_turntablecontrol.cpp \
+    src/tab_deviceconnect.cpp \
+    src/turntable_controller.cpp\
+    src/logindialog.cpp \
+    src/main.cpp \
+    src/mainwindow.cpp
 
 HEADERS += \
-    PID_Controller.h \
-    TrajectoryJsonDialog.h \
-    command_struct.h \
-    command_transmitter.h \
-    tab_file_read.h \
-    tab_stm32.h \
-    tab_turntablecontrol.h \
-    tab_deviceconnect.h \
-    turntable_controller.h\
-    logindialog.h \
-    mainwindow.h
+    include/PID_Controller.h \
+    include/TrajectoryJsonDialog.h \
+    include/command_struct.h \
+    include/command_transmitter.h \
+    include/tab_file_read.h \
+    include/tab_stm32.h \
+    include/tab_turntablecontrol.h \
+    include/tab_deviceconnect.h \
+    include/turntable_controller.h\
+    include/logindialog.h \
+    include/mainwindow.h
 
 
 # ================= libmodbus sources =================
 SOURCES += \
-    $$PWD/modbus/src/modbus.c \
-    $$PWD/modbus/src/modbus-data.c \
-    $$PWD/modbus/src/modbus-rtu.c \
-    $$PWD/modbus/src/modbus-tcp.c
+    $$PWD/thirdparty/libmodbus/src/modbus.c \
+    $$PWD/thirdparty/libmodbus/src/modbus-data.c \
+    $$PWD/thirdparty/libmodbus/src/modbus-rtu.c \
+    $$PWD/thirdparty/libmodbus/src/modbus-tcp.c
 
 HEADERS += \
-    $$PWD/modbus/src/modbus.h \
-    $$PWD/modbus/src/modbus-data.h \
-    $$PWD/modbus/src/modbus-rtu.h \
-    $$PWD/modbus/src/modbus-tcp.h
+    $$PWD/thirdparty/libmodbus/src/modbus.h \
+    #$$PWD/thirdparty/libmodbus/src/modbus-data.h \
+    $$PWD/thirdparty/libmodbus/src/modbus-rtu.h \
+    $$PWD/thirdparty/libmodbus/src/modbus-tcp.h
 
 FORMS += \
     mainwindow.ui
