@@ -16,6 +16,7 @@ INCLUDEPATH += src
 INCLUDEPATH += include 
 
 SOURCES += \
+    src/tab_netural.cpp \
     src/PID_Controller.cpp \
     src/TrajectoryJsonDialog.cpp \
     src/command_transmitter.cpp \
@@ -34,6 +35,7 @@ HEADERS += \
     include/command_struct.h \
     include/command_transmitter.h \
     include/tab_file_read.h \
+    include/tab_netural.h \
     include/tab_stm32.h \
     include/tab_turntablecontrol.h \
     include/tab_deviceconnect.h \
@@ -51,7 +53,6 @@ SOURCES += \
 
 HEADERS += \
     $$PWD/thirdparty/libmodbus/src/modbus.h \
-    #$$PWD/thirdparty/libmodbus/src/modbus-data.h \
     $$PWD/thirdparty/libmodbus/src/modbus-rtu.h \
     $$PWD/thirdparty/libmodbus/src/modbus-tcp.h
 

@@ -35,7 +35,7 @@
      </font>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>4</number>
     </property>
     <property name="iconSize">
      <size>
@@ -1478,6 +1478,11 @@
      <zorder>groupBox_8</zorder>
      <zorder>groupBox_9</zorder>
      <zorder>groupBox_10</zorder>
+    </widget>
+    <widget class="QWidget" name="tab_device_netural">
+     <attribute name="title">
+      <string>神经网络训练</string>
+     </attribute>
     </widget>
    </widget>
    <widget class="QLabel" name="label_39">
