@@ -2,12 +2,14 @@
 #include <QApplication>
 #include <QScreen>
 #include <QGuiApplication>
-
+#include <QDebug>
 LoginDialog::LoginDialog(QWidget *parent)
     : QDialog(parent)
 {
     // 设置管理员文件路径
-    adminFilePath = QDir::currentPath() + "/config/admins.json";
+    adminFilePath = QDir::currentPath()+ "/config/admins.json";
+    qDebug() << "currentPath:" << QDir::currentPath();
+    qDebug() << "appDir:" << QCoreApplication::applicationDirPath();
 
     setupUI();
     applyStyles();
