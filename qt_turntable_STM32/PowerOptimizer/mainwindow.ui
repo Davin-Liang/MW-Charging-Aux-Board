@@ -35,7 +35,7 @@
      </font>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>3</number>
     </property>
     <property name="iconSize">
      <size>
@@ -66,7 +66,7 @@
        </font>
       </property>
       <property name="layoutDirection">
-       <enum>Qt::LayoutDirection::LeftToRight</enum>
+       <enum>Qt::LeftToRight</enum>
       </property>
       <property name="title">
        <string>数据采集系统STM32以太网连接</string>
@@ -172,7 +172,7 @@
             <string>未连接</string>
            </property>
            <property name="textFormat">
-            <enum>Qt::TextFormat::PlainText</enum>
+            <enum>Qt::PlainText</enum>
            </property>
           </widget>
          </item>
@@ -196,7 +196,7 @@
        </font>
       </property>
       <property name="layoutDirection">
-       <enum>Qt::LayoutDirection::LeftToRight</enum>
+       <enum>Qt::LeftToRight</enum>
       </property>
       <property name="title">
        <string>天线转台连接</string>
@@ -355,7 +355,7 @@
             <string>未连接</string>
            </property>
            <property name="textFormat">
-            <enum>Qt::TextFormat::PlainText</enum>
+            <enum>Qt::PlainText</enum>
            </property>
           </widget>
          </item>
@@ -374,7 +374,7 @@
         <x>0</x>
         <y>0</y>
         <width>1001</width>
-        <height>61</height>
+        <height>71</height>
        </rect>
       </property>
       <property name="font">
@@ -398,6 +398,13 @@
         <widget class="QLineEdit" name="lineEdit_motor_x"/>
        </item>
        <item>
+        <widget class="QLabel" name="label_52">
+         <property name="text">
+          <string>mm</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QLabel" name="label_14">
          <property name="text">
           <string>Y坐标</string>
@@ -408,6 +415,13 @@
         <widget class="QLineEdit" name="lineEdit_motor_y"/>
        </item>
        <item>
+        <widget class="QLabel" name="label_53">
+         <property name="text">
+          <string>mm</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QLabel" name="label_15">
          <property name="text">
           <string>速度</string>
@@ -416,6 +430,13 @@
        </item>
        <item>
         <widget class="QLineEdit" name="lineEdit_motor_speed"/>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_54">
+         <property name="text">
+          <string>mm/s</string>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QPushButton" name="pushButton_motor_control">
@@ -436,9 +457,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>61</y>
+        <y>71</y>
         <width>1001</width>
-        <height>121</height>
+        <height>111</height>
        </rect>
       </property>
       <property name="font">
@@ -474,6 +495,13 @@
           <widget class="QLineEdit" name="lineEdit_max_voltage"/>
          </item>
          <item>
+          <widget class="QLabel" name="label_58">
+           <property name="text">
+            <string>v</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QLabel" name="label_9">
            <property name="text">
             <string>电压步长</string>
@@ -484,6 +512,13 @@
           <widget class="QLineEdit" name="lineEdit_voltage_step"/>
          </item>
          <item>
+          <widget class="QLabel" name="label_60">
+           <property name="text">
+            <string>v</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QLabel" name="label_26">
            <property name="text">
             <string>初始电压</string>
@@ -492,6 +527,13 @@
          </item>
          <item>
           <widget class="QLineEdit" name="lineEdit_initial_voltage"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_59">
+           <property name="text">
+            <string>v</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -508,6 +550,13 @@
           <widget class="QLineEdit" name="lineEdit_square_step_2"/>
          </item>
          <item>
+          <widget class="QLabel" name="label_61">
+           <property name="text">
+            <string>mm</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QLabel" name="label_8">
            <property name="text">
             <string>方形步长</string>
@@ -518,6 +567,13 @@
           <widget class="QLineEdit" name="lineEdit_square_step"/>
          </item>
          <item>
+          <widget class="QLabel" name="label_62">
+           <property name="text">
+            <string>mm</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QLabel" name="label_7">
            <property name="text">
             <string>圆形半径</string>
@@ -526,6 +582,13 @@
          </item>
          <item>
           <widget class="QLineEdit" name="lineEdit_circle_radius"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_63">
+           <property name="text">
+            <string>mm</string>
+           </property>
+          </widget>
          </item>
          <item>
           <widget class="QPushButton" name="pushButton_find_optimal">
@@ -601,6 +664,13 @@
          <item>
           <widget class="QLineEdit" name="lineEdit_read_currentpower"/>
          </item>
+         <item>
+          <widget class="QLabel" name="label_67">
+           <property name="text">
+            <string>w</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
        <item>
@@ -620,6 +690,13 @@
          </item>
          <item>
           <widget class="QLineEdit" name="lineEdit_read_currentvoltage"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_68">
+           <property name="text">
+            <string>v</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -686,6 +763,13 @@
          <item>
           <widget class="QLineEdit" name="lineEdit_read_motor_x"/>
          </item>
+         <item>
+          <widget class="QLabel" name="label_55">
+           <property name="text">
+            <string>mm</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
        <item>
@@ -706,6 +790,13 @@
          <item>
           <widget class="QLineEdit" name="lineEdit_read_motor_y"/>
          </item>
+         <item>
+          <widget class="QLabel" name="label_56">
+           <property name="text">
+            <string>mm</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
        <item>
@@ -716,6 +807,7 @@
             <font>
              <family>宋体</family>
              <pointsize>12</pointsize>
+             <weight>50</weight>
              <bold>false</bold>
             </font>
            </property>
@@ -726,6 +818,13 @@
          </item>
          <item>
           <widget class="QLineEdit" name="lineEdit_read_motor_speed"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_57">
+           <property name="text">
+            <string>mm/s</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -768,6 +867,13 @@
          <item>
           <widget class="QLineEdit" name="lineEdit_read_channel1voltagemax"/>
          </item>
+         <item>
+          <widget class="QLabel" name="label_69">
+           <property name="text">
+            <string>v</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
        <item>
@@ -787,6 +893,13 @@
          </item>
          <item>
           <widget class="QLineEdit" name="lineEdit_read_channel2voltagemax"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_70">
+           <property name="text">
+            <string>v</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -808,6 +921,13 @@
          <item>
           <widget class="QLineEdit" name="lineEdit_read_channel3voltagemax"/>
          </item>
+         <item>
+          <widget class="QLabel" name="label_71">
+           <property name="text">
+            <string>v</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
        <item>
@@ -827,6 +947,13 @@
          </item>
          <item>
           <widget class="QLineEdit" name="lineEdit_read_channel4voltagemax"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_72">
+           <property name="text">
+            <string>v</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -848,6 +975,13 @@
          <item>
           <widget class="QLineEdit" name="lineEdit_opt_motor_x"/>
          </item>
+         <item>
+          <widget class="QLabel" name="label_64">
+           <property name="text">
+            <string>mm</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
        <item>
@@ -868,6 +1002,13 @@
          <item>
           <widget class="QLineEdit" name="lineEdit_opt_motor_y"/>
          </item>
+         <item>
+          <widget class="QLabel" name="label_65">
+           <property name="text">
+            <string>mm</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
        <item>
@@ -887,6 +1028,13 @@
          </item>
          <item>
           <widget class="QLineEdit" name="lineEdit_read_powermax"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_66">
+           <property name="text">
+            <string>v</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -915,6 +1063,7 @@
             <font>
              <family>宋体</family>
              <pointsize>12</pointsize>
+             <weight>50</weight>
              <bold>false</bold>
             </font>
            </property>
@@ -954,10 +1103,10 @@
           <bool>true</bool>
          </property>
          <property name="selectionMode">
-          <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
+          <enum>QAbstractItemView::NoSelection</enum>
          </property>
          <property name="selectionBehavior">
-          <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+          <enum>QAbstractItemView::SelectItems</enum>
          </property>
         </widget>
        </item>
@@ -973,49 +1122,35 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>151</width>
+        <width>121</width>
         <height>121</height>
        </rect>
       </property>
       <property name="title">
-       <string>转台型号</string>
+       <string/>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout_7">
-       <property name="spacing">
-        <number>0</number>
+      <widget class="QLabel" name="label_turntable_img">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>10</y>
+         <width>101</width>
+         <height>101</height>
+        </rect>
        </property>
-       <property name="leftMargin">
-        <number>0</number>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
        </property>
-       <property name="topMargin">
-        <number>0</number>
+       <property name="text">
+        <string/>
        </property>
-       <property name="rightMargin">
-        <number>0</number>
+       <property name="pixmap">
+        <pixmap>:/i18n/PowerOptimizer_zh_CN.qm</pixmap>
        </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-       <item>
-        <widget class="QLabel" name="label_turntable_img">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="pixmap">
-          <pixmap>:/i18n/PowerOptimizer_zh_CN.qm</pixmap>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignmentFlag::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
-      </layout>
+      </widget>
      </widget>
      <widget class="QGroupBox" name="open_group_box_turntable_control">
       <property name="geometry">
@@ -1193,7 +1328,7 @@
         <x>251</x>
         <y>222</y>
         <width>751</width>
-        <height>58</height>
+        <height>71</height>
        </rect>
       </property>
       <property name="title">
@@ -1252,9 +1387,9 @@
      <widget class="QGroupBox" name="groupBox_9">
       <property name="geometry">
        <rect>
-        <x>151</x>
+        <x>121</x>
         <y>0</y>
-        <width>851</width>
+        <width>881</width>
         <height>121</height>
        </rect>
       </property>
@@ -1283,6 +1418,13 @@
          </item>
          <item>
           <widget class="QLineEdit" name="line_edit_x_pos_ref"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_73">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
          </item>
          <item>
           <widget class="QLabel" name="label_30">
@@ -1441,9 +1583,9 @@
       <property name="geometry">
        <rect>
         <x>251</x>
-        <y>280</y>
+        <y>290</y>
         <width>751</width>
-        <height>251</height>
+        <height>241</height>
        </rect>
       </property>
       <property name="title">
@@ -1493,14 +1635,12 @@
      <font>
       <family>宋体</family>
       <pointsize>12</pointsize>
+      <weight>75</weight>
       <bold>true</bold>
      </font>
     </property>
     <property name="text">
      <string>各类设备控制中心</string>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignmentFlag::AlignCenter</set>
     </property>
    </widget>
   </widget>

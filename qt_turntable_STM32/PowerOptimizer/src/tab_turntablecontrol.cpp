@@ -148,27 +148,31 @@ void TabTurntableControl::update_turntable_image()
 {
     QString imgPath = "./image/turntable.png";
     QPixmap pix(imgPath);
-    // 如果图片加载失败，可显示默认文字提示
+
     if (pix.isNull()) {
         mw->ui->label_turntable_img->setText("转台图片未找到");
         mw->ui->label_turntable_img->setAlignment(Qt::AlignCenter);
         return;
     }
 
-    // mw->ui->label_turntable_img->setPixmap(
-    //     pix.scaled(mw->ui->label_turntable_img->size(),
-    //                Qt::KeepAspectRatio,
-    //                Qt::SmoothTransformation));
+    auto label = mw->ui->label_turntable_img;
 
-    // 等布局完成后再缩放一次
-    QTimer::singleShot(0, this, [this, pix]() {
-        mw->ui->label_turntable_img->setPixmap(
-            pix.scaled(
-                mw->ui->label_turntable_img->size(),
-                Qt::KeepAspectRatio,
-                Qt::SmoothTransformation));
+    label->setAlignment(Qt::AlignCenter);
+    label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    QTimer::singleShot(0, this, [label, pix]() {
+        if (!label->size().isEmpty()) {
+            label->setPixmap(
+                pix.scaled(
+                    label->size(),
+                    Qt::KeepAspectRatio,
+                    Qt::SmoothTransformation
+                )
+            );
+        }
     });
 }
+
 /**
  * @brief 初始化转台X轴位置实时曲线图表
  */
