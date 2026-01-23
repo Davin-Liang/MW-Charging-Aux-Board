@@ -13,9 +13,21 @@
 #include <opencv2/videoio.hpp> // VideoCapture
 #include <mutex>
 
+#define USE_YOLOV8
+
+#include "yolov8.h"
+
 // RKNN 和 RGA 头文件
+#ifdef USE_YOLOV8
+#include "yolov8/postprocess.h"
+#else
+#include "include/yolov5/postprocess.h"
+#endif
 #include "rknn_api.h"
-#include "postprocess.h" 
+#include "image_utils.h"
+#include "file_utils.h"
+#include "image_drawing.h"
+
 
 #define TIME_CONM_CALC 1
 
@@ -78,7 +90,8 @@ private:
     int videoDeviceIndex_;
 
     /* RKNN 上下文 (句柄本质是 uint64，非指针，需手动管理 destroy) */
-    rknn_context rknnCtx_ = 0;
+    // rknn_context rknnCtx_ = 0;
+    rknn_app_context_t rknnAppCtx_;
 
     /* 内存资源 */
     std::vector<unsigned char> modelData_; // 模型数据

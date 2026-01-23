@@ -15,34 +15,35 @@
 #include <media/videobuf2-vmalloc.h>
 
 struct vvd_frame_buf {
-	/* common v4l buffer stuff -- must be first */
 	struct vb2_v4l2_buffer vb;
 	struct list_head list;
 };
 
-extern unsigned char red[];
-extern unsigned char blue[];
-extern unsigned char green[];
+extern unsigned char red[8230];
+extern unsigned char blue[8267];
+extern unsigned char green[8265];
 
 static struct list_head queued_bufs;
 static struct timer_list vvd_timer;
+static struct mutex vb_queue_lock;
+static struct mutex v4l2_lock;
 static int copy_cnt;
 
 /* 这个结构体中的函数都不需要自己提供 */
 static const struct v4l2_file_operations vvd_fops = {
-	.owner                    = THIS_MODULE,
-	.open                     = v4l2_fh_open,
-	.release                  = vb2_fop_release,
-	.read                     = vb2_fop_read,
-	.poll                     = vb2_fop_poll,
-	.mmap                     = vb2_fop_mmap,
-	.unlocked_ioctl           = video_ioctl2,
+	.owner          = THIS_MODULE,
+	.open           = v4l2_fh_open,
+	.release        = vb2_fop_release,
+	.read           = vb2_fop_read,
+	.poll           = vb2_fop_poll,
+	.mmap           = vb2_fop_mmap,
+	.unlocked_ioctl = video_ioctl2,
 };
 
 /* 查询能力IOCTL */
-static int vvd_querycap(struct file *file, void *fh,
-		struct v4l2_capability *cap)
+static int vvd_querycap(struct file *file, void *fh, struct v4l2_capability *cap)
 {
+	printk("[%s] func: %s, line: %d\n", __FILE__, __func__, __LINE__);
 	strlcpy(cap->driver, "L1ang_virtual_video", sizeof(cap->driver));
 	strlcpy(cap->card, "no-card", sizeof(cap->card));
 	cap->device_caps = V4L2_CAP_VIDEO_CAPTURE | V4L2_CAP_STREAMING | V4L2_CAP_READWRITE;
@@ -55,6 +56,7 @@ static int vvd_querycap(struct file *file, void *fh,
 static int vvd_enum_fmt_vid_cap(struct file *file, void *priv,
 struct v4l2_fmtdesc *f)
 {
+	printk("[%s] func: %s, line: %d\n", __FILE__, __func__, __LINE__);
 	if (f->index > 0)
 		return -EINVAL;
 
@@ -72,12 +74,13 @@ static int vvd_s_fmt_vid_cap(struct file *file, void *priv,
 	 * 分辩用户传入的参数是否可用
 	 * 如果不可用，给APP传入最接近的、硬件支持的参数
      */
+    printk("[%s] func: %s, line: %d\n", __FILE__, __func__, __LINE__);
 	if (f->type != V4L2_BUF_TYPE_VIDEO_CAPTURE)
 		return -EINVAL;
 	if (f->fmt.pix.pixelformat != V4L2_PIX_FMT_MJPEG)
 		return -EINVAL;
-    f.fmt.pix.width = 800;
-    f.fmt.pix.height = 600;
+    f->fmt.pix.width = 800;
+    f->fmt.pix.height = 600;
 
 	return 0;
 }
@@ -95,6 +98,19 @@ static int vvd_enum_framesizes(struct file *file, void *fh,
 	return 0;
 }
 
+static int vvd_g_fmt(struct file *file, void *priv, struct v4l2_format *f)
+{
+   struct v4l2_pix_format *pix = &f->fmt.pix;
+
+   pix->width = 800;
+   pix->height = 600;
+   pix->field = V4L2_FIELD_NONE;
+   pix->pixelformat = V4L2_PIX_FMT_MJPEG;
+   pix->bytesperline = 0;
+   return 0;
+}
+
+
 /* 这个结构体中的大部分函数也是内核已经提供好了的 */
 static const struct v4l2_ioctl_ops vvd_ops = {
 	.vidioc_querycap          = vvd_querycap,
@@ -102,6 +118,7 @@ static const struct v4l2_ioctl_ops vvd_ops = {
 	.vidioc_enum_fmt_vid_cap  = vvd_enum_fmt_vid_cap,
 	.vidioc_s_fmt_vid_cap     = vvd_s_fmt_vid_cap,
 	.vidioc_enum_framesizes	  = vvd_enum_framesizes,
+	.vidioc_g_fmt_vid_cap     = vvd_g_fmt,
 
 	.vidioc_reqbufs           = vb2_ioctl_reqbufs,
 	.vidioc_create_bufs       = vb2_ioctl_create_bufs,
@@ -124,7 +141,7 @@ static int vvd_queue_setup(struct vb2_queue *vq,
 	*nplanes = 1; // 直接设定每个buffer只有1个plane
 	sizes[0] = PAGE_ALIGN(800 * 600 * 2);
 
-	dev_dbg(s->dev, "nbuffers=%d sizes[0]=%d\n", *nbuffers, sizes[0]);
+	printk("nbuffers=%d sizes[0]=%d\n", *nbuffers, sizes[0]);
 	return 0;
 }
 
@@ -142,7 +159,6 @@ static void vvd_buf_queue(struct vb2_buffer *vb)
 
 static struct vvd_frame_buf *vvd_get_next_fill_buf(void)
 {
-	unsigned long flags;
 	struct vvd_frame_buf *buf = NULL;
 
 	// spin_lock_irqsave(&s->queued_bufs_lock, flags);
@@ -167,22 +183,22 @@ static void vvd_timer_expire(struct timer_list *t)
 	buf = vvd_get_next_fill_buf(); // 得到空闲buffer
 
 	if (buf) {
-		ptr = vb2_plane_vaddr(&buf->vb.vb2_buffer, 0); // 得到 struct vb2_buffer 指针
+		ptr = vb2_plane_vaddr(&buf->vb.vb2_buf, 0); // 得到 struct vb2_buffer 指针
 
 		/* 每60帧（2s）拷贝不同颜色  */
 		if (copy_cnt < 60) {
 			memcpy(ptr, red, sizeof(red));
-			vb2_set_plane_payload(&buf->vb.vb2_buffer, 0, sizeof(red)); // 设置每次拷贝的数据，因为可能数据每次的长度可能不一样
-		} else if (copy_cnt >= 60 & copy_cnt < 120) {
+			vb2_set_plane_payload(&buf->vb.vb2_buf, 0, sizeof(red)); // 设置每次拷贝的数据，因为可能数据每次的长度可能不一样
+		} else if (copy_cnt >= 60 && copy_cnt < 120) {
 			memcpy(ptr, green, sizeof(green));
-			vb2_set_plane_payload(&buf->vb.vb2_buffer, 0, sizeof(green)); // 设置每次拷贝的数据，因为可能数据每次的长度可能不一样
-		} else if (copy_cnt >= 120 & copy_cnt < 180) {
+			vb2_set_plane_payload(&buf->vb.vb2_buf, 0, sizeof(green)); // 设置每次拷贝的数据，因为可能数据每次的长度可能不一样
+		} else if (copy_cnt >= 120 && copy_cnt < 180) {
 			memcpy(ptr, blue, sizeof(blue));
-			vb2_set_plane_payload(&buf->vb.vb2_buffer, 0, sizeof(blue)); // 设置每次拷贝的数据，因为可能数据每次的长度可能不一样
+			vb2_set_plane_payload(&buf->vb.vb2_buf, 0, sizeof(blue)); // 设置每次拷贝的数据，因为可能数据每次的长度可能不一样
 		}
 
 		/* 将buffer放入完成链表：vb2_buffer_done */
-		vb2_buffer_done(&buf->vb.vb2_buffer, VB2_BUF_STATE_DONE);
+		vb2_buffer_done(&buf->vb.vb2_buf, VB2_BUF_STATE_DONE);
 	}
 
 	copy_cnt += 1;
@@ -210,6 +226,17 @@ static void vvd_stop_streaming(struct vb2_queue *vq)
 {
 	/* 停止硬件传输 */
 	del_timer(&vvd_timer);
+
+	while (!list_empty(&queued_bufs)) {
+		struct vvd_frame_buf *buf;
+
+		buf = list_entry(queued_bufs.next,
+				struct vvd_frame_buf, list);
+		list_del(&buf->list);
+		vb2_buffer_done(&buf->vb.vb2_buf, VB2_BUF_STATE_ERROR);
+	}
+
+
 }
 
 
@@ -224,7 +251,7 @@ static const struct vb2_ops vvd_vb2_ops = {
 };
 
 
-static const struct video_device vvd_vdev = {
+static struct video_device vvd_vdev = {
 	.name                     = "L1angGM_virtual_video_driver",
 	.release                  = video_device_release_empty,
 	.fops                     = &vvd_fops,
@@ -233,6 +260,12 @@ static const struct video_device vvd_vdev = {
 
 static struct v4l2_device vvd_v4l2_dev;
 static struct vb2_queue vvd_vb2_queue;
+
+static void vvd_video_release(struct v4l2_device *v)
+{
+
+}
+
 
 static int vvd_init(void)
 {
@@ -244,7 +277,7 @@ static int vvd_init(void)
 	 * 1. 函数调用（比如ioctl）
 	 * 2. 队列/buffer的管理
 	 */
-	vvd_vb2_queue.type = V4L2_BUF_TYPE_SDR_CAPTURE;
+	vvd_vb2_queue.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 	vvd_vb2_queue.io_modes = VB2_MMAP | VB2_USERPTR | VB2_READ;
 	vvd_vb2_queue.drv_priv = NULL;
 	vvd_vb2_queue.buf_struct_size = sizeof(struct vvd_frame_buf); // 分配vb时，分配的空间大小为buf_struct_size
@@ -257,11 +290,16 @@ static int vvd_init(void)
 		return -1;
 	}
 
+	/* 初始化锁 */
+	mutex_init(&vb_queue_lock);
+	mutex_init(&v4l2_lock);
+
 	vvd_vdev.queue = &vvd_vb2_queue; // queue和video_device 挂钩
-	vvd_vdev.queue->lock = &s->vb_queue_lock;
+	vvd_vdev.queue->lock = &vb_queue_lock;
 
 	/* Register the v4l2_device structure */
-	vvd_v4l2_dev.release = airspy_video_release;
+	vvd_v4l2_dev.release = vvd_video_release;
+	strcpy(vvd_v4l2_dev.name, "L1angGM_vvd_v4l2");
 	ret = v4l2_device_register(NULL, &vvd_v4l2_dev);
 	if (ret) {
 		printk("Failed to register v4l2-device (%d)\n", ret);
@@ -269,8 +307,8 @@ static int vvd_init(void)
 	}
 
 	vvd_vdev.v4l2_dev = &vvd_v4l2_dev;
-	vvd_vdev.lock = &s->v4l2_lock;
-	ret = video_register_device(&vvd_vdev, VFL_TYPE_SDR, -1);
+	vvd_vdev.lock = &v4l2_lock;
+	ret = video_register_device(&vvd_vdev, VFL_TYPE_GRABBER, -1);
 	if (ret) {
 		printk("Failed to register as video device (%d)\n", ret);
 		return -1;

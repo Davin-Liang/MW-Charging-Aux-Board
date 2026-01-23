@@ -10,7 +10,7 @@ export CXX=${GCC_COMPILER}-g++
 # build
 mkdir -p build/
 cd build/
-cmake ..
+cmake .. -DYOLO_VERSION=yolov8
 make -j4
 make install
 cd -
