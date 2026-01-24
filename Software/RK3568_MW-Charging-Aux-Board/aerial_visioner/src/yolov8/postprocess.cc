@@ -25,7 +25,7 @@
 #include <vector>
 #define LABEL_NALE_TXT_PATH "./model/coco_80_labels_list.txt"
 
-static char labelTxtPath[40];
+static char labelTxtPath[50];
 
 static char *labels[OBJ_CLASS_NUM];
 
@@ -33,6 +33,7 @@ void set_label_path(const std::string& str)
 {
     memset(labelTxtPath, 0, sizeof(labelTxtPath));
     strncpy(labelTxtPath, str.c_str(), sizeof(labelTxtPath) - 1);
+    printf("label path = %s", labelTxtPath);
 }
 
 inline static int clamp(float val, int min, int max) { return val > min ? (val < max ? val : max) : min; }
@@ -677,7 +678,6 @@ int init_post_process()
 
 char *coco_cls_to_name(int cls_id)
 {
-
     if (cls_id >= OBJ_CLASS_NUM)
     {
         return "null";

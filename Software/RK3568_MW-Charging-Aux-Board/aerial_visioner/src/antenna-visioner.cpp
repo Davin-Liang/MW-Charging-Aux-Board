@@ -12,6 +12,7 @@
 #include "opencv2/imgproc.hpp"
 #include "opencv2/imgcodecs.hpp"
 #include "opencv2/opencv.hpp"
+#include "postprocess.h"
 
 
 AntennaVisioner::AntennaVisioner(const std::string& modelPath, 
@@ -86,6 +87,7 @@ bool AntennaVisioner::init_system()
 #ifdef USE_YOLOV8
     int ret;
 
+    set_label_path(labelPath_);
     ret = init_post_process();
     if (ret != 0) {
         printf("Fail to initial post process.\n");
@@ -108,6 +110,8 @@ bool AntennaVisioner::init_system()
     /* 设置摄像头分辨率 (建议与模型输入尺寸接近，提高效率) */
     cap_.set(cv::CAP_PROP_FRAME_WIDTH, 640);
     cap_.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
+
+    return true;
 
 fail_to_init_model:
     deinit_post_process();
@@ -196,6 +200,11 @@ bool AntennaVisioner::detect_once(cv::Mat& outputFrame)
 #ifdef USE_YOLOV8
     int ret;
 
+    #if TIME_CONM_CALC
+    /* C++14 使用 std::chrono 进行高精度计时 */
+    auto start_time = std::chrono::high_resolution_clock::now();
+    #endif
+    
     cv::Mat origImg;
     image_buffer_t ibImage;
 
@@ -255,6 +264,12 @@ bool AntennaVisioner::detect_once(cv::Mat& outputFrame)
 
     /* 输出图像 */
     outputFrame = origImg;
+
+    #if TIME_CONM_CALC
+    auto end_time = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+    std::cout << "Inference + Draw time: " << duration.count() << "ms" << std::endl;
+    #endif
 
 #else
 

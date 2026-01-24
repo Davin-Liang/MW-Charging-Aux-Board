@@ -6,7 +6,7 @@ project(3rdparty_libs)
 set(RKNN_PATH ${CMAKE_CURRENT_SOURCE_DIR}/rknpu2)
 set(LIBRKNNRT ${RKNN_PATH}/lib/librknnrt.so PARENT_SCOPE)
 set(LIBRKNNRT_INCLUDES ${RKNN_PATH}/include PARENT_SCOPE)
-install(PROGRAMS ${LIBRKNNRT} DESTINATION lib)
+install(PROGRAMS ${RKNN_PATH}/lib/librknnrt.so DESTINATION lib)
 
 # rga
 set(RGA_PATH ${CMAKE_CURRENT_SOURCE_DIR}/librga)

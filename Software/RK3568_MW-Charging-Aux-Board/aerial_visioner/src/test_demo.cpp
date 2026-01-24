@@ -8,7 +8,7 @@
 
 int main()
 {
-    AntennaVisioner anV("./model/yolov5s-640-640.rknn", "./model/coco_80_labels_list.txt", 9);
+    AntennaVisioner anV("./yolov8_model/yolov8n.rknn", "./yolov8_model/coco_80_labels_list.txt", 9);
 
     anV.init_system();
     cv::Mat img;
