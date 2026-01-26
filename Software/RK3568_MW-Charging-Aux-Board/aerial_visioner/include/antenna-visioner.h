@@ -1,8 +1,3 @@
-/**
- * @file AntennaVisioner.h
- * @brief 天线视觉识别器类定义 (C++14 Modernized)
- */
-
 #ifndef ANTENNA_VISIONER_H
 #define ANTENNA_VISIONER_H
 

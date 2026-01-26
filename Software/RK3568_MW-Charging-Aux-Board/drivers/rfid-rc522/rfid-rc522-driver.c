@@ -218,10 +218,8 @@ ssize_t rfid_rc522_read(struct file *filp, char __user *buf, size_t count, loff_
 int rfid_rc522_release(struct inode* inode ,struct file *filp)
 {
 	struct rc522_device * rfid_rc522_dev = filp->private_data;
-	struct gpio_desc * reset_pin = rfid_rc522_dev->reset_gpio;
 
 	control_rfid_rc522_reset_pin(rfid_rc522_dev, ENABLE);
-	gpiod_put(reset_pin);
 	printk("Release RFID-RC522 device successfully.\n");
 
 	return 0;
@@ -245,7 +243,7 @@ int rfid_rc522_probe(struct spi_device *spi)
 	struct rc522_device * rfid_rc522_dev;
 	int ret;
 
-	printk("Enter rfid_rc522_probe()");
+	printk("Enter rfid_rc522_probe().");
 
 	/* 分配 rc522_device  */
 	rfid_rc522_dev = kzalloc(sizeof(struct rc522_device), GFP_KERNEL);
@@ -258,7 +256,6 @@ int rfid_rc522_probe(struct spi_device *spi)
 		printk("Fail to get device tree node.\n");
 		goto err_get_of_node;
 	}
-
 
 	/* 获取reset引脚的GPIO描述符 */
 	rfid_rc522_dev->reset_gpio = gpiod_get(&spi->dev, "reset", 0);
@@ -277,7 +274,7 @@ int rfid_rc522_probe(struct spi_device *spi)
 	}
 
 	/* 初始化 cdev */
-	cdev_init(&rfid_rc522_dev->cdev, rfid_rc522_fops);
+	cdev_init(&rfid_rc522_dev->cdev, &rfid_rc522_fops);
 
 	/* 向内核中添加一个cdev */
 	ret = cdev_add(&rfid_rc522_dev->cdev, rfid_rc522_dev->dev_id, 1);
@@ -294,7 +291,9 @@ int rfid_rc522_probe(struct spi_device *spi)
 	}
 	
 	/* 在nfc_class类下创建一个NFC_class设备 */
-	rfid_rc522_dev->device = device_create(rfid_rc522_dev->class, NULL, rfid_rc522_dev->dev_id, NULL, DEVICE_NAME);	
+	rfid_rc522_dev->device = device_create(rfid_rc522_dev->class, NULL, 
+											rfid_rc522_dev->dev_id, 
+											NULL, DEVICE_NAME);	
 	if (rfid_rc522_dev->device == NULL) {
 	   printk("Fail to create device in nfc class.\n");
 	   goto err_create_device;
@@ -306,7 +305,7 @@ int rfid_rc522_probe(struct spi_device *spi)
 	/* 设置SPI私有数据 */
 	spi_set_drvdata(spi, rfid_rc522_dev);
 	
-	spi_setup(rfid_rc522_dev->spi);	
+	ret = spi_setup(rfid_rc522_dev->spi);	
 	if (ret) {
 	   printk("Fail to setup spi.\n");
 	   goto err_setup_spi;	
@@ -335,6 +334,7 @@ err_add_cdev:
 	return ret;	
 
 err_create_class:
+	cdev_del(&rfid_rc522_dev->cdev);
 	gpiod_put(rfid_rc522_dev->reset_gpio);
 	kfree(rfid_rc522_dev);
 	ret = -EINVAL;
@@ -342,6 +342,7 @@ err_create_class:
 
 err_create_device:
 	class_destroy(rfid_rc522_dev->class);
+	cdev_del(&rfid_rc522_dev->cdev);
 	gpiod_put(rfid_rc522_dev->reset_gpio);
 	kfree(rfid_rc522_dev);
 	ret = -EINVAL;
@@ -350,6 +351,7 @@ err_create_device:
 err_setup_spi:
 	device_destroy(rfid_rc522_dev->class, rfid_rc522_dev->dev_id);
 	class_destroy(rfid_rc522_dev->class);
+	cdev_del(&rfid_rc522_dev->cdev);
 	gpiod_put(rfid_rc522_dev->reset_gpio);
 	kfree(rfid_rc522_dev);
 	return ret;		
@@ -362,6 +364,7 @@ int rfid_rc522_remove(struct spi_device *spi)
 	rfid_rc522_dev->spi = NULL;
 	device_destroy(rfid_rc522_dev->class, rfid_rc522_dev->dev_id);
 	class_destroy(rfid_rc522_dev->class);
+	cdev_del(&rfid_rc522_dev->cdev);
 	gpiod_put(rfid_rc522_dev->reset_gpio);
 	kfree(rfid_rc522_dev);
 }
@@ -384,7 +387,7 @@ static int __init rfid_rc522_driver_init(void)
 
 	ret = spi_register_driver(&rfid_rc522_driver);
 	if (ret)
-		printk("Fail to egister spi driver unsucess(Error: %d)\n", ret);
+		printk("Fail to egister spi driver unsucess(Error: %d).\n", ret);
 	else
 		printk("Register spi driver successfully.\n");
 
