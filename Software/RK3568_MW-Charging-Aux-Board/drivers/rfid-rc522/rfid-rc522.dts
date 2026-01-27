@@ -1,0 +1,24 @@
+/* 以下pinctrl信息在中添加     */
+&spi0 {
+	status = "okay";
+	pinctrl-0 = <&spi0m1_cs0 &spi0m1_pins>;
+	pinctrl-1 = <&spi0m1_cs0 &spi0m1_pins_hs>;
+
+	rc522: rc522@0 {
+		 compatible = "L1angGM,RFID-RC522";
+		 reg = <0>;
+		 spi-max-frequency = <8000000>; // 设置SPI速率为8M
+		 rst-gpio = <&gpio1 RK_PB0 GPIO_ACTIVE_HIGH>; // 使用GPIO1_B0和RFID的RST引脚相连
+         pinctrl-0 = <&rc522_rst>; // 使用rc522_rst节点的pinctrl
+		 status = "okay";
+	};
+};
+
+&pinctrl {
+	rc522 {
+		rc522_rst: rc522-rst {
+			// 将GPIO1的PB0设置为RK_FUNC_GPIO功能，电气属性设置为上拉
+			rockchip,pins = <1 RK_PB0 RK_FUNC_GPIO &pcfg_pull_up>;
+		};
+	};
+};

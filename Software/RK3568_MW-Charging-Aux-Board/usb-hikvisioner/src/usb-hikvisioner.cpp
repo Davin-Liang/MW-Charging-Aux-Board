@@ -1,4 +1,6 @@
 #include "usb-hikvisioner.h"
+#include <unistd.h>
+
 
 /**
  * @brief 构造函数
@@ -8,7 +10,7 @@ USBHikvisioner::USBHikvisioner(int cameraDeviceIndex = 0)
 :cameraDeviceIndex_(cameraDeviceIndex),
  deviceHandle_(NULL),
  nPayloadSize_(0),
- cameraStatus_(WAIT_FOR_INIT):
+ cameraStatus_(WAIT_FOR_INIT)
 {
 
 }
@@ -60,7 +62,7 @@ bool USBHikvisioner::camera_init(void)
             }
             print_device_info_(*pDeviceInfo);
         }
-        return true;
+        // return true;
     } else {
         printf("Find No Devices!\n");
         return false;
@@ -96,7 +98,7 @@ bool USBHikvisioner::camera_open(void)
 {
     int ret = MV_OK;
 
-    int (cameraStatus_ == OPENED) {
+    if (cameraStatus_ == OPENED) {
         printf("Camera has been opened. No need to open again.\n");
         return true;
     }
@@ -113,6 +115,31 @@ bool USBHikvisioner::camera_open(void)
         return false;
     }   
 
+    /* 设置自动增益 (Auto Gain) -> Continuous (2) */
+    // 如果不支持自动，手动设置一个较高值
+    ret = MV_CC_SetEnumValue(deviceHandle_, "GainAuto", 2);
+    if (MV_OK != ret) {
+        printf("[Warning] Set Auto Gain Fail, trying manual gain 10dB...\n");
+        MV_CC_SetEnumValue(deviceHandle_, "GainAuto", 0); // Off
+        MV_CC_SetFloatValue(deviceHandle_, "Gain", 10.0f);
+    } else {
+        printf("[Config] Set Auto Gain Success.\n");
+    }
+
+    /* 设置自动曝光 (Auto Exposure) -> Continuous (2) */
+    // 如果不支持自动，手动设置一个较长曝光时间 (50ms = 50000us)
+    ret = MV_CC_SetEnumValue(deviceHandle_, "ExposureAuto", 2);
+    if (MV_OK != ret) {
+        printf("[Warning] Set Auto Exposure Fail, trying manual exposure 50ms...\n");
+        MV_CC_SetEnumValue(deviceHandle_, "ExposureAuto", 0); // Off
+        MV_CC_SetFloatValue(deviceHandle_, "ExposureTime", 50000.0f); 
+    } else {
+        printf("[Config] Set Auto Exposure Success.\n");
+    }
+
+    // 3. 稍微等待一下让自动算法收敛（变亮）
+    usleep(500000); // 等待 0.5 秒
+
     /* 关闭触发模式 */
     ret = MV_CC_SetEnumValue(deviceHandle_, "TriggerMode", 0);
     if (MV_OK != ret) {
@@ -120,6 +147,20 @@ bool USBHikvisioner::camera_open(void)
         return false;
     } 
     
+    /* --- 设置 Binning (降低分辨率，提高帧率) --- */
+    // BinningHorizontal = 4, BinningVertical = 4 表示宽高各缩小一半
+    ret = MV_CC_SetEnumValue(deviceHandle_, "BinningHorizontal", 4);
+    if (MV_OK != ret) {
+        printf("Set BinningH fail! ret: [0x%x]\n", ret);
+        return false;
+    }
+
+    ret = MV_CC_SetEnumValue(deviceHandle_, "BinningVertical", 4);
+    if (MV_OK != ret) {
+        printf("Set BinningV fail! ret: [0x%x]\n", ret);
+        return false;
+    }
+
     /* 获取图像大小 */
     MVCC_INTVALUE stParam;
     memset(&stParam, 0, sizeof(MVCC_INTVALUE));
@@ -193,13 +234,15 @@ bool USBHikvisioner::camera_close(void)
  */
 bool USBHikvisioner::read_img(cv::Mat& img, unsigned int nMsec)
 {
+    int ret;
+
     if (cameraStatus_ != OPENED) {
         printf("Camera needs to been opened.\n");
         return false;
     }
     
     /* 获取一帧图像，超时时间1000ms */
-    ret = MV_CC_GetOneFrameTimeout(deviceHandle_, pData_, nPayloadSize, &stImageInfo_, nMsec);
+    ret = MV_CC_GetOneFrameTimeout(deviceHandle_, pData_.get(), nPayloadSize_, &stImageInfo_, nMsec);
     if (MV_OK != ret) {
         printf("Get Frame fail! ret: [0x%x]\n.", ret);
         return false;
@@ -222,28 +265,43 @@ bool USBHikvisioner::convert_to_mat(MV_FRAME_OUT_INFO_EX& stImageInfo,
                                     std::unique_ptr<uint8_t[]>& pData,
                                     cv::Mat& dstImg)
 {
-    cv::Mat srcImage;
-
     if (!pData) {
         printf("Data is null.\n");
         return false;
     }
 
-    if (PixelType_Gvsp_Mono8 == stImageInfo.enPixelType) // Mono8类型
-        srcImage = cv::Mat(stImageInfo.nHeight, stImageInfo.nWidth, CV_8UC1, pData.get());
-    else if ( PixelType_Gvsp_RGB8_Packed == stImageInfo.enPixelType ) { // RGB8类型
-        /* 构造临时的 RGB Mat */
-        srcImage = cv::Mat(stImageInfo.nHeight, stImageInfo.nWidth, CV_8UC3, pData.get());
-        /* 转换 RGB -> BGR (OpenCV 默认显示格式) 并存入 dstImg */
-        cv::cvtColor(srcImage, dstImg, cv::COLOR_RGB2BGR);
-    } else {
-        printf("Unsupported pixel format\n");
-        return false;
+    /* 1. 如果本身就是 Mono8 (灰度)，直接引用内存构建 Mat，无需转换 */
+    if (stImageInfo.enPixelType == PixelType_Gvsp_Mono8) {
+        dstImg = cv::Mat(stImageInfo.nHeight, stImageInfo.nWidth, CV_8UC1, pData.get()).clone();
+        return true;
     }
 
-    /* 检查转换结果 */
-    if (dstImg.empty()) {
-        printf("Convert Mat failed.\n");
+    // 2. 如果是彩色格式 (Bayer, RGB, YUV 等)，统一让 SDK 转换成 BGR8
+    // BGR8 是 OpenCV 默认的彩色格式 (Blue, Green, Red)
+    
+    // 计算目标需要的内存大小 (宽 * 高 * 3通道)
+    unsigned int nRGBSize = stImageInfo.nWidth * stImageInfo.nHeight * 3;
+    
+    // 准备转换参数
+    MV_CC_PIXEL_CONVERT_PARAM stConvertParam = {0};
+    stConvertParam.nWidth = stImageInfo.nWidth;
+    stConvertParam.nHeight = stImageInfo.nHeight;
+    stConvertParam.pSrcData = pData.get();                  // 输入数据
+    stConvertParam.nSrcDataLen = stImageInfo.nFrameLen;     // 输入长度
+    stConvertParam.enSrcPixelType = stImageInfo.enPixelType;// 输入格式 (自动识别)
+    
+    // 目标格式：PixelType_Gvsp_BGR8_Packed (这是 OpenCV 最喜欢的格式)
+    stConvertParam.enDstPixelType = PixelType_Gvsp_BGR8_Packed; 
+    
+    // 创建输出 Mat (分配内存)
+    dstImg = cv::Mat(stImageInfo.nHeight, stImageInfo.nWidth, CV_8UC3);
+    stConvertParam.pDstBuffer = dstImg.data;                // 将转换结果直接写入 Mat 的内存
+    stConvertParam.nDstBufferSize = nRGBSize;
+
+    // 调用 SDK 进行转换
+    int ret = MV_CC_ConvertPixelType(deviceHandle_, &stConvertParam);
+    if (MV_OK != ret) {
+        printf("Convert Pixel Type fail! ret: [0x%x], Input Format: [0x%x]\n", ret, stImageInfo.enPixelType);
         return false;
     }
 
