@@ -56,6 +56,10 @@ static int rfid_rc522_write_regs(struct rc522_device * rfid_rc522_dev, unsigned 
 {
     int ret;
     unsigned char * buf;
+
+	if (!rfid_rc522_dev || !rfid_rc522_dev->spi)
+		return -ENODEV;
+	
     struct spi_device * spi = rfid_rc522_dev->spi;
     
     buf = (unsigned char *)kzalloc(1 + len, GFP_KERNEL);
@@ -88,6 +92,10 @@ static int rfid_rc522_read_regs(struct rc522_device *rfid_rc522_dev, unsigned ch
 	int ret = -1;
 	unsigned char txbuf[1];
 	unsigned char * rxbuf;
+
+	if (!rfid_rc522_dev || !rfid_rc522_dev->spi)
+		return -ENODEV;
+	
 	struct spi_device *spi = rfid_rc522_dev->spi;
 
 	/* 申请缓冲区内存 */
@@ -108,6 +116,8 @@ static int rfid_rc522_read_regs(struct rc522_device *rfid_rc522_dev, unsigned ch
 	memcpy(dat, rxbuf + 1, len);
 	kfree(rxbuf);
 	ret = 0; // 成功
+
+	return 0;
 	
 cleanup:
 	kfree(rxbuf);
@@ -152,7 +162,7 @@ int rfid_rc522_open(struct inode * inode, struct file * filp)
     rfid_rc522_dev = container_of(inode->i_cdev, struct rc522_device, cdev);
 
     /* 保存到 file 私有数据，后面 read/write 都能用 */
-	filp->private_data = &rfid_rc522_dev;
+	filp->private_data = rfid_rc522_dev;
 
 	/* 初始化RC522 */
     control_rfid_rc522_reset_pin(rfid_rc522_dev, DISABLE);
@@ -176,7 +186,7 @@ ssize_t rfid_rc522_write(struct file *filp, const char __user *buf, size_t count
 		return -ENOMEM;
 
 	ret = copy_from_user(w_buf, buf, count);
-	if (ret < 0) {
+	if (ret) {
 		kfree(w_buf);
 		printk("Fail to copy data from user.\n");
 		return ret;
