@@ -1,0 +1,140 @@
+// command_struct.h
+#ifndef __COMMAND_STRUCT_H
+#define __COMMAND_STRUCT_H
+
+#include <stdint.h>
+
+// 命令类型枚举
+typedef enum {
+    CMD_MOTOR_CONTROL = 0x01, // 电机控制  
+    CMD_FIND_OPT_RES = 0x02, // 寻优
+		CMD_POWER_SCAN = 0x03,
+    MOTOR_DATA_READ = 0x04, // 电机数据读取
+    CMD_OPT_RES_READ = 0x05, // 寻优结果读取
+    CURRENT_VPCH_READ = 0x06,
+    CMD_PASS_DATE_TIME = 0x07, // 向下位机传递数据
+    CMD_RESPONSE = 0x80 // 响应命令
+} CommandType_t;
+
+// 响应状态
+typedef enum {
+    STATUS_SUCCESS = 0,
+    STATUS_INVALID_CMD,
+    STATUS_INVALID_PARAM,
+    STATUS_EXECUTE_FAIL,
+    STATUS_BUSY
+} ResponseStatus_t;
+
+// 命令头结构
+typedef struct __attribute__((packed)) {
+    uint8_t startMagic; // 起始标志 0xAA
+    uint16_t cmdId; // 命令ID
+//    uint16_t seqNum; // 序列号
+    uint16_t dataLen; // 数据长度
+    uint8_t checksum; // 头校验和
+} CmdHeader_t;
+
+// 日期时间结构
+typedef struct __attribute__((packed)) {
+    uint16_t year;          // 年份 2023-2100
+    uint8_t month;          // 月份 1-12
+    uint8_t day;            // 日期 1-31
+    uint8_t hour;           // 小时 0-23
+    uint8_t minute;         // 分钟 0-59
+    uint8_t week_day;       // 星期 0-6 (0=周日)
+} DateTime_t;
+
+// 电机控制命令  
+typedef struct __attribute__((packed)) {
+    int16_t x; // 接收天线 X 坐标[m] float >> int16_t
+    int16_t y; // 接收天线 Y 坐标[m] float >> int16_t
+    uint16_t speed; // 接收天线移动速度——0 表示不设置速度/ >0 表示设置速度
+} MotorCmd_t;
+
+// 轨迹类型
+typedef enum {
+    SQU_TRAJ = 0x01, // 方型轨迹
+    CIR_TRAJ = 0x02, // 圆形轨迹
+} ThajType_t;
+
+typedef struct __attribute__((packed)) {
+    float motorX;
+    float motorY;
+    int motorSpeed;
+} MotorData_t;
+
+typedef struct __attribute__((packed)) {
+    MotorData_t motorData;
+    float optimalPower;
+    float optimalVs[4]; 
+} OptResData_t;
+
+typedef struct __attribute__((packed)) {
+    uint8_t currentChannel;
+    float currentV;
+    float currentP; 
+} CurrentVPCh_t;
+
+// 寻优控制命令
+typedef struct __attribute__((packed)) {
+    uint8_t whichThaj; // 哪种轨迹
+    uint16_t cirTrajRad; // 圆形轨迹半径[mm]
+    uint16_t squThajLen; // 方形轨迹边长[mm]
+    uint16_t squThajStepLen; // 执行方形轨迹的步长[mm]
+    float maxVol; // 通道可设置的最大电压[v]
+    float volStepLen; // 设置电压时电压跳变的步长[v]
+    float initialVol; // 通道初始电压[V]    
+} FindOptimalCmd_t;
+
+typedef struct __attribute__((packed)) {
+    uint8_t whichThaj; // 哪种轨迹
+    float cirTrajRad; // 圆形轨迹半径[m]
+    float squThajLen; // 方形轨迹边长[mm]
+    uint8_t squThajStepLen; // 执行方形轨迹的步长[mm] 
+} PowerScan_t;
+
+// 响应结构
+typedef struct __attribute__((packed)) {
+    uint16_t originalSeq;   // 原命令序列号
+    uint8_t status;          // 执行状态
+    uint32_t timestamp;      // 时间戳
+    uint16_t dataLen;       // 响应数据长度
+    uint8_t data[];          // 响应数据(柔性数组)
+} ResponseData_t;
+
+// 完整命令帧结构
+typedef struct __attribute__((packed)) {
+    CmdHeader_t header;
+    union __attribute__((packed)) {
+        MotorCmd_t motorCmd;
+        FindOptimalCmd_t findOptCmd;
+        MotorData_t motorData;
+        CurrentVPCh_t currentVPCh;
+        DateTime_t timeData;
+        ResponseData_t response;
+        uint8_t rawData[128];  // 原始数据存储
+    } payload;
+} CommandFrame_t;
+
+// 数据中心
+struct DataCenter_t {
+    uint16_t dataUpdateFlag;
+    MotorCmd_t * motorCmd;
+    FindOptimalCmd_t * findOptCmd;
+    DateTime_t * timeData;
+};
+
+// 函数声明
+uint8_t calculate_checksum(const uint8_t* data, uint16_t len);
+int build_command_frame(uint8_t* buffer, CommandType_t cmdType, const void* data, uint16_t dataLen);
+int parse_command_frame(const uint8_t* buffer, uint16_t len, CommandFrame_t* cmd);
+ResponseStatus_t execute_command(const CommandFrame_t* cmd, uint8_t* responseData, uint16_t* respLen);
+
+uint16_t get_data_update_flag(struct DataCenter_t * dc);
+MotorCmd_t * get_motor_cmd(struct DataCenter_t * dc);
+FindOptimalCmd_t * get_find_optimal_cmd(struct DataCenter_t * dc);
+uint8_t check_data_update_flag(uint16_t flag, uint8_t bit);
+DateTime_t * get_time_data(struct DataCenter_t * dc);
+struct DataCenter_t * malloc_data_center(void);
+
+#endif
