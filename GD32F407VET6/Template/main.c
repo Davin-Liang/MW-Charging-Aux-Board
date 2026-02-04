@@ -5,7 +5,7 @@
 
 #define TEST_LED_PORT  GPIOB
 #define TEST_LED_PIN   GPIO_PIN_4
-#define TEST_LED_CLK   RCU_GPIOE
+#define TEST_LED_CLK   RCU_GPIOB
 
 void LED_Init(void) {
     rcu_periph_clock_enable(TEST_LED_CLK);
