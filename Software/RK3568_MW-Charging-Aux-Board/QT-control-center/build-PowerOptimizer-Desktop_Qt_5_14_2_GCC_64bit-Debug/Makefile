@@ -37,7 +37,7 @@ MOVE          = mv -f
 TAR           = tar -cf
 COMPRESS      = gzip -9f
 DISTNAME      = PowerOptimizer1.0.0
-DISTDIR = /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/build-PowerOptimizer-Desktop_Qt_5_14_2_GCC_64bit-Debug/build/.obj/PowerOptimizer1.0.0
+DISTDIR = /home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/build-PowerOptimizer-Desktop_Qt_5_14_2_GCC_64bit-Debug/build/.obj/PowerOptimizer1.0.0
 LINK          = g++
 LFLAGS        = -Wl,-rpath,/opt/Qt5.14.2/5.14.2/gcc_64/lib
 LIBS          = $(SUBLIBS) /opt/Qt5.14.2/5.14.2/gcc_64/lib/libQt5Charts.so /opt/Qt5.14.2/5.14.2/gcc_64/lib/libQt5Widgets.so /opt/Qt5.14.2/5.14.2/gcc_64/lib/libQt5Gui.so /opt/Qt5.14.2/5.14.2/gcc_64/lib/libQt5Network.so /opt/Qt5.14.2/5.14.2/gcc_64/lib/libQt5Core.so -lGL -lpthread   
@@ -52,8 +52,7 @@ OBJECTS_DIR   = build/.obj/
 
 ####### Files
 
-SOURCES       = ../PowerOptimizer/src/tab_netural.cpp \
-		../PowerOptimizer/src/PID_Controller.cpp \
+SOURCES       = ../PowerOptimizer/src/PID_Controller.cpp \
 		../PowerOptimizer/src/TrajectoryJsonDialog.cpp \
 		../PowerOptimizer/src/command_transmitter.cpp \
 		../PowerOptimizer/src/tab_file_read.cpp \
@@ -74,8 +73,7 @@ SOURCES       = ../PowerOptimizer/src/tab_netural.cpp \
 		build/.moc/moc_tab_deviceconnect.cpp \
 		build/.moc/moc_logindialog.cpp \
 		build/.moc/moc_mainwindow.cpp
-OBJECTS       = build/.obj/tab_netural.o \
-		build/.obj/PID_Controller.o \
+OBJECTS       = build/.obj/PID_Controller.o \
 		build/.obj/TrajectoryJsonDialog.o \
 		build/.obj/command_transmitter.o \
 		build/.obj/tab_file_read.o \
@@ -287,6 +285,7 @@ DIST          = /opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/features/spec_pre.prf \
 		/opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/features/qt_config.prf \
 		/opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/linux-g++/qmake.conf \
 		/opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/features/spec_post.prf \
+		../PowerOptimizer/.qmake.stash \
 		/opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/features/exclusive_builds.prf \
 		/opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/features/toolchain.prf \
 		/opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/features/default_pre.prf \
@@ -312,7 +311,6 @@ DIST          = /opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/features/spec_pre.prf \
 		../PowerOptimizer/include/command_struct.h \
 		../PowerOptimizer/include/command_transmitter.h \
 		../PowerOptimizer/include/tab_file_read.h \
-		../PowerOptimizer/include/tab_netural.h \
 		../PowerOptimizer/include/tab_stm32.h \
 		../PowerOptimizer/include/tab_turntablecontrol.h \
 		../PowerOptimizer/include/tab_deviceconnect.h \
@@ -321,8 +319,7 @@ DIST          = /opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/features/spec_pre.prf \
 		../PowerOptimizer/include/mainwindow.h \
 		../PowerOptimizer/thirdparty/libmodbus/src/modbus.h \
 		../PowerOptimizer/thirdparty/libmodbus/src/modbus-rtu.h \
-		../PowerOptimizer/thirdparty/libmodbus/src/modbus-tcp.h ../PowerOptimizer/src/tab_netural.cpp \
-		../PowerOptimizer/src/PID_Controller.cpp \
+		../PowerOptimizer/thirdparty/libmodbus/src/modbus-tcp.h ../PowerOptimizer/src/PID_Controller.cpp \
 		../PowerOptimizer/src/TrajectoryJsonDialog.cpp \
 		../PowerOptimizer/src/command_transmitter.cpp \
 		../PowerOptimizer/src/tab_file_read.cpp \
@@ -539,6 +536,7 @@ Makefile: ../PowerOptimizer/PowerOptimizer.pro /opt/Qt5.14.2/5.14.2/gcc_64/mkspe
 		/opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/features/qt_config.prf \
 		/opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/linux-g++/qmake.conf \
 		/opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/features/spec_post.prf \
+		.qmake.stash \
 		/opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/features/exclusive_builds.prf \
 		/opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/features/toolchain.prf \
 		/opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/features/default_pre.prf \
@@ -751,6 +749,7 @@ Makefile: ../PowerOptimizer/PowerOptimizer.pro /opt/Qt5.14.2/5.14.2/gcc_64/mkspe
 /opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/features/qt_config.prf:
 /opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/linux-g++/qmake.conf:
 /opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/features/spec_post.prf:
+.qmake.stash:
 /opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/features/exclusive_builds.prf:
 /opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/features/toolchain.prf:
 /opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/features/default_pre.prf:
@@ -787,8 +786,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../PowerOptimizer/include/PID_Controller.h ../PowerOptimizer/include/TrajectoryJsonDialog.h ../PowerOptimizer/include/command_struct.h ../PowerOptimizer/include/command_transmitter.h ../PowerOptimizer/include/tab_file_read.h ../PowerOptimizer/include/tab_netural.h ../PowerOptimizer/include/tab_stm32.h ../PowerOptimizer/include/tab_turntablecontrol.h ../PowerOptimizer/include/tab_deviceconnect.h ../PowerOptimizer/include/turntable_controller.h ../PowerOptimizer/include/logindialog.h ../PowerOptimizer/include/mainwindow.h ../PowerOptimizer/thirdparty/libmodbus/src/modbus.h ../PowerOptimizer/thirdparty/libmodbus/src/modbus-rtu.h ../PowerOptimizer/thirdparty/libmodbus/src/modbus-tcp.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../PowerOptimizer/src/tab_netural.cpp ../PowerOptimizer/src/PID_Controller.cpp ../PowerOptimizer/src/TrajectoryJsonDialog.cpp ../PowerOptimizer/src/command_transmitter.cpp ../PowerOptimizer/src/tab_file_read.cpp ../PowerOptimizer/src/tab_stm32.cpp ../PowerOptimizer/src/tab_turntablecontrol.cpp ../PowerOptimizer/src/tab_deviceconnect.cpp ../PowerOptimizer/src/turntable_controller.cpp ../PowerOptimizer/src/logindialog.cpp ../PowerOptimizer/src/main.cpp ../PowerOptimizer/src/mainwindow.cpp ../PowerOptimizer/thirdparty/libmodbus/src/modbus.c ../PowerOptimizer/thirdparty/libmodbus/src/modbus-data.c ../PowerOptimizer/thirdparty/libmodbus/src/modbus-rtu.c ../PowerOptimizer/thirdparty/libmodbus/src/modbus-tcp.c $(DISTDIR)/
+	$(COPY_FILE) --parents ../PowerOptimizer/include/PID_Controller.h ../PowerOptimizer/include/TrajectoryJsonDialog.h ../PowerOptimizer/include/command_struct.h ../PowerOptimizer/include/command_transmitter.h ../PowerOptimizer/include/tab_file_read.h ../PowerOptimizer/include/tab_stm32.h ../PowerOptimizer/include/tab_turntablecontrol.h ../PowerOptimizer/include/tab_deviceconnect.h ../PowerOptimizer/include/turntable_controller.h ../PowerOptimizer/include/logindialog.h ../PowerOptimizer/include/mainwindow.h ../PowerOptimizer/thirdparty/libmodbus/src/modbus.h ../PowerOptimizer/thirdparty/libmodbus/src/modbus-rtu.h ../PowerOptimizer/thirdparty/libmodbus/src/modbus-tcp.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../PowerOptimizer/src/PID_Controller.cpp ../PowerOptimizer/src/TrajectoryJsonDialog.cpp ../PowerOptimizer/src/command_transmitter.cpp ../PowerOptimizer/src/tab_file_read.cpp ../PowerOptimizer/src/tab_stm32.cpp ../PowerOptimizer/src/tab_turntablecontrol.cpp ../PowerOptimizer/src/tab_deviceconnect.cpp ../PowerOptimizer/src/turntable_controller.cpp ../PowerOptimizer/src/logindialog.cpp ../PowerOptimizer/src/main.cpp ../PowerOptimizer/src/mainwindow.cpp ../PowerOptimizer/thirdparty/libmodbus/src/modbus.c ../PowerOptimizer/thirdparty/libmodbus/src/modbus-data.c ../PowerOptimizer/thirdparty/libmodbus/src/modbus-rtu.c ../PowerOptimizer/thirdparty/libmodbus/src/modbus-tcp.c $(DISTDIR)/
 	$(COPY_FILE) --parents ../PowerOptimizer/mainwindow.ui $(DISTDIR)/
 
 
@@ -947,7 +946,7 @@ build/.moc/moc_TrajectoryJsonDialog.cpp: ../PowerOptimizer/include/TrajectoryJso
 		/opt/Qt5.14.2/5.14.2/gcc_64/include/QtGui/qfontdatabase.h \
 		build/.moc/moc_predefs.h \
 		/opt/Qt5.14.2/5.14.2/gcc_64/bin/moc
-	/opt/Qt5.14.2/5.14.2/gcc_64/bin/moc $(DEFINES) --include /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/build-PowerOptimizer-Desktop_Qt_5_14_2_GCC_64bit-Debug/build/.moc/moc_predefs.h -I/opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/linux-g++ -I/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer -I/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty -I/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src -I/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/src -I/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCharts -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWidgets -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtGui -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtNetwork -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore -I. -I/usr/include/c++/7 -I/usr/include/x86_64-linux-gnu/c++/7 -I/usr/include/c++/7/backward -I/usr/lib/gcc/x86_64-linux-gnu/7/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../PowerOptimizer/include/TrajectoryJsonDialog.h -o build/.moc/moc_TrajectoryJsonDialog.cpp
+	/opt/Qt5.14.2/5.14.2/gcc_64/bin/moc $(DEFINES) --include /home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/build-PowerOptimizer-Desktop_Qt_5_14_2_GCC_64bit-Debug/build/.moc/moc_predefs.h -I/opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/linux-g++ -I/home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer -I/home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/thirdparty -I/home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/thirdparty/libmodbus/src -I/home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/src -I/home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCharts -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWidgets -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtGui -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtNetwork -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore -I. -I/usr/include/c++/7 -I/usr/include/x86_64-linux-gnu/c++/7 -I/usr/include/c++/7/backward -I/usr/lib/gcc/x86_64-linux-gnu/7/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../PowerOptimizer/include/TrajectoryJsonDialog.h -o build/.moc/moc_TrajectoryJsonDialog.cpp
 
 build/.moc/moc_tab_file_read.cpp: ../PowerOptimizer/include/tab_file_read.h \
 		/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore/QObject \
@@ -1075,7 +1074,7 @@ build/.moc/moc_tab_file_read.cpp: ../PowerOptimizer/include/tab_file_read.h \
 		/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWidgets/qrubberband.h \
 		build/.moc/moc_predefs.h \
 		/opt/Qt5.14.2/5.14.2/gcc_64/bin/moc
-	/opt/Qt5.14.2/5.14.2/gcc_64/bin/moc $(DEFINES) --include /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/build-PowerOptimizer-Desktop_Qt_5_14_2_GCC_64bit-Debug/build/.moc/moc_predefs.h -I/opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/linux-g++ -I/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer -I/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty -I/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src -I/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/src -I/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCharts -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWidgets -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtGui -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtNetwork -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore -I. -I/usr/include/c++/7 -I/usr/include/x86_64-linux-gnu/c++/7 -I/usr/include/c++/7/backward -I/usr/lib/gcc/x86_64-linux-gnu/7/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../PowerOptimizer/include/tab_file_read.h -o build/.moc/moc_tab_file_read.cpp
+	/opt/Qt5.14.2/5.14.2/gcc_64/bin/moc $(DEFINES) --include /home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/build-PowerOptimizer-Desktop_Qt_5_14_2_GCC_64bit-Debug/build/.moc/moc_predefs.h -I/opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/linux-g++ -I/home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer -I/home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/thirdparty -I/home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/thirdparty/libmodbus/src -I/home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/src -I/home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCharts -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWidgets -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtGui -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtNetwork -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore -I. -I/usr/include/c++/7 -I/usr/include/x86_64-linux-gnu/c++/7 -I/usr/include/c++/7/backward -I/usr/lib/gcc/x86_64-linux-gnu/7/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../PowerOptimizer/include/tab_file_read.h -o build/.moc/moc_tab_file_read.cpp
 
 build/.moc/moc_tab_stm32.cpp: ../PowerOptimizer/include/tab_stm32.h \
 		/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore/QObject \
@@ -1226,7 +1225,7 @@ build/.moc/moc_tab_stm32.cpp: ../PowerOptimizer/include/tab_stm32.h \
 		../PowerOptimizer/include/command_struct.h \
 		build/.moc/moc_predefs.h \
 		/opt/Qt5.14.2/5.14.2/gcc_64/bin/moc
-	/opt/Qt5.14.2/5.14.2/gcc_64/bin/moc $(DEFINES) --include /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/build-PowerOptimizer-Desktop_Qt_5_14_2_GCC_64bit-Debug/build/.moc/moc_predefs.h -I/opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/linux-g++ -I/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer -I/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty -I/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src -I/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/src -I/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCharts -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWidgets -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtGui -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtNetwork -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore -I. -I/usr/include/c++/7 -I/usr/include/x86_64-linux-gnu/c++/7 -I/usr/include/c++/7/backward -I/usr/lib/gcc/x86_64-linux-gnu/7/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../PowerOptimizer/include/tab_stm32.h -o build/.moc/moc_tab_stm32.cpp
+	/opt/Qt5.14.2/5.14.2/gcc_64/bin/moc $(DEFINES) --include /home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/build-PowerOptimizer-Desktop_Qt_5_14_2_GCC_64bit-Debug/build/.moc/moc_predefs.h -I/opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/linux-g++ -I/home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer -I/home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/thirdparty -I/home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/thirdparty/libmodbus/src -I/home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/src -I/home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCharts -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWidgets -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtGui -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtNetwork -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore -I. -I/usr/include/c++/7 -I/usr/include/x86_64-linux-gnu/c++/7 -I/usr/include/c++/7/backward -I/usr/lib/gcc/x86_64-linux-gnu/7/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../PowerOptimizer/include/tab_stm32.h -o build/.moc/moc_tab_stm32.cpp
 
 build/.moc/moc_tab_turntablecontrol.cpp: ../PowerOptimizer/include/tab_turntablecontrol.h \
 		/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore/QObject \
@@ -1377,7 +1376,7 @@ build/.moc/moc_tab_turntablecontrol.cpp: ../PowerOptimizer/include/tab_turntable
 		/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore/qjsonvalue.h \
 		build/.moc/moc_predefs.h \
 		/opt/Qt5.14.2/5.14.2/gcc_64/bin/moc
-	/opt/Qt5.14.2/5.14.2/gcc_64/bin/moc $(DEFINES) --include /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/build-PowerOptimizer-Desktop_Qt_5_14_2_GCC_64bit-Debug/build/.moc/moc_predefs.h -I/opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/linux-g++ -I/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer -I/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty -I/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src -I/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/src -I/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCharts -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWidgets -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtGui -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtNetwork -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore -I. -I/usr/include/c++/7 -I/usr/include/x86_64-linux-gnu/c++/7 -I/usr/include/c++/7/backward -I/usr/lib/gcc/x86_64-linux-gnu/7/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../PowerOptimizer/include/tab_turntablecontrol.h -o build/.moc/moc_tab_turntablecontrol.cpp
+	/opt/Qt5.14.2/5.14.2/gcc_64/bin/moc $(DEFINES) --include /home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/build-PowerOptimizer-Desktop_Qt_5_14_2_GCC_64bit-Debug/build/.moc/moc_predefs.h -I/opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/linux-g++ -I/home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer -I/home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/thirdparty -I/home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/thirdparty/libmodbus/src -I/home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/src -I/home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCharts -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWidgets -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtGui -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtNetwork -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore -I. -I/usr/include/c++/7 -I/usr/include/x86_64-linux-gnu/c++/7 -I/usr/include/c++/7/backward -I/usr/lib/gcc/x86_64-linux-gnu/7/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../PowerOptimizer/include/tab_turntablecontrol.h -o build/.moc/moc_tab_turntablecontrol.cpp
 
 build/.moc/moc_tab_deviceconnect.cpp: ../PowerOptimizer/include/tab_deviceconnect.h \
 		/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore/QObject \
@@ -1456,7 +1455,7 @@ build/.moc/moc_tab_deviceconnect.cpp: ../PowerOptimizer/include/tab_deviceconnec
 		/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore/qbasictimer.h \
 		build/.moc/moc_predefs.h \
 		/opt/Qt5.14.2/5.14.2/gcc_64/bin/moc
-	/opt/Qt5.14.2/5.14.2/gcc_64/bin/moc $(DEFINES) --include /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/build-PowerOptimizer-Desktop_Qt_5_14_2_GCC_64bit-Debug/build/.moc/moc_predefs.h -I/opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/linux-g++ -I/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer -I/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty -I/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src -I/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/src -I/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCharts -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWidgets -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtGui -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtNetwork -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore -I. -I/usr/include/c++/7 -I/usr/include/x86_64-linux-gnu/c++/7 -I/usr/include/c++/7/backward -I/usr/lib/gcc/x86_64-linux-gnu/7/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../PowerOptimizer/include/tab_deviceconnect.h -o build/.moc/moc_tab_deviceconnect.cpp
+	/opt/Qt5.14.2/5.14.2/gcc_64/bin/moc $(DEFINES) --include /home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/build-PowerOptimizer-Desktop_Qt_5_14_2_GCC_64bit-Debug/build/.moc/moc_predefs.h -I/opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/linux-g++ -I/home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer -I/home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/thirdparty -I/home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/thirdparty/libmodbus/src -I/home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/src -I/home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCharts -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWidgets -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtGui -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtNetwork -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore -I. -I/usr/include/c++/7 -I/usr/include/x86_64-linux-gnu/c++/7 -I/usr/include/c++/7/backward -I/usr/lib/gcc/x86_64-linux-gnu/7/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../PowerOptimizer/include/tab_deviceconnect.h -o build/.moc/moc_tab_deviceconnect.cpp
 
 build/.moc/moc_logindialog.cpp: ../PowerOptimizer/include/logindialog.h \
 		/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWidgets/QDialog \
@@ -1601,7 +1600,7 @@ build/.moc/moc_logindialog.cpp: ../PowerOptimizer/include/logindialog.h \
 		/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWidgets/qstackedwidget.h \
 		build/.moc/moc_predefs.h \
 		/opt/Qt5.14.2/5.14.2/gcc_64/bin/moc
-	/opt/Qt5.14.2/5.14.2/gcc_64/bin/moc $(DEFINES) --include /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/build-PowerOptimizer-Desktop_Qt_5_14_2_GCC_64bit-Debug/build/.moc/moc_predefs.h -I/opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/linux-g++ -I/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer -I/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty -I/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src -I/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/src -I/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCharts -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWidgets -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtGui -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtNetwork -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore -I. -I/usr/include/c++/7 -I/usr/include/x86_64-linux-gnu/c++/7 -I/usr/include/c++/7/backward -I/usr/lib/gcc/x86_64-linux-gnu/7/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../PowerOptimizer/include/logindialog.h -o build/.moc/moc_logindialog.cpp
+	/opt/Qt5.14.2/5.14.2/gcc_64/bin/moc $(DEFINES) --include /home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/build-PowerOptimizer-Desktop_Qt_5_14_2_GCC_64bit-Debug/build/.moc/moc_predefs.h -I/opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/linux-g++ -I/home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer -I/home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/thirdparty -I/home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/thirdparty/libmodbus/src -I/home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/src -I/home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCharts -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWidgets -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtGui -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtNetwork -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore -I. -I/usr/include/c++/7 -I/usr/include/x86_64-linux-gnu/c++/7 -I/usr/include/c++/7/backward -I/usr/lib/gcc/x86_64-linux-gnu/7/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../PowerOptimizer/include/logindialog.h -o build/.moc/moc_logindialog.cpp
 
 build/.moc/moc_mainwindow.cpp: ../PowerOptimizer/include/mainwindow.h \
 		/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWidgets/QMainWindow \
@@ -1795,7 +1794,7 @@ build/.moc/moc_mainwindow.cpp: ../PowerOptimizer/include/mainwindow.h \
 		/opt/Qt5.14.2/5.14.2/gcc_64/include/QtNetwork/QAbstractSocket \
 		build/.moc/moc_predefs.h \
 		/opt/Qt5.14.2/5.14.2/gcc_64/bin/moc
-	/opt/Qt5.14.2/5.14.2/gcc_64/bin/moc $(DEFINES) --include /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/build-PowerOptimizer-Desktop_Qt_5_14_2_GCC_64bit-Debug/build/.moc/moc_predefs.h -I/opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/linux-g++ -I/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer -I/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty -I/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src -I/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/src -I/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCharts -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWidgets -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtGui -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtNetwork -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore -I. -I/usr/include/c++/7 -I/usr/include/x86_64-linux-gnu/c++/7 -I/usr/include/c++/7/backward -I/usr/lib/gcc/x86_64-linux-gnu/7/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../PowerOptimizer/include/mainwindow.h -o build/.moc/moc_mainwindow.cpp
+	/opt/Qt5.14.2/5.14.2/gcc_64/bin/moc $(DEFINES) --include /home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/build-PowerOptimizer-Desktop_Qt_5_14_2_GCC_64bit-Debug/build/.moc/moc_predefs.h -I/opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/linux-g++ -I/home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer -I/home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/thirdparty -I/home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/thirdparty/libmodbus/src -I/home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/src -I/home/topeet/MW-Charging-Aux-Board/qt_turntable_STM32/PowerOptimizer/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCharts -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWidgets -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtGui -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtNetwork -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore -I. -I/usr/include/c++/7 -I/usr/include/x86_64-linux-gnu/c++/7 -I/usr/include/c++/7/backward -I/usr/lib/gcc/x86_64-linux-gnu/7/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../PowerOptimizer/include/mainwindow.h -o build/.moc/moc_mainwindow.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
@@ -1817,9 +1816,6 @@ compiler_lex_clean:
 compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean compiler_uic_clean 
 
 ####### Compile
-
-build/.obj/tab_netural.o: ../PowerOptimizer/src/tab_netural.cpp ../PowerOptimizer/include/tab_netural.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/.obj/tab_netural.o ../PowerOptimizer/src/tab_netural.cpp
 
 build/.obj/PID_Controller.o: ../PowerOptimizer/src/PID_Controller.cpp ../PowerOptimizer/include/PID_Controller.h \
 		../PowerOptimizer/include/turntable_controller.h \
