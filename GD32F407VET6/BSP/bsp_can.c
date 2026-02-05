@@ -35,8 +35,8 @@ void bsp_can_config(void)
     can_parameter.auto_bus_off_recovery = ENABLE;
     can_parameter.auto_retrans = ENABLE;
 		
-// can_parameter.working_mode = CAN_NORMAL_MODE;   // 正常模式(需要接线)
-    can_parameter.working_mode = CAN_LOOPBACK_MODE; // 回环模式(自发自收)
+    can_parameter.working_mode = CAN_NORMAL_MODE;   // 正常模式(需要接线)
+    //can_parameter.working_mode = CAN_LOOPBACK_MODE; // 回环模式(自发自收)
     
     // 波特率 500k (APB1=42M): 42M / 6 / (1+9+4) = 500k
     can_parameter.prescaler = 6;

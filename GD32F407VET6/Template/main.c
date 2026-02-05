@@ -1,5 +1,5 @@
-#define USE_SIMULATOR_TASK      // 开启模拟任务总开关
-#define USE_CAN_LOOPBACK_TEST   // 开启 CAN 回环测试 (如果不定义，则使用队列直写测试)
+#define USE_SIMULATOR_TASK     0   // 开启模拟任务总开关
+#define USE_CAN_LOOPBACK_TEST  0  // 开启 CAN 回环测试 (如果不定义，则使用队列直写测试)
 
 #include "gd32f4xx.h"
 #include "FreeRTOS.h"
