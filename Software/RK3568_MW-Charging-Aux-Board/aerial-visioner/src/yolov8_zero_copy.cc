@@ -22,6 +22,12 @@
 #include "file_utils.h"
 #include "image_utils.h"
 
+#include "opencv2/core.hpp"
+#include "opencv2/videoio.hpp" // VideoCapture
+#include "opencv2/imgproc.hpp"
+#include "opencv2/imgcodecs.hpp"
+#include "opencv2/opencv.hpp"
+
 static void dump_tensor_attr(rknn_tensor_attr *attr) {
     char dims[128] = {0};
     for (int i = 0; i < attr->n_dims; ++i) {
@@ -279,11 +285,42 @@ int inference_yolov8_model(rknn_app_context_t *app_ctx, image_buffer_t *img, obj
     }
 
     // letterbox
+    // if (dst_img.virt_addr != NULL) {
+    //     uint8_t* ptr = (uint8_t*)dst_img.virt_addr;
+    //     int total_pixels = dst_img.width * dst_img.height;
+        
+    //     // 手动循环赋值，制造“全红”背景
+    //     // 假设是 RGB888 格式
+    //     for (int i = 0; i < total_pixels; i++) {
+    //         ptr[i * 3 + 0] = 255; // R (如果是BGR格式，这里是B，变成蓝色)
+    //         ptr[i * 3 + 1] = 0;   // G
+    //         ptr[i * 3 + 2] = 0;   // B
+    //     }
+    //     printf("DEBUG: Memory has been painted RED manually.\n");
+    // }
     ret = convert_image_with_letterbox(img, &dst_img, &letter_box, bg_color);
     if (ret < 0) {
         printf("convert_image_with_letterbox fail! ret=%d\n", ret);
         return -1;
     }
+
+    // if (dst_img.virt_addr != NULL) {
+    //     // 1. 【包装】利用现有的内存构建 Mat (Zero-Copy)
+    //     // 假设 dst_img 是 RGB888 格式 (CV_8UC3)
+    //     cv::Mat rknn_input_wrapper(dst_img.height, dst_img.width, CV_8UC3, dst_img.virt_addr);
+
+    //     // 2. 【转换】RGB -> BGR (为了显示正常)
+    //     // 注意：这里必须输出到一个新的 Mat (show_img)，
+    //     // 千万不要直接在 rknn_input_wrapper 上做原地转换(cvtColor(x, x, ...))，
+    //     // 否则你会把喂给 NPU 的数据也改成 BGR，导致推理失效！
+    //     cv::Mat show_img;
+    //     cv::cvtColor(rknn_input_wrapper, show_img, cv::COLOR_RGB2BGR);
+
+    //     cv::imwrite("debug_letterbox.jpg", show_img);
+    //     printf("Debug image saved to debug_letterbox.jpg\n");
+    // } else {
+    //     printf("Error: dst_img.virt_addr is NULL!\n");
+    // }
 
     // Run
     printf("rknn_run\n");

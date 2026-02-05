@@ -270,11 +270,11 @@ bool USBHikvisioner::convert_to_mat(MV_FRAME_OUT_INFO_EX& stImageInfo,
         return false;
     }
 
-    /* 1. 如果本身就是 Mono8 (灰度)，直接引用内存构建 Mat，无需转换 */
-    if (stImageInfo.enPixelType == PixelType_Gvsp_Mono8) {
-        dstImg = cv::Mat(stImageInfo.nHeight, stImageInfo.nWidth, CV_8UC1, pData.get()).clone();
-        return true;
-    }
+    // /* 1. 如果本身就是 Mono8 (灰度)，直接引用内存构建 Mat，无需转换 */
+    // if (stImageInfo.enPixelType == PixelType_Gvsp_Mono8) {
+    //     dstImg = cv::Mat(stImageInfo.nHeight, stImageInfo.nWidth, CV_8UC1, pData.get()).clone();
+    //     return true;
+    // }
 
     // 2. 如果是彩色格式 (Bayer, RGB, YUV 等)，统一让 SDK 转换成 BGR8
     // BGR8 是 OpenCV 默认的彩色格式 (Blue, Green, Red)
@@ -291,10 +291,10 @@ bool USBHikvisioner::convert_to_mat(MV_FRAME_OUT_INFO_EX& stImageInfo,
     stConvertParam.enSrcPixelType = stImageInfo.enPixelType;// 输入格式 (自动识别)
     
     // 目标格式：PixelType_Gvsp_BGR8_Packed (这是 OpenCV 最喜欢的格式)
-    stConvertParam.enDstPixelType = PixelType_Gvsp_BGR8_Packed; 
+    stConvertParam.enDstPixelType = PixelType_Gvsp_RGB8_Packed; 
     
     // 创建输出 Mat (分配内存)
-    dstImg = cv::Mat(stImageInfo.nHeight, stImageInfo.nWidth, CV_8UC3);
+    // dstImg = cv::Mat(stImageInfo.nHeight, stImageInfo.nWidth, CV_8UC3);
     stConvertParam.pDstBuffer = dstImg.data;                // 将转换结果直接写入 Mat 的内存
     stConvertParam.nDstBufferSize = nRGBSize;
 

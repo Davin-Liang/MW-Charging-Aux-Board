@@ -197,6 +197,25 @@ int inference_yolov8_model(rknn_app_context_t *app_ctx, image_buffer_t *img, obj
         return -1;
     }
 
+    if (dst_img.virt_addr != NULL) {
+        // 1. 【包装】利用现有的内存构建 Mat (Zero-Copy)
+        // 假设 dst_img 是 RGB888 格式 (CV_8UC3)
+        cv::Mat rknn_input_wrapper(dst_img.height, dst_img.width, CV_8UC3, dst_img.virt_addr);
+
+        // 2. 【转换】RGB -> BGR (为了显示正常)
+        // 注意：这里必须输出到一个新的 Mat (show_img)，
+        // 千万不要直接在 rknn_input_wrapper 上做原地转换(cvtColor(x, x, ...))，
+        // 否则你会把喂给 NPU 的数据也改成 BGR，导致推理失效！
+        cv::Mat show_img;
+        cv::cvtColor(rknn_input_wrapper, show_img, cv::COLOR_RGB2BGR);
+
+        cv::imwrite("debug_letterbox.jpg", show_img);
+        printf("Debug image saved to debug_letterbox.jpg\n");
+    } else {
+        printf("Error: dst_img.virt_addr is NULL!\n");
+    }
+
+
     // Set Input Data
     inputs[0].index = 0;
     inputs[0].type = RKNN_TENSOR_UINT8;

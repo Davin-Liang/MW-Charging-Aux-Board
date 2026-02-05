@@ -3,13 +3,17 @@
 #include <iostream>
 #include <chrono>
 
+
 int main ()
 {
     bool ret;
-    cv::Mat img;
+    std::vector<DetectionResult> results;
 
     USBHikvisioner uhv(0);
-    AntennaVisioner anV("./yolov8_model/yolov8n.rknn", "./yolov8_model/coco_80_labels_list.txt", 9);
+    AntennaVisioner anV("./yolov8_model/yolov8n.rknn", 
+                        "./yolov8_model/coco_80_labels_list.txt", 1024, 614);
+
+    cv::Mat& img = anV.get_rga_mat();
 
     anV.init_system();
     ret = uhv.camera_init();
@@ -22,15 +26,24 @@ int main ()
 
     auto start_time = std::chrono::high_resolution_clock::now();    
     ret = uhv.read_img(img, 1000);
+
+    // cv::Mat temp = cv::imread("./yolov8_model/image.jpg");
+    // temp.copyTo(img);
+
     if (!ret)
         return 0;
     auto end_time = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
-    std::cout << "Inference + Draw time: " << duration.count() << "ms" << std::endl;
+    std::cout << "采集一帧图像所需要的时间: " << duration.count() << "ms." << std::endl;
 
-    ret = anV.detect_once(img);
+    ret = anV.detect_once(img, results);
     if (!ret)
         return 0;
+
+    for (const auto& item : results) {
+        std::cout << "Detected: " << item.className 
+                  << ", Prob: " << item.prop << std::endl;
+    }
 
     if (img.empty()) {
         std::cout << "错误：图像为空，无法保存！" << std::endl;
