@@ -1,0 +1,16 @@
+{
+    "motorCmd": {
+        "x": 0,
+        "y": 0,
+        "speed": 100
+    },
+    "findOptCmd": {
+        "whichThaj": 0,
+        "cirTrajRad": 2.5,
+        "squThajLen": 15,
+        "squThajStepLen": 5,
+        "maxVol": 12.0,
+        "volStepLen": 0.5,
+        "initialVol": 0.0
+    }
+}
