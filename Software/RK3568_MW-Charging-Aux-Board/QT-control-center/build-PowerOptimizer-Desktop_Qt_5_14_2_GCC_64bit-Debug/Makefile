@@ -163,6 +163,114 @@ PowerOptimizer_autogen/mocs_compilation.cpp.s:
 	$(MAKE) -f CMakeFiles/PowerOptimizer.dir/build.make CMakeFiles/PowerOptimizer.dir/PowerOptimizer_autogen/mocs_compilation.cpp.s
 .PHONY : PowerOptimizer_autogen/mocs_compilation.cpp.s
 
+home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.o: home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c.o
+
+.PHONY : home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.o
+
+# target to build an object file
+home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c.o:
+	$(MAKE) -f CMakeFiles/PowerOptimizer.dir/build.make CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c.o
+.PHONY : home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c.o
+
+home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.i: home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c.i
+
+.PHONY : home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.i
+
+# target to preprocess a source file
+home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c.i:
+	$(MAKE) -f CMakeFiles/PowerOptimizer.dir/build.make CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c.i
+.PHONY : home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c.i
+
+home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.s: home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c.s
+
+.PHONY : home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.s
+
+# target to generate assembly for a file
+home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c.s:
+	$(MAKE) -f CMakeFiles/PowerOptimizer.dir/build.make CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c.s
+.PHONY : home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c.s
+
+home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.o: home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c.o
+
+.PHONY : home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.o
+
+# target to build an object file
+home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c.o:
+	$(MAKE) -f CMakeFiles/PowerOptimizer.dir/build.make CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c.o
+.PHONY : home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c.o
+
+home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.i: home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c.i
+
+.PHONY : home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.i
+
+# target to preprocess a source file
+home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c.i:
+	$(MAKE) -f CMakeFiles/PowerOptimizer.dir/build.make CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c.i
+.PHONY : home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c.i
+
+home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.s: home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c.s
+
+.PHONY : home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.s
+
+# target to generate assembly for a file
+home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c.s:
+	$(MAKE) -f CMakeFiles/PowerOptimizer.dir/build.make CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c.s
+.PHONY : home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c.s
+
+home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.o: home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c.o
+
+.PHONY : home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.o
+
+# target to build an object file
+home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c.o:
+	$(MAKE) -f CMakeFiles/PowerOptimizer.dir/build.make CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c.o
+.PHONY : home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c.o
+
+home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.i: home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c.i
+
+.PHONY : home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.i
+
+# target to preprocess a source file
+home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c.i:
+	$(MAKE) -f CMakeFiles/PowerOptimizer.dir/build.make CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c.i
+.PHONY : home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c.i
+
+home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.s: home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c.s
+
+.PHONY : home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.s
+
+# target to generate assembly for a file
+home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c.s:
+	$(MAKE) -f CMakeFiles/PowerOptimizer.dir/build.make CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c.s
+.PHONY : home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c.s
+
+home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.o: home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c.o
+
+.PHONY : home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.o
+
+# target to build an object file
+home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c.o:
+	$(MAKE) -f CMakeFiles/PowerOptimizer.dir/build.make CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c.o
+.PHONY : home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c.o
+
+home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.i: home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c.i
+
+.PHONY : home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.i
+
+# target to preprocess a source file
+home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c.i:
+	$(MAKE) -f CMakeFiles/PowerOptimizer.dir/build.make CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c.i
+.PHONY : home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c.i
+
+home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.s: home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c.s
+
+.PHONY : home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.s
+
+# target to generate assembly for a file
+home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c.s:
+	$(MAKE) -f CMakeFiles/PowerOptimizer.dir/build.make CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c.s
+.PHONY : home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c.s
+
 src/PID_Controller.o: src/PID_Controller.cpp.o
 
 .PHONY : src/PID_Controller.o
@@ -487,114 +595,6 @@ src/turntable_controller.cpp.s:
 	$(MAKE) -f CMakeFiles/PowerOptimizer.dir/build.make CMakeFiles/PowerOptimizer.dir/src/turntable_controller.cpp.s
 .PHONY : src/turntable_controller.cpp.s
 
-thirdparty/libmodbus/src/modbus-data.o: thirdparty/libmodbus/src/modbus-data.c.o
-
-.PHONY : thirdparty/libmodbus/src/modbus-data.o
-
-# target to build an object file
-thirdparty/libmodbus/src/modbus-data.c.o:
-	$(MAKE) -f CMakeFiles/PowerOptimizer.dir/build.make CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-data.c.o
-.PHONY : thirdparty/libmodbus/src/modbus-data.c.o
-
-thirdparty/libmodbus/src/modbus-data.i: thirdparty/libmodbus/src/modbus-data.c.i
-
-.PHONY : thirdparty/libmodbus/src/modbus-data.i
-
-# target to preprocess a source file
-thirdparty/libmodbus/src/modbus-data.c.i:
-	$(MAKE) -f CMakeFiles/PowerOptimizer.dir/build.make CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-data.c.i
-.PHONY : thirdparty/libmodbus/src/modbus-data.c.i
-
-thirdparty/libmodbus/src/modbus-data.s: thirdparty/libmodbus/src/modbus-data.c.s
-
-.PHONY : thirdparty/libmodbus/src/modbus-data.s
-
-# target to generate assembly for a file
-thirdparty/libmodbus/src/modbus-data.c.s:
-	$(MAKE) -f CMakeFiles/PowerOptimizer.dir/build.make CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-data.c.s
-.PHONY : thirdparty/libmodbus/src/modbus-data.c.s
-
-thirdparty/libmodbus/src/modbus-rtu.o: thirdparty/libmodbus/src/modbus-rtu.c.o
-
-.PHONY : thirdparty/libmodbus/src/modbus-rtu.o
-
-# target to build an object file
-thirdparty/libmodbus/src/modbus-rtu.c.o:
-	$(MAKE) -f CMakeFiles/PowerOptimizer.dir/build.make CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-rtu.c.o
-.PHONY : thirdparty/libmodbus/src/modbus-rtu.c.o
-
-thirdparty/libmodbus/src/modbus-rtu.i: thirdparty/libmodbus/src/modbus-rtu.c.i
-
-.PHONY : thirdparty/libmodbus/src/modbus-rtu.i
-
-# target to preprocess a source file
-thirdparty/libmodbus/src/modbus-rtu.c.i:
-	$(MAKE) -f CMakeFiles/PowerOptimizer.dir/build.make CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-rtu.c.i
-.PHONY : thirdparty/libmodbus/src/modbus-rtu.c.i
-
-thirdparty/libmodbus/src/modbus-rtu.s: thirdparty/libmodbus/src/modbus-rtu.c.s
-
-.PHONY : thirdparty/libmodbus/src/modbus-rtu.s
-
-# target to generate assembly for a file
-thirdparty/libmodbus/src/modbus-rtu.c.s:
-	$(MAKE) -f CMakeFiles/PowerOptimizer.dir/build.make CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-rtu.c.s
-.PHONY : thirdparty/libmodbus/src/modbus-rtu.c.s
-
-thirdparty/libmodbus/src/modbus-tcp.o: thirdparty/libmodbus/src/modbus-tcp.c.o
-
-.PHONY : thirdparty/libmodbus/src/modbus-tcp.o
-
-# target to build an object file
-thirdparty/libmodbus/src/modbus-tcp.c.o:
-	$(MAKE) -f CMakeFiles/PowerOptimizer.dir/build.make CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-tcp.c.o
-.PHONY : thirdparty/libmodbus/src/modbus-tcp.c.o
-
-thirdparty/libmodbus/src/modbus-tcp.i: thirdparty/libmodbus/src/modbus-tcp.c.i
-
-.PHONY : thirdparty/libmodbus/src/modbus-tcp.i
-
-# target to preprocess a source file
-thirdparty/libmodbus/src/modbus-tcp.c.i:
-	$(MAKE) -f CMakeFiles/PowerOptimizer.dir/build.make CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-tcp.c.i
-.PHONY : thirdparty/libmodbus/src/modbus-tcp.c.i
-
-thirdparty/libmodbus/src/modbus-tcp.s: thirdparty/libmodbus/src/modbus-tcp.c.s
-
-.PHONY : thirdparty/libmodbus/src/modbus-tcp.s
-
-# target to generate assembly for a file
-thirdparty/libmodbus/src/modbus-tcp.c.s:
-	$(MAKE) -f CMakeFiles/PowerOptimizer.dir/build.make CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-tcp.c.s
-.PHONY : thirdparty/libmodbus/src/modbus-tcp.c.s
-
-thirdparty/libmodbus/src/modbus.o: thirdparty/libmodbus/src/modbus.c.o
-
-.PHONY : thirdparty/libmodbus/src/modbus.o
-
-# target to build an object file
-thirdparty/libmodbus/src/modbus.c.o:
-	$(MAKE) -f CMakeFiles/PowerOptimizer.dir/build.make CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus.c.o
-.PHONY : thirdparty/libmodbus/src/modbus.c.o
-
-thirdparty/libmodbus/src/modbus.i: thirdparty/libmodbus/src/modbus.c.i
-
-.PHONY : thirdparty/libmodbus/src/modbus.i
-
-# target to preprocess a source file
-thirdparty/libmodbus/src/modbus.c.i:
-	$(MAKE) -f CMakeFiles/PowerOptimizer.dir/build.make CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus.c.i
-.PHONY : thirdparty/libmodbus/src/modbus.c.i
-
-thirdparty/libmodbus/src/modbus.s: thirdparty/libmodbus/src/modbus.c.s
-
-.PHONY : thirdparty/libmodbus/src/modbus.s
-
-# target to generate assembly for a file
-thirdparty/libmodbus/src/modbus.c.s:
-	$(MAKE) -f CMakeFiles/PowerOptimizer.dir/build.make CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus.c.s
-.PHONY : thirdparty/libmodbus/src/modbus.c.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -608,6 +608,18 @@ help:
 	@echo "... PowerOptimizer_autogen/mocs_compilation.o"
 	@echo "... PowerOptimizer_autogen/mocs_compilation.i"
 	@echo "... PowerOptimizer_autogen/mocs_compilation.s"
+	@echo "... home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.o"
+	@echo "... home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.i"
+	@echo "... home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.s"
+	@echo "... home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.o"
+	@echo "... home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.i"
+	@echo "... home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.s"
+	@echo "... home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.o"
+	@echo "... home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.i"
+	@echo "... home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.s"
+	@echo "... home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.o"
+	@echo "... home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.i"
+	@echo "... home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.s"
 	@echo "... src/PID_Controller.o"
 	@echo "... src/PID_Controller.i"
 	@echo "... src/PID_Controller.s"
@@ -644,18 +656,6 @@ help:
 	@echo "... src/turntable_controller.o"
 	@echo "... src/turntable_controller.i"
 	@echo "... src/turntable_controller.s"
-	@echo "... thirdparty/libmodbus/src/modbus-data.o"
-	@echo "... thirdparty/libmodbus/src/modbus-data.i"
-	@echo "... thirdparty/libmodbus/src/modbus-data.s"
-	@echo "... thirdparty/libmodbus/src/modbus-rtu.o"
-	@echo "... thirdparty/libmodbus/src/modbus-rtu.i"
-	@echo "... thirdparty/libmodbus/src/modbus-rtu.s"
-	@echo "... thirdparty/libmodbus/src/modbus-tcp.o"
-	@echo "... thirdparty/libmodbus/src/modbus-tcp.i"
-	@echo "... thirdparty/libmodbus/src/modbus-tcp.s"
-	@echo "... thirdparty/libmodbus/src/modbus.o"
-	@echo "... thirdparty/libmodbus/src/modbus.i"
-	@echo "... thirdparty/libmodbus/src/modbus.s"
 .PHONY : help
 
 

@@ -349,100 +349,100 @@ CMakeFiles/PowerOptimizer.dir/src/logindialog.cpp.o.provides: CMakeFiles/PowerOp
 CMakeFiles/PowerOptimizer.dir/src/logindialog.cpp.o.provides.build: CMakeFiles/PowerOptimizer.dir/src/logindialog.cpp.o
 
 
-CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus.c.o: CMakeFiles/PowerOptimizer.dir/flags.make
-CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus.c.o: /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/build-PowerOptimizer-Desktop_Qt_5_14_2_GCC_64bit-Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building C object CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus.c.o"
-	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus.c.o   -c /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus.c
+CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c.o: CMakeFiles/PowerOptimizer.dir/flags.make
+CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c.o: /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/build-PowerOptimizer-Desktop_Qt_5_14_2_GCC_64bit-Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building C object CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c.o"
+	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c.o   -c /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c
 
-CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus.c.i"
-	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus.c > CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus.c.i
+CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c.i"
+	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c > CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c.i
 
-CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus.c.s"
-	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus.c -o CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus.c.s
+CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c.s"
+	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c -o CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c.s
 
-CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus.c.o.requires:
+CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c.o.requires:
 
-.PHONY : CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus.c.o.requires
+.PHONY : CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c.o.requires
 
-CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus.c.o.provides: CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus.c.o.requires
-	$(MAKE) -f CMakeFiles/PowerOptimizer.dir/build.make CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus.c.o.provides.build
-.PHONY : CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus.c.o.provides
+CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c.o.provides: CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c.o.requires
+	$(MAKE) -f CMakeFiles/PowerOptimizer.dir/build.make CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c.o.provides.build
+.PHONY : CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c.o.provides
 
-CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus.c.o.provides.build: CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus.c.o
-
-
-CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-data.c.o: CMakeFiles/PowerOptimizer.dir/flags.make
-CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-data.c.o: /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus-data.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/build-PowerOptimizer-Desktop_Qt_5_14_2_GCC_64bit-Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building C object CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-data.c.o"
-	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-data.c.o   -c /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus-data.c
-
-CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-data.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-data.c.i"
-	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus-data.c > CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-data.c.i
-
-CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-data.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-data.c.s"
-	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus-data.c -o CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-data.c.s
-
-CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-data.c.o.requires:
-
-.PHONY : CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-data.c.o.requires
-
-CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-data.c.o.provides: CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-data.c.o.requires
-	$(MAKE) -f CMakeFiles/PowerOptimizer.dir/build.make CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-data.c.o.provides.build
-.PHONY : CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-data.c.o.provides
-
-CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-data.c.o.provides.build: CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-data.c.o
+CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c.o.provides.build: CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c.o
 
 
-CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-rtu.c.o: CMakeFiles/PowerOptimizer.dir/flags.make
-CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-rtu.c.o: /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus-rtu.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/build-PowerOptimizer-Desktop_Qt_5_14_2_GCC_64bit-Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building C object CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-rtu.c.o"
-	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-rtu.c.o   -c /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus-rtu.c
+CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c.o: CMakeFiles/PowerOptimizer.dir/flags.make
+CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c.o: /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/build-PowerOptimizer-Desktop_Qt_5_14_2_GCC_64bit-Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building C object CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c.o"
+	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c.o   -c /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c
 
-CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-rtu.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-rtu.c.i"
-	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus-rtu.c > CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-rtu.c.i
+CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c.i"
+	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c > CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c.i
 
-CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-rtu.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-rtu.c.s"
-	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus-rtu.c -o CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-rtu.c.s
+CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c.s"
+	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c -o CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c.s
 
-CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-rtu.c.o.requires:
+CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c.o.requires:
 
-.PHONY : CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-rtu.c.o.requires
+.PHONY : CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c.o.requires
 
-CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-rtu.c.o.provides: CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-rtu.c.o.requires
-	$(MAKE) -f CMakeFiles/PowerOptimizer.dir/build.make CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-rtu.c.o.provides.build
-.PHONY : CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-rtu.c.o.provides
+CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c.o.provides: CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c.o.requires
+	$(MAKE) -f CMakeFiles/PowerOptimizer.dir/build.make CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c.o.provides.build
+.PHONY : CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c.o.provides
 
-CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-rtu.c.o.provides.build: CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-rtu.c.o
+CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c.o.provides.build: CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c.o
 
 
-CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-tcp.c.o: CMakeFiles/PowerOptimizer.dir/flags.make
-CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-tcp.c.o: /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus-tcp.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/build-PowerOptimizer-Desktop_Qt_5_14_2_GCC_64bit-Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building C object CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-tcp.c.o"
-	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-tcp.c.o   -c /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus-tcp.c
+CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c.o: CMakeFiles/PowerOptimizer.dir/flags.make
+CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c.o: /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/build-PowerOptimizer-Desktop_Qt_5_14_2_GCC_64bit-Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building C object CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c.o"
+	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c.o   -c /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c
 
-CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-tcp.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-tcp.c.i"
-	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus-tcp.c > CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-tcp.c.i
+CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c.i"
+	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c > CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c.i
 
-CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-tcp.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-tcp.c.s"
-	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus-tcp.c -o CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-tcp.c.s
+CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c.s"
+	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c -o CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c.s
 
-CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-tcp.c.o.requires:
+CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c.o.requires:
 
-.PHONY : CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-tcp.c.o.requires
+.PHONY : CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c.o.requires
 
-CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-tcp.c.o.provides: CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-tcp.c.o.requires
-	$(MAKE) -f CMakeFiles/PowerOptimizer.dir/build.make CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-tcp.c.o.provides.build
-.PHONY : CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-tcp.c.o.provides
+CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c.o.provides: CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c.o.requires
+	$(MAKE) -f CMakeFiles/PowerOptimizer.dir/build.make CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c.o.provides.build
+.PHONY : CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c.o.provides
 
-CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-tcp.c.o.provides.build: CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-tcp.c.o
+CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c.o.provides.build: CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c.o
+
+
+CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c.o: CMakeFiles/PowerOptimizer.dir/flags.make
+CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c.o: /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/build-PowerOptimizer-Desktop_Qt_5_14_2_GCC_64bit-Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building C object CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c.o"
+	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c.o   -c /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c
+
+CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c.i"
+	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c > CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c.i
+
+CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c.s"
+	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c -o CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c.s
+
+CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c.o.requires:
+
+.PHONY : CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c.o.requires
+
+CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c.o.provides: CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c.o.requires
+	$(MAKE) -f CMakeFiles/PowerOptimizer.dir/build.make CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c.o.provides.build
+.PHONY : CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c.o.provides
+
+CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c.o.provides.build: CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c.o
 
 
 CMakeFiles/PowerOptimizer.dir/PowerOptimizer_autogen/mocs_compilation.cpp.o: CMakeFiles/PowerOptimizer.dir/flags.make
@@ -483,10 +483,10 @@ PowerOptimizer_OBJECTS = \
 "CMakeFiles/PowerOptimizer.dir/src/tab_deviceconnect.cpp.o" \
 "CMakeFiles/PowerOptimizer.dir/src/turntable_controller.cpp.o" \
 "CMakeFiles/PowerOptimizer.dir/src/logindialog.cpp.o" \
-"CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus.c.o" \
-"CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-data.c.o" \
-"CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-rtu.c.o" \
-"CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-tcp.c.o" \
+"CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c.o" \
+"CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c.o" \
+"CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c.o" \
+"CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c.o" \
 "CMakeFiles/PowerOptimizer.dir/PowerOptimizer_autogen/mocs_compilation.cpp.o"
 
 # External object files for target PowerOptimizer
@@ -504,10 +504,10 @@ PowerOptimizer: CMakeFiles/PowerOptimizer.dir/src/tab_turntablecontrol.cpp.o
 PowerOptimizer: CMakeFiles/PowerOptimizer.dir/src/tab_deviceconnect.cpp.o
 PowerOptimizer: CMakeFiles/PowerOptimizer.dir/src/turntable_controller.cpp.o
 PowerOptimizer: CMakeFiles/PowerOptimizer.dir/src/logindialog.cpp.o
-PowerOptimizer: CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus.c.o
-PowerOptimizer: CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-data.c.o
-PowerOptimizer: CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-rtu.c.o
-PowerOptimizer: CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-tcp.c.o
+PowerOptimizer: CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c.o
+PowerOptimizer: CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c.o
+PowerOptimizer: CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c.o
+PowerOptimizer: CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c.o
 PowerOptimizer: CMakeFiles/PowerOptimizer.dir/PowerOptimizer_autogen/mocs_compilation.cpp.o
 PowerOptimizer: CMakeFiles/PowerOptimizer.dir/build.make
 PowerOptimizer: /opt/Qt5.14.2/5.14.2/gcc_64/lib/libQt5Network.so.5.14.2
@@ -536,10 +536,10 @@ CMakeFiles/PowerOptimizer.dir/requires: CMakeFiles/PowerOptimizer.dir/src/tab_tu
 CMakeFiles/PowerOptimizer.dir/requires: CMakeFiles/PowerOptimizer.dir/src/tab_deviceconnect.cpp.o.requires
 CMakeFiles/PowerOptimizer.dir/requires: CMakeFiles/PowerOptimizer.dir/src/turntable_controller.cpp.o.requires
 CMakeFiles/PowerOptimizer.dir/requires: CMakeFiles/PowerOptimizer.dir/src/logindialog.cpp.o.requires
-CMakeFiles/PowerOptimizer.dir/requires: CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus.c.o.requires
-CMakeFiles/PowerOptimizer.dir/requires: CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-data.c.o.requires
-CMakeFiles/PowerOptimizer.dir/requires: CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-rtu.c.o.requires
-CMakeFiles/PowerOptimizer.dir/requires: CMakeFiles/PowerOptimizer.dir/thirdparty/libmodbus/src/modbus-tcp.c.o.requires
+CMakeFiles/PowerOptimizer.dir/requires: CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c.o.requires
+CMakeFiles/PowerOptimizer.dir/requires: CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c.o.requires
+CMakeFiles/PowerOptimizer.dir/requires: CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c.o.requires
+CMakeFiles/PowerOptimizer.dir/requires: CMakeFiles/PowerOptimizer.dir/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c.o.requires
 CMakeFiles/PowerOptimizer.dir/requires: CMakeFiles/PowerOptimizer.dir/PowerOptimizer_autogen/mocs_compilation.cpp.o.requires
 
 .PHONY : CMakeFiles/PowerOptimizer.dir/requires

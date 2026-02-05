@@ -6,15 +6,15 @@
 
 #IncludeRegexTransform: 
 
-/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/config.h
+/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/config.h
 
-/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus-data.c
+/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c
 stdlib.h
 -
 stdint.h
 -
 stdint.h
-/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/stdint.h
+/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/stdint.h
 string.h
 -
 assert.h
@@ -26,15 +26,15 @@ arpa/inet.h
 config.h
 -
 modbus.h
-/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus.h
+/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.h
 
-/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus-private.h
+/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-private.h
 stdint.h
 -
 sys/time.h
 -
 stdint.h
-/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/stdint.h
+/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/stdint.h
 time.h
 -
 config.h
@@ -42,19 +42,19 @@ config.h
 sys/types.h
 -
 modbus.h
-/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus.h
+/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.h
 
-/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus-rtu-private.h
+/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu-private.h
 stdint.h
 -
 stdint.h
-/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/stdint.h
+/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/stdint.h
 windows.h
 -
 termios.h
 -
 
-/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus-rtu.c
+/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c
 errno.h
 -
 fcntl.h
@@ -68,25 +68,25 @@ string.h
 unistd.h
 -
 modbus-private.h
-/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus-private.h
+/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-private.h
 assert.h
 -
 modbus-rtu-private.h
-/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus-rtu-private.h
+/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu-private.h
 modbus-rtu.h
-/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus-rtu.h
+/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.h
 sys/ioctl.h
 -
 linux/serial.h
 -
 
-/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus-rtu.h
+/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.h
 modbus.h
-/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus.h
+/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.h
 
-/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus-tcp-private.h
+/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp-private.h
 
-/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus-tcp.c
+/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c
 stdio.h
 -
 stdlib.h
@@ -126,21 +126,21 @@ arpa/inet.h
 netdb.h
 -
 modbus-private.h
-/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus-private.h
+/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-private.h
 modbus-tcp-private.h
-/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus-tcp-private.h
+/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp-private.h
 modbus-tcp.h
-/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus-tcp.h
+/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.h
 
-/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus-tcp.h
+/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.h
 modbus.h
-/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus.h
+/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.h
 winsock2.h
 -
 
-/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus-version.h
+/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-version.h
 
-/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus.c
+/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c
 errno.h
 -
 limits.h
@@ -160,21 +160,21 @@ unistd.h
 config.h
 -
 modbus-private.h
-/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus-private.h
+/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-private.h
 modbus.h
-/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus.h
+/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.h
 
-/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus.h
+/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.h
 sys/param.h
 -
 stdint.h
 -
 stdint.h
-/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/stdint.h
+/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/stdint.h
 modbus-version.h
-/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus-version.h
+/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-version.h
 modbus-rtu.h
-/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus-rtu.h
+/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.h
 modbus-tcp.h
-/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus-tcp.h
+/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.h
 

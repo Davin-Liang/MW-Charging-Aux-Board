@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include <QTcpSocket>
 #include <QTimer>
-#include <modbus.h>
+#include "modbus.h"
 //#include "command_transmitter.h"
 #include "turntable_controller.h"
 #include "PID_Controller.h"

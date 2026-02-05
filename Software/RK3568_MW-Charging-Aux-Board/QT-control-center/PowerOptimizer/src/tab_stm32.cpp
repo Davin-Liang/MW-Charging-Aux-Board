@@ -14,7 +14,7 @@
 #include <fstream>
 #include <iostream>
 // JSON 库
-#include "thirdparty/nlohmann/json.hpp"
+#include "nlohmann/json.hpp"
 
 using json = nlohmann::json;
 

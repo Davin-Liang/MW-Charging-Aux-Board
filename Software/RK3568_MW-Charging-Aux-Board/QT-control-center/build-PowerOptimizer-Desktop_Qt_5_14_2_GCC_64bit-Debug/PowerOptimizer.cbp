@@ -40,12 +40,11 @@
 					<Add option="-DQT_WIDGETS_LIB"/>
 					<Add option="-DQT_CHARTS_LIB"/>
 					<Add directory="/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/build-PowerOptimizer-Desktop_Qt_5_14_2_GCC_64bit-Debug/PowerOptimizer_autogen/include"/>
-					<Add directory="/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer"/>
-					<Add directory="/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty"/>
-					<Add directory="/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src"/>
 					<Add directory="/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/src"/>
 					<Add directory="/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/include"/>
 					<Add directory="/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/build-PowerOptimizer-Desktop_Qt_5_14_2_GCC_64bit-Debug"/>
+					<Add directory="/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty"/>
+					<Add directory="/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src"/>
 					<Add directory="/opt/Qt5.14.2/5.14.2/gcc_64/include"/>
 					<Add directory="/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore"/>
 					<Add directory="/opt/Qt5.14.2/5.14.2/gcc_64/./mkspecs/linux-g++"/>
@@ -82,12 +81,11 @@
 					<Add option="-DQT_WIDGETS_LIB"/>
 					<Add option="-DQT_CHARTS_LIB"/>
 					<Add directory="/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/build-PowerOptimizer-Desktop_Qt_5_14_2_GCC_64bit-Debug/PowerOptimizer_autogen/include"/>
-					<Add directory="/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer"/>
-					<Add directory="/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty"/>
-					<Add directory="/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src"/>
 					<Add directory="/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/src"/>
 					<Add directory="/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/include"/>
 					<Add directory="/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/build-PowerOptimizer-Desktop_Qt_5_14_2_GCC_64bit-Debug"/>
+					<Add directory="/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty"/>
+					<Add directory="/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src"/>
 					<Add directory="/opt/Qt5.14.2/5.14.2/gcc_64/include"/>
 					<Add directory="/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore"/>
 					<Add directory="/opt/Qt5.14.2/5.14.2/gcc_64/./mkspecs/linux-g++"/>
@@ -132,6 +130,27 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-data.c">
+			<Option target="PowerOptimizer"/>
+		</Unit>
+		<Unit filename="/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.c">
+			<Option target="PowerOptimizer"/>
+		</Unit>
+		<Unit filename="/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-rtu.h">
+			<Option target="PowerOptimizer"/>
+		</Unit>
+		<Unit filename="/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.c">
+			<Option target="PowerOptimizer"/>
+		</Unit>
+		<Unit filename="/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus-tcp.h">
+			<Option target="PowerOptimizer"/>
+		</Unit>
+		<Unit filename="/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.c">
+			<Option target="PowerOptimizer"/>
+		</Unit>
+		<Unit filename="/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/3rdparty/libmodbus/src/modbus.h">
+			<Option target="PowerOptimizer"/>
+		</Unit>
 		<Unit filename="/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/include/PID_Controller.h">
 			<Option target="PowerOptimizer"/>
 		</Unit>
@@ -205,27 +224,6 @@
 			<Option target="PowerOptimizer"/>
 		</Unit>
 		<Unit filename="/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/src/turntable_controller.cpp">
-			<Option target="PowerOptimizer"/>
-		</Unit>
-		<Unit filename="/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus-data.c">
-			<Option target="PowerOptimizer"/>
-		</Unit>
-		<Unit filename="/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus-rtu.c">
-			<Option target="PowerOptimizer"/>
-		</Unit>
-		<Unit filename="/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus-rtu.h">
-			<Option target="PowerOptimizer"/>
-		</Unit>
-		<Unit filename="/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus-tcp.c">
-			<Option target="PowerOptimizer"/>
-		</Unit>
-		<Unit filename="/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus-tcp.h">
-			<Option target="PowerOptimizer"/>
-		</Unit>
-		<Unit filename="/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus.c">
-			<Option target="PowerOptimizer"/>
-		</Unit>
-		<Unit filename="/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src/modbus.h">
 			<Option target="PowerOptimizer"/>
 		</Unit>
 		<Unit filename="/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/build-PowerOptimizer-Desktop_Qt_5_14_2_GCC_64bit-Debug/PowerOptimizer_autogen/mocs_compilation.cpp">

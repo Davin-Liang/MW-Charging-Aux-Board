@@ -7,6 +7,8 @@ project(PowerOptimizer VERSION 1.0 LANGUAGES CXX C)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+get_filename_component(THIRDPARTY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty" ABSOLUTE)
+message(STATUS "Thirdparty directory located at: ${THIRDPARTY_DIR}")
 # 2. 查找 Qt 组件
 find_package(Qt5 REQUIRED COMPONENTS Core Gui Network Widgets Charts)
 
@@ -33,11 +35,11 @@ set(PROJECT_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/src/tab_deviceconnect.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/turntable_controller.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/logindialog.cpp"
-    # libmodbus 源码
-    "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/libmodbus/src/modbus.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/libmodbus/src/modbus-data.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/libmodbus/src/modbus-rtu.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/libmodbus/src/modbus-tcp.c"
+    # libmodbus 源码 (路径已更新为新的 external 目录)
+    "${THIRDPARTY_DIR}/libmodbus/src/modbus.c"
+    "${THIRDPARTY_DIR}/libmodbus/src/modbus-data.c"
+    "${THIRDPARTY_DIR}/libmodbus/src/modbus-rtu.c"
+    "${THIRDPARTY_DIR}/libmodbus/src/modbus-tcp.c"
 )
 
 # 6. 列出所有头文件 (PROJECT_HEADERS)
@@ -54,20 +56,21 @@ set(PROJECT_HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/include/turntable_controller.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/logindialog.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mainwindow.h"
-    # libmodbus 头文件
-    "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/libmodbus/src/modbus.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/libmodbus/src/modbus-rtu.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/libmodbus/src/modbus-tcp.h"
+    # libmodbus 头文件 (路径已更新)
+     "${THIRDPARTY_DIR}/libmodbus/src/modbus.h"
+     "${THIRDPARTY_DIR}/libmodbus/src/modbus-rtu.h"
+     "${THIRDPARTY_DIR}/libmodbus/src/modbus-tcp.h"
 )
 
 # 7. 设置包含目录
 include_directories(
-    "${CMAKE_CURRENT_SOURCE_DIR}"
-    "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty"
-    "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/libmodbus/src"
     "${CMAKE_CURRENT_SOURCE_DIR}/src"
     "${CMAKE_CURRENT_SOURCE_DIR}/include"
-    "${CMAKE_CURRENT_BINARY_DIR}" # 重要：手动生成的 UI 头文件在这里
+    "${CMAKE_CURRENT_BINARY_DIR}" # UI 头文件路径
+
+    # === 新的第三方库包含路径 ===
+    "${THIRDPARTY_DIR}"                    # 这样你可以 #include "nlohmann/json.hpp"
+    "${THIRDPARTY_DIR}/libmodbus/src"      # 这样你可以 #include "modbus.h"
 )
 
 # 8. 生成可执行程序 (只调用这一次 add_executable)
