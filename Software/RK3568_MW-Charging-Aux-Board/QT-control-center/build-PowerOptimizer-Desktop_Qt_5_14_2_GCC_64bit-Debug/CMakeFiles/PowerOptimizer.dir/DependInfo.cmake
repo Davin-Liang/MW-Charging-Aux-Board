@@ -24,6 +24,7 @@ set(CMAKE_TARGET_DEFINITIONS_C
 # The include file search paths:
 set(CMAKE_C_TARGET_INCLUDE_PATH
   "PowerOptimizer_autogen/include"
+  "/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer"
   "/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty"
   "/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src"
   "/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/src"
@@ -66,6 +67,7 @@ set(CMAKE_TARGET_DEFINITIONS_CXX
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "PowerOptimizer_autogen/include"
+  "/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer"
   "/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty"
   "/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/thirdparty/libmodbus/src"
   "/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/PowerOptimizer/src"

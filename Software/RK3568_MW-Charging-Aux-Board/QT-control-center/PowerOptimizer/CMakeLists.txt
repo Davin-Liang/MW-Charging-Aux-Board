@@ -58,11 +58,11 @@ set(PROJECT_HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/libmodbus/src/modbus.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/libmodbus/src/modbus-rtu.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/libmodbus/src/modbus-tcp.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/nlohmann/json.hpp"
 )
 
 # 7. 设置包含目录
 include_directories(
+    "${CMAKE_CURRENT_SOURCE_DIR}"
     "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty"
     "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/libmodbus/src"
     "${CMAKE_CURRENT_SOURCE_DIR}/src"
