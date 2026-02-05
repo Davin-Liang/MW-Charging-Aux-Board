@@ -1,0 +1,4 @@
+/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/build-PowerOptimizer-Desktop_Qt_5_14_2_GCC_64bit-Debug/CMakeFiles/rebuild_cache.dir
+/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/build-PowerOptimizer-Desktop_Qt_5_14_2_GCC_64bit-Debug/CMakeFiles/PowerOptimizer.dir
+/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/build-PowerOptimizer-Desktop_Qt_5_14_2_GCC_64bit-Debug/CMakeFiles/edit_cache.dir
+/home/topeet/qt/MW-Charging-Aux-Board/Software/RK3568_MW-Charging-Aux-Board/QT-control-center/build-PowerOptimizer-Desktop_Qt_5_14_2_GCC_64bit-Debug/CMakeFiles/PowerOptimizer_autogen.dir
