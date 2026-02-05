@@ -9,7 +9,7 @@
 
 void test1(void)
 {
-    dm542_pul_config(horDm542, ENABLE);
+//    dm542_pul_config(horDm542, ENABLE);
 //		vTaskSuspend(NULL);;
 //    dm542_dir_config(horDm542, Bit_SET);
 //    dm542_ena_config(horDm542, Bit_SET);

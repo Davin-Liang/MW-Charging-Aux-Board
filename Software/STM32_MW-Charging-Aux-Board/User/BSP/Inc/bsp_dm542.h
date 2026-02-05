@@ -22,47 +22,6 @@
 #define DATA_FLAG           0XCD
 #define MOTOR_DATA_LEN         9
 
-/*
- * 横方向步进电机
- * PUL+ <——> PA6 <——> TIM3_CH1
- * DIR+ <——> PA7
- * ENA+ <——> PA8  
- */
-#define HOR_DM542_TIMER_PUL_GPIO_CLK    RCC_AHB1Periph_GPIOA
-#define HOR_DM542_TIMER_CLK 	        RCC_APB1Periph_TIM3
-#define HOR_DM542_TIMER_PUL_PIN         GPIO_Pin_6
-#define HOR_DM542_TIMER_PUL_GPIO_PORT   GPIOA
-#define HOR_DM542_TIMER_PUL_SOURCE      GPIO_PinSource6
-#define HOR_DM542_TIMER_PUL_AF          GPIO_AF_TIM3
-#define HOR_DM542_TIM                   TIM3
-
-#define HOR_DM542_DIR_GPIO_CLK          RCC_AHB1Periph_GPIOA
-#define HOR_DM542_DIR_PIN               GPIO_Pin_8
-#define HOR_DM542_DIR_GPIO_PORT         GPIOA
-
-#define HOR_DM542_SLAVE_TIMER_CLK 	    RCC_APB1Periph_TIM2
-#define HOR_DM542_SLAVE_TIM             TIM2
-
-/*
- * 纵方向步进电机
- * PUL+ <——> PB6 <——> TIM4_CH1
- * DIR+ <——> PB7
- * ENA+ <——> PB5
- */
-#define VER_DM542_TIMER_PUL_GPIO_CLK    RCC_AHB1Periph_GPIOB
-#define VER_DM542_TIMER_CLK 	        RCC_APB1Periph_TIM4
-#define VER_DM542_TIMER_PUL_PIN         GPIO_Pin_6
-#define VER_DM542_TIMER_PUL_GPIO_PORT   GPIOB
-#define VER_DM542_TIMER_PUL_SOURCE      GPIO_PinSource6
-#define VER_DM542_TIMER_PUL_AF          GPIO_AF_TIM4
-#define VER_DM542_TIM                   TIM4
-
-#define VER_DM542_DIR_GPIO_CLK          RCC_AHB1Periph_GPIOB
-#define VER_DM542_DIR_PIN               GPIO_Pin_7
-#define VER_DM542_DIR_GPIO_PORT         GPIOB
-
-#define VER_DM542_SLAVE_TIMER_CLK 	    RCC_APB1Periph_TIM5
-#define VER_DM542_SLAVE_TIM             TIM5
 
 enum Dm542Def{
     horDm542, // 横向DM542驱动器
@@ -90,8 +49,6 @@ extern SemaphoreHandle_t dm542_USART3_Mutex;
 
 void hor_dm542_init(uint32_t period, uint16_t prescaler, uint32_t pulse);
 void ver_dm542_init(uint32_t period, uint16_t prescaler, uint32_t pulse);
-void dm542_dir_config(enum Dm542Def whichDm542, BitAction bitVal);
-void dm542_pul_config(enum Dm542Def whichDm542, FunctionalState newState);
 int motor_position_ctrl(float horPosition, float verPosition);
 void screw_motor_status_init(void);
 void screw_motor_status_reset(void);
