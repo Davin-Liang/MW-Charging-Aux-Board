@@ -49,3 +49,5 @@
 .\output\bsp_can.o: ..\..\FreeRTOS\include\queue.h
 .\output\bsp_can.o: ..\..\FreeRTOS\include\task.h
 .\output\bsp_can.o: ..\..\FreeRTOS\include\list.h
+.\output\bsp_can.o: ..\..\BSP\bsp_debug_usart.h
+.\output\bsp_can.o: D:\keil5\ARM\ARMCC\Bin\..\include\stdio.h

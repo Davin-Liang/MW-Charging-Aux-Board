@@ -62,7 +62,7 @@
 #define VER_SLAVE_TIM           TIMER4
 #define VER_SLAVE_TIM_CLK       RCU_TIMER4
 #define VER_SLAVE_IRQn          TIMER4_IRQn
-#define VER_SLAVE_TRIG_SRC      TIMER_SMCFG_TRGSEL_ITI3
+#define VER_SLAVE_TRIG_SRC      TIMER_SMCFG_TRGSEL_ITI2
 
 // ·½Ïò¿ØÖÆ: PB7
 #define VER_DIR_PORT            GPIOB

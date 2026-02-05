@@ -52,3 +52,5 @@
 .\output\motor_task.o: ..\..\FreeRTOS\include\queue.h
 .\output\motor_task.o: ..\..\BSP\bsp_can.h
 .\output\motor_task.o: ..\..\Template\app_protocol.h
+.\output\motor_task.o: ..\..\BSP\bsp_debug_usart.h
+.\output\motor_task.o: D:\keil5\ARM\ARMCC\Bin\..\include\stdio.h

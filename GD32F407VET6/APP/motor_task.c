@@ -3,9 +3,10 @@
 #include "bsp_can.h"
 #include "queue.h"
 #include "app_protocol.h"
+#include "bsp_debug_usart.h"
 QueueHandle_t motorCmdQueue;
 
-// 假设 LED 接在 PE3 (根据你的点灯代码)
+// LED 
 #define DEBUG_LED_PORT  GPIOB
 #define DEBUG_LED_PIN   GPIO_PIN_4
 
@@ -23,6 +24,7 @@ void MotorTask(void *pvParameters)
     hor_dm542_init(NEEDED_ARR - 1, NEEDED_PSC - 1, NEEDED_CCR);
     ver_dm542_init(NEEDED_ARR - 1, NEEDED_PSC - 1, NEEDED_CCR);
 
+		printf("[Motor] Hardware Init Done. Waiting for commands...\r\n");
     // 3. 任务主循环
     while(1)
     {
@@ -31,10 +33,12 @@ void MotorTask(void *pvParameters)
         {
             // 收到指令，LED 翻转一次表示正在处理
             gpio_bit_toggle(DEBUG_LED_PORT, DEBUG_LED_PIN);
-            
+            // 收到指令打印
+            printf("[Motor] Received CMD: X=%.2f, Y=%.2f. Moving...\r\n", targetPos.x, targetPos.y);
             // 执行运动 (阻塞直到完成)
             motor_position_ctrl(targetPos.x, targetPos.y);
-            
+            // 运动完成打印
+            printf("[Motor] Position Reached! Feedback sent.\r\n");
             // 发送反馈
             can_send_position_feedback(horSM.currentPosition, verSM.currentPosition);
             
