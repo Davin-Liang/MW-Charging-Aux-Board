@@ -35,7 +35,7 @@
      </font>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>1</number>
     </property>
     <property name="iconSize">
      <size>
@@ -66,7 +66,7 @@
        </font>
       </property>
       <property name="layoutDirection">
-       <enum>Qt::LayoutDirection::LeftToRight</enum>
+       <enum>Qt::LeftToRight</enum>
       </property>
       <property name="title">
        <string>数据采集系统STM32以太网连接</string>
@@ -172,7 +172,7 @@
             <string>未连接</string>
            </property>
            <property name="textFormat">
-            <enum>Qt::TextFormat::PlainText</enum>
+            <enum>Qt::PlainText</enum>
            </property>
           </widget>
          </item>
@@ -196,7 +196,7 @@
        </font>
       </property>
       <property name="layoutDirection">
-       <enum>Qt::LayoutDirection::LeftToRight</enum>
+       <enum>Qt::LeftToRight</enum>
       </property>
       <property name="title">
        <string>天线转台连接</string>
@@ -355,7 +355,7 @@
             <string>未连接</string>
            </property>
            <property name="textFormat">
-            <enum>Qt::TextFormat::PlainText</enum>
+            <enum>Qt::PlainText</enum>
            </property>
           </widget>
          </item>
@@ -374,7 +374,7 @@
         <x>0</x>
         <y>0</y>
         <width>1001</width>
-        <height>61</height>
+        <height>71</height>
        </rect>
       </property>
       <property name="font">
@@ -436,9 +436,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>61</y>
+        <y>71</y>
         <width>1001</width>
-        <height>121</height>
+        <height>111</height>
        </rect>
       </property>
       <property name="font">
@@ -716,6 +716,7 @@
             <font>
              <family>宋体</family>
              <pointsize>12</pointsize>
+             <weight>50</weight>
              <bold>false</bold>
             </font>
            </property>
@@ -915,6 +916,7 @@
             <font>
              <family>宋体</family>
              <pointsize>12</pointsize>
+             <weight>50</weight>
              <bold>false</bold>
             </font>
            </property>
@@ -954,10 +956,10 @@
           <bool>true</bool>
          </property>
          <property name="selectionMode">
-          <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
+          <enum>QAbstractItemView::NoSelection</enum>
          </property>
          <property name="selectionBehavior">
-          <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+          <enum>QAbstractItemView::SelectItems</enum>
          </property>
         </widget>
        </item>
@@ -1009,9 +1011,6 @@
          </property>
          <property name="pixmap">
           <pixmap>:/i18n/PowerOptimizer_zh_CN.qm</pixmap>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignmentFlag::AlignCenter</set>
          </property>
         </widget>
        </item>
@@ -1193,7 +1192,7 @@
         <x>251</x>
         <y>222</y>
         <width>751</width>
-        <height>58</height>
+        <height>71</height>
        </rect>
       </property>
       <property name="title">
@@ -1441,9 +1440,9 @@
       <property name="geometry">
        <rect>
         <x>251</x>
-        <y>280</y>
+        <y>290</y>
         <width>751</width>
-        <height>251</height>
+        <height>241</height>
        </rect>
       </property>
       <property name="title">
@@ -1498,14 +1497,12 @@
      <font>
       <family>宋体</family>
       <pointsize>12</pointsize>
+      <weight>75</weight>
       <bold>true</bold>
      </font>
     </property>
     <property name="text">
      <string>各类设备控制中心</string>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignmentFlag::AlignCenter</set>
     </property>
    </widget>
   </widget>
