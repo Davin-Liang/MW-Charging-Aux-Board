@@ -27,6 +27,13 @@ void LED_Init(void) {
     gpio_output_options_set(TEST_LED_PORT, GPIO_OTYPE_PP, GPIO_OSPEED_50MHZ, TEST_LED_PIN);
     gpio_bit_set(TEST_LED_PORT, TEST_LED_PIN); // 默认灭
 }
+// 独立的点灯任务
+void Task_Blink(void *pvParameters) {
+    while(1) {
+        gpio_bit_toggle(TEST_LED_PORT, TEST_LED_PIN);
+        vTaskDelay(500); // 500ms 闪烁
+    }
+}
 /* 3. 模拟任务实现 (根据宏切换逻辑) */
 #ifdef USE_SIMULATOR_TASK 
 
@@ -76,14 +83,16 @@ int main(void){
 	
 
     // 1. LED任务
-    // xTaskCreate(Task_Blink, "Blinky", 128, NULL, 2, NULL); 
+
+  //  xTaskCreate(Task_Blink, "Blinky", 128, NULL, 2, NULL); 
+	
     // 2. 创建电机任务
     xTaskCreate(MotorTask, "Motor", 512, NULL, 3, NULL);
 
     // 3. 创建模拟任务
-		#ifdef USE_SIMULATOR_TASK
-    xTaskCreate(Task_Simulator, "TestSim", 128, NULL, 1, NULL);
-		#endif
+//		#ifdef USE_SIMULATOR_TASK
+//    xTaskCreate(Task_Simulator, "TestSim", 128, NULL, 1, NULL);
+//		#endif
 		printf("[Main] Starting Scheduler...\r\n");
     vTaskStartScheduler();
     while(1);
