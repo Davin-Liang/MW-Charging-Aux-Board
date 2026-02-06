@@ -4,7 +4,7 @@
 #include "semphr.h"
 #include "bsp_dm542.h" 
 #include "task.h"
-
+#include "bsp_debug_usart.h"
 // 引用外部信号量 (在 bsp_dm542.c 中定义)
 extern SemaphoreHandle_t xMotorMoveDoneSem; 
 extern struct ScrewMotorStatus horSM;
@@ -81,7 +81,7 @@ void bsp_can_init(void)
 
     // 中断配置 (FIFO0 消息挂起中断) 
     NVIC_InitStructure.NVIC_IRQChannel = CAN1_RX0_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 6; // 根据FreeRTOS 需求调整
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2; // 根据FreeRTOS 需求调整
     NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
@@ -94,35 +94,38 @@ void bsp_can_init(void)
  */
 uint8_t can_send_motor_cmd(float x, float y)
 {
-    CanTxMsg TxMessage;
-    FloatByte_u cvtX, cvtY;
-    uint8_t mailbox;
-    uint16_t timeout = 0;
+	CanTxMsg TxMessage;
+	FloatByte_u cvtX, cvtY;
+	uint8_t mailbox;
+	uint16_t timeout = 0;
 
-    cvtX.fVal = x; 
-    cvtY.fVal = y;
+	cvtX.fVal = x; 
+	cvtY.fVal = y;
 
-    TxMessage.StdId = CAN_ID_CMD_RX; // 0x201
-    TxMessage.ExtId = 0x00;
-    TxMessage.RTR = CAN_RTR_Data;
-    TxMessage.IDE = CAN_Id_Standard;
-    TxMessage.DLC = 8;
-    
-    TxMessage.Data[0] = cvtX.bytes[0]; TxMessage.Data[1] = cvtX.bytes[1];
-    TxMessage.Data[2] = cvtX.bytes[2]; TxMessage.Data[3] = cvtX.bytes[3];
-    TxMessage.Data[4] = cvtY.bytes[0]; TxMessage.Data[5] = cvtY.bytes[1];
-    TxMessage.Data[6] = cvtY.bytes[2]; TxMessage.Data[7] = cvtY.bytes[3];
+	TxMessage.StdId = CAN_ID_CMD_RX; // 0x201
+	TxMessage.ExtId = 0x00;
+	TxMessage.RTR = CAN_RTR_Data;
+	TxMessage.IDE = CAN_Id_Standard;
+	TxMessage.DLC = 8;
+	
+	TxMessage.Data[0] = cvtX.bytes[0]; TxMessage.Data[1] = cvtX.bytes[1];
+	TxMessage.Data[2] = cvtX.bytes[2]; TxMessage.Data[3] = cvtX.bytes[3];
+	TxMessage.Data[4] = cvtY.bytes[0]; TxMessage.Data[5] = cvtY.bytes[1];
+	TxMessage.Data[6] = cvtY.bytes[2]; TxMessage.Data[7] = cvtY.bytes[3];
 
-    mailbox = CAN_Transmit(CAN1, &TxMessage);
 
-    // 简单的等待发送完成，防止发太快堵塞 
-    while((CAN_TransmitStatus(CAN1, mailbox) == CAN_TxStatus_Failed) && (timeout < 0xFFFF))
-    {
-        timeout++;
-    }
+	printf("[STM32 CAN] Sending CMD: ID=0x%X, X=%.2f, Y=%.2f\r\n", 
+				 TxMessage.StdId, x, y);
+	mailbox = CAN_Transmit(CAN1, &TxMessage);
 
-    if(timeout >= 0xFFFF) return 1;
-    return 0;
+	// 简单的等待发送完成，防止发太快堵塞 
+	while((CAN_TransmitStatus(CAN1, mailbox) == CAN_TxStatus_Failed) && (timeout < 0xFFFF))
+	{
+			timeout++;
+	}
+
+	if(timeout >= 0xFFFF) return 1;
+	return 0;
 }
 
 /**
@@ -137,7 +140,8 @@ void CAN1_RX0_IRQHandler(void)
     if (CAN_GetITStatus(CAN1, CAN_IT_FMP0) != RESET)
     {
         CAN_Receive(CAN1, CAN_FIFO0, &RxMessage);
-
+				printf("[STM32 CAN] IRQ Triggered! Recv ID: 0x%X, DLC: %d\r\n", 
+               RxMessage.StdId, RxMessage.DLC);
         // 检查是否是 GD32 的反馈 (ID: 0x202)
         if (RxMessage.StdId == CAN_ID_FB_TX && RxMessage.DLC == 8)
         {
@@ -149,7 +153,9 @@ void CAN1_RX0_IRQHandler(void)
             // 更新电机状态
             horSM.currentPosition = cvtX.fVal;
             verSM.currentPosition = cvtY.fVal;
-
+						printf("[STM32 CAN] Feedback Accepted! Motor Pos: X=%.2f, Y=%.2f\r\n", 
+                   cvtX.fVal, cvtY.fVal);
+			
             // 释放信号量，通知任务
             if(xMotorMoveDoneSem != NULL)
             {

@@ -38,7 +38,7 @@ void hor_dm542_init(uint32_t period, uint16_t prescaler, uint32_t pulse)
         xMotorMoveDoneSem = xSemaphoreCreateBinary();
 
     // 初始化 CAN 通信 (替代原有的 GPIO/TIM 初始化) 
-    bsp_can_init();
+     bsp_can_init();
     
     //初始状态恢复 (读 Flash) 
     screw_motor_status_init();
