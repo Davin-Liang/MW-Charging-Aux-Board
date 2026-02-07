@@ -10,8 +10,8 @@ int main ()
     std::vector<DetectionResult> results;
 
     USBHikvisioner uhv(0);
-    AntennaVisioner anV("./yolov8_model/yolov8n.rknn", 
-                        "./yolov8_model/coco_80_labels_list.txt", 1024, 614);
+    AntennaVisioner anV("./yolov8_model/best.rknn", 
+                        "./yolov8_model/antenna.txt", 1024, 614);
 
     cv::Mat& img = anV.get_rga_mat();
 
@@ -25,10 +25,10 @@ int main ()
         return 0;
 
     auto start_time = std::chrono::high_resolution_clock::now();    
-    ret = uhv.read_img(img, 1000);
+    // ret = uhv.read_img(img, 1000);
 
-    // cv::Mat temp = cv::imread("./yolov8_model/image.jpg");
-    // temp.copyTo(img);
+    cv::Mat temp = cv::imread("./yolov8_model/image.jpg");
+    temp.copyTo(img);
 
     if (!ret)
         return 0;
