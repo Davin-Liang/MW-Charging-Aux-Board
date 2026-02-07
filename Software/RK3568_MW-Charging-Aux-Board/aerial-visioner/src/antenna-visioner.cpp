@@ -171,6 +171,8 @@ bool AntennaVisioner::detect_once(cv::Mat& outputFrame, std::vector<DetectionRes
         return false; // 跳过本帧后续处理，开始处理下一帧
     }
 
+    
+
     #if TIME_CONM_CALC
     auto end_time = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
