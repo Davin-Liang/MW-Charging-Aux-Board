@@ -11,11 +11,12 @@ int main ()
 
     USBHikvisioner uhv(0);
     AntennaVisioner anV("./yolov8_model/best.rknn", 
-                        "./yolov8_model/antenna.txt", 1024, 614);
+                        "./yolov8_model/antenna.txt", 1024, 614, &uhv);
 
     cv::Mat& img = anV.get_rga_mat();
 
     anV.init_system();
+    uhv.open_grab_callback();
     ret = uhv.camera_init();
     if (!ret)
         return 0;
@@ -27,8 +28,8 @@ int main ()
     auto start_time = std::chrono::high_resolution_clock::now();    
     // ret = uhv.read_img(img, 1000);
 
-    cv::Mat temp = cv::imread("./yolov8_model/image.jpg");
-    temp.copyTo(img);
+    // cv::Mat temp = cv::imread("./yolov8_model/image.jpg");
+    // temp.copyTo(img);
 
     if (!ret)
         return 0;

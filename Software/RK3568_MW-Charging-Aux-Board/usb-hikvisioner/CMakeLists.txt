@@ -28,6 +28,9 @@ message(STATUS "OpenCV libraries found: ${OpenCV_LIBS}")
 set(OPENCV_LIB_SRC_DIR "${CMAKE_SOURCE_DIR}/../3rdparty/opencv/lib")
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/ 3rdparty.out)
+if(NOT TARGET dma_buffer_pool_lib)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../dma-buffer-pool ${CMAKE_CURRENT_BINARY_DIR}/dma_build)
+endif()
 
 # 编译库
 add_library(usb_hikvisioner_lib STATIC
@@ -37,11 +40,17 @@ add_library(usb_hikvisioner_lib STATIC
 target_include_directories(usb_hikvisioner_lib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${LIBHIKVISION_INCLUDES}
+    ${LIBRGA_INCLUDES}
 )
+
+find_package(Threads REQUIRED)
 
 target_link_libraries(usb_hikvisioner_lib PUBLIC
     ${OpenCV_LIBS}
     ${HIKVISION_LIBS}
+    ${LIBRGA}
+    Threads::Threads
+    dma_buffer_pool_lib
 )
 
 # 编译可执行程序

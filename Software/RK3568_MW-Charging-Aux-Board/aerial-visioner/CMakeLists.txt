@@ -27,7 +27,10 @@ set(OPENCV_LIB_SRC_DIR "${CMAKE_SOURCE_DIR}/../3rdparty/opencv/lib")
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/ 3rdparty.out)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/utils/ utils.out)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/allocator/ allocator.out)
+# add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/allocator/ allocator.out)
+if(NOT TARGET usb_hikvisioner_lib)
+    add_subdirectory(../usb-hikvisioner build_usb_hikvisioner_lib)
+endif()
 
 # 编译库
 add_library(aerial_visioner_lib STATIC
@@ -53,6 +56,7 @@ target_link_libraries(aerial_visioner_lib PUBLIC
     ${OpenCV_LIBS}
     dl
     allocator_obj
+    usb_hikvisioner_lib
 )
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)

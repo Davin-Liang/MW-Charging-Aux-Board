@@ -87,11 +87,16 @@ void RC522Controller::calculate_crc_(const std::vector<uint8_t>& inData, std::ve
     write_raw_rc_(CommandReg, PCD_CALCCRC); // 开始计算 CRC
 
     /* 等待 CRC 计算完成 */
-    i = 0xFF;
+    uint32_t retry = 2000; // 增加重试次数
     do {
         n = read_raw_rc_(DivIrqReg);
-        i--;
-    } while ((i != 0) && !(n & 0x04));
+        retry--;
+        usleep(10); // 每次循环真实休眠 10 微秒 (10us * 2000 = 20ms 超时)
+    } while ((retry != 0) && !(n & 0x04));
+
+    if (retry == 0) {
+        std::cerr << "CRC Calculation Timeout!" << std::endl;
+    }
 
     /* 读取结果 */
     outData.clear();
@@ -144,10 +149,11 @@ char RC522Controller::pcd_com_mf522_(uint8_t command,
         set_bit_mask_(BitFramingReg, 0x80);  // 启动发送
 
     /* 等待命令完成或超时 */
-    i = 1000; // 根据时钟频率调整
+    i = 3000; // 增加重试次数，确保至少能等 30 毫秒
     do {
         n = read_raw_rc_(ComIrqReg);
         i--;
+        usleep(10); // 每次循环真实休眠 10 微秒 (防止 CPU 空转跑太快)
     } while ((i != 0) && !(n & 0x01) && !(n & waitFor));
 
     clear_bit_mask_(BitFramingReg, 0x80);    // 停止发送
@@ -459,34 +465,41 @@ void RC522Controller::run_test_loop() {
         std::cerr << "PCD Reset Failed" << std::endl;
         return;
     }
-    
-    if (config_iso_type('A') == MI_ERR) {
-        std::cerr << "Config ISO Type Failed" << std::endl;
-    } else {
-        std::cout << "RC522 Initialized. Scanning..." << std::endl;
-    }
 
-    // 默认密钥 (全F)
+    uint8_t version = read_raw_rc_(0x37); 
+    printf("==============================\n");
+    printf("RC522 Chip Version: 0x%02X\n", version);
+    printf("==============================\n");
+    
+    if (config_iso_type('A') == MI_ERR)
+        std::cerr << "Config ISO Type Failed" << std::endl;
+    else
+        std::cout << "RC522 Initialized. Scanning..." << std::endl;
+
+    /* 默认密钥 (全F) */
     std::vector<uint8_t> defaultKey = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-    // 测试写入数据 (全0xAA)
+    /* 测试写入数据 (全0xAA) */
     std::vector<uint8_t> writeBuf(16, 0xAA);
     std::vector<uint8_t> readBuf;
     std::vector<uint8_t> cardId; // UID
     
-    uint8_t sector = 1;      // 操作第1扇区
-    uint8_t blockAddr = sector * 4 + 3; // 该扇区的块地址
+    uint8_t sector = 2;      // 我们换到第 2 扇区 (因为第1扇区已经报废了)
+    
+    // 操作该扇区的第 0 块，绝对安全的普通数据块 (2 * 4 + 0 = 块 8)
+    // 绝对不要写 + 3！
+    uint8_t blockAddr = sector * 4 + 0; 
 
     while (true) {
-        // 1. 寻卡
+        /* 1. 寻卡 */
         if (pcd_request(PICC_REQIDL, cardId) == MI_OK) {
             
-            // 2. 防冲突 (获取完整UID)
+            /* 2. 防冲突 */
             if (pcd_anticoll(cardId) == MI_OK) {
                 
-                // 3. 选卡
+                /* 3. 选卡 */
                 pcd_select(cardId);
                 
-                // 4. 验证密码
+                /* 4. 验证密码 */
                 char authStatus = pcd_auth_state(KEYA, blockAddr, defaultKey, cardId);
                 
                 if (authStatus != MI_OK) {
@@ -499,6 +512,13 @@ void RC522Controller::run_test_loop() {
                     // 5. 写测试
                     if (pcd_write(blockAddr, writeBuf) == MI_OK) {
                         std::cout << " > Write Block Success" << std::endl;
+                        
+                        // ==========================================
+                        // 【极其关键】等待卡片内部 EEPROM 物理写入完成！
+                        // 强制延时 15 毫秒，不要立刻发起读请求
+                        // ==========================================
+                        std::this_thread::sleep_for(std::chrono::milliseconds(15));
+                        
                     } else {
                         std::cout << " > Write Block Failed" << std::endl;
                     }
@@ -510,13 +530,20 @@ void RC522Controller::run_test_loop() {
                         std::cout << " > Read Block Failed" << std::endl;
                     }
                 }
-            } else {
-                // 防冲突失败，停止卡片
-                pcd_halt();
-            }
+
+                // ==========================================
+                // 读写完毕，让卡片休眠并清除加密状态
+                // ==========================================
+                pcd_halt(); 
+                clear_bit_mask_(Status2Reg, 0x08); 
+                
+                // 成功交互后，休息1秒，避免疯狂读写
+                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                continue; 
+            } 
         }
         
-        // 降低CPU占用
+        // 没寻到卡时的休眠
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 }

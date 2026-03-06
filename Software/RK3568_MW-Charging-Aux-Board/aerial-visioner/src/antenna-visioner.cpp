@@ -25,24 +25,26 @@ AntennaVisioner::AntennaVisioner(const std::string& modelPath,
     /* 成员变量已有默认初始化值 (C++11/14 特性) */
     memset(&rknnAppCtx_, 0, sizeof(rknn_app_context_t));
     
-    useHikvision = false; // 不使用海康威视摄像头，使用普通USB相机
+    useHikvision_ = false; // 不使用海康威视摄像头，使用普通USB相机
 }
 
 AntennaVisioner::AntennaVisioner(const std::string& modelPath, 
                                 const std::string& labelPath, 
                                 const int width, 
-                                const int height)
+                                const int height,
+                                USBHikvisioner* camera)
     : modelPath_(modelPath), 
       labelPath_(labelPath), 
       width_(width), 
       height_(height),
       dmaFd_(-1), 
-      virtAddr_(nullptr)
+      virtAddr_(nullptr),
+      uhv_(camera)
 {
     /* 成员变量已有默认初始化值 (C++11/14 特性) */
     memset(&rknnAppCtx_, 0, sizeof(rknn_app_context_t));
 
-    useHikvision = true; // 使用海康威视摄像头
+    useHikvision_ = true; // 使用海康威视摄像头
 }
 
 AntennaVisioner::~AntennaVisioner() 
@@ -59,7 +61,7 @@ AntennaVisioner::~AntennaVisioner()
             std::cout << "DMA buffer freed." << std::endl;
         }
 
-    if (useHikvision) return;
+    if (useHikvision_) return;
 
     if (cap_.isOpened()) cap_.release();
 }
@@ -81,7 +83,7 @@ bool AntennaVisioner::init_system()
         goto fail_to_init_model;
     }
 
-    if (useHikvision) {
+    if (useHikvision_) {
         /* 计算大小 (这里假设是 RGBA8888) */
         bufSize_ = width_ * height_ * 3;
 
@@ -126,60 +128,152 @@ fail_to_open_camera:
     return false;
 }
 
-bool AntennaVisioner::detect_once(cv::Mat& outputFrame, std::vector<DetectionResult>& outResults) 
+// bool AntennaVisioner::detect_once(cv::Mat& outputFrame, std::vector<DetectionResult>& outResults) 
+// {
+//     int ret;
+
+//     // [关键步骤] 每次进入函数先清空上一帧的检测结果，防止累积
+//     outResults.clear();
+
+//     #if TIME_CONM_CALC
+//     /* C++14 使用 std::chrono 进行高精度计时 */
+//     auto start_time = std::chrono::high_resolution_clock::now();
+//     #endif
+    
+//     cv::Mat origImg;
+//     image_buffer_t ibImage;
+
+//     memset(&ibImage, 0, sizeof(image_buffer_t));
+
+//     origImg = outputFrame;
+//     if (origImg.empty()) {
+//         std::cerr << "Read pic data failed." << std::endl;
+//         return false;
+//     }
+
+//     /* 格式转换: OpenCV 默认是 BGR，RKNN/YOLO 通常需要 RGB */
+//     // cv::cvtColor(origImg, origImg, cv::COLOR_BGR2RGB);
+
+//     /* 填充 src_image 结构体信息 */
+//     ibImage.width = origImg.cols;
+//     ibImage.height = origImg.rows;
+//     ibImage.format = IMAGE_FORMAT_RGB888;
+//     ibImage.size = origImg.total() * origImg.elemSize(); // 宽*高*通道数
+
+//     /* [普通路径]: 直接使用 OpenCV 的内存指针 */
+//     // 注意：origImg 必须在 inference 结束前保持存活
+//     ibImage.virt_addr = origImg.data;
+//     ibImage.fd = dmaFd_; // 有 dma fd
+
+//     /* 推理与后处理 */
+//     object_detect_result_list odResults;
+//     ret = inference_yolov8_model(&rknnAppCtx_, &ibImage, &odResults);
+//     if (ret != 0) {
+//         printf("inference fail! ret=%d\n", ret);
+//         return false; // 跳过本帧后续处理，开始处理下一帧
+//     }
+
+    
+
+//     #if TIME_CONM_CALC
+//     auto end_time = std::chrono::high_resolution_clock::now();
+//     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+//     std::cout << "推理时间: " << duration.count() << "ms." << std::endl;
+//     #endif
+
+//     /* 处理检测结果 */
+//     for (int i = 0; i < odResults.count; i++) {
+//         object_detect_result *detResult = &(odResults.results[i]);
+        
+//         DetectionResult resultItem;
+//         resultItem.className = std::string(coco_cls_to_name(detResult->cls_id)); 
+//         resultItem.classId = detResult->cls_id;
+//         resultItem.prop = detResult->prop;
+//         outResults.push_back(resultItem);
+
+//         /* 简单的终端打印 */
+//         printf("%s @ (%.2f) \n", coco_cls_to_name(detResult->cls_id), detResult->prop);
+
+//         int x1 = detResult->box.left;
+//         int y1 = detResult->box.top;
+//         int x2 = detResult->box.right;
+//         int y2 = detResult->box.bottom;
+
+//         /* 调用你原本的画图函数 (依然保留画图功能) */
+//         draw_rectangle(&ibImage, x1, y1, x2 - x1, y2 - y1, COLOR_BLUE, 3);
+        
+//         char text[256];
+//         sprintf(text, "%s %.1f%%", coco_cls_to_name(detResult->cls_id), detResult->prop * 100);
+//         draw_text(&ibImage, text, x1, y1 - 20, COLOR_RED, 10);
+//     }
+
+//     #if TIME_CONM_CALC
+//     end_time = std::chrono::high_resolution_clock::now();
+//     duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+//     std::cout << "推理+画图时间: " << duration.count() << "ms." << std::endl;
+//     #endif
+    
+//     return true;
+// }
+
+bool AntennaVisioner::detect_once(cv::Mat& outputFrame, std::vector<DetectionResult>& outResults)
 {
     int ret;
 
-    // [关键步骤] 每次进入函数先清空上一帧的检测结果，防止累积
     outResults.clear();
 
     #if TIME_CONM_CALC
-    /* C++14 使用 std::chrono 进行高精度计时 */
     auto start_time = std::chrono::high_resolution_clock::now();
     #endif
     
-    cv::Mat origImg;
     image_buffer_t ibImage;
-
     memset(&ibImage, 0, sizeof(image_buffer_t));
+    DmaBuffer_t* yoloBuffer = nullptr;
 
-    origImg = outputFrame;
-    if (origImg.empty()) {
-        std::cerr << "Read pic data failed." << std::endl;
-        return false;
+    /* --- 分支 1：使用海康相机 & DMA 零拷贝流水线 --- */
+    if (useHikvision_ && uhv_ != nullptr) {
+        yoloBuffer = uhv_->yoloTaskQueue.pop();
+        if (yoloBuffer == nullptr) return false;
+
+        ibImage.width =  yoloBuffer->width;
+        ibImage.height = yoloBuffer->height;
+        ibImage.format = IMAGE_FORMAT_RGB888;
+        ibImage.size = yoloBuffer->bufferSize;
+        ibImage.virt_addr = static_cast<unsigned char*>(yoloBuffer->virtAddr);
+        ibImage.fd = yoloBuffer->dmaFd; 
+    } else { /* --- 分支 2：使用普通 USB 相机 (OpenCV 原生) --- */
+        cv::Mat origImg;
+        cap_ >> origImg; // 读取一帧
+        if (origImg.empty()) return false;
+
+        /* 需要将 BGR 转为模型需要的 RGB */
+        cv::cvtColor(origImg, outputFrame, cv::COLOR_BGR2RGB);
+
+        ibImage.width = outputFrame.cols;
+        ibImage.height = outputFrame.rows;
+        ibImage.format = IMAGE_FORMAT_RGB888;
+        ibImage.size = outputFrame.total() * outputFrame.elemSize();
+        ibImage.virt_addr = outputFrame.data;
+        ibImage.fd = -1;
     }
-
-    /* 格式转换: OpenCV 默认是 BGR，RKNN/YOLO 通常需要 RGB */
-    // cv::cvtColor(origImg, origImg, cv::COLOR_BGR2RGB);
-
-    /* 填充 src_image 结构体信息 */
-    ibImage.width = origImg.cols;
-    ibImage.height = origImg.rows;
-    ibImage.format = IMAGE_FORMAT_RGB888;
-    ibImage.size = origImg.total() * origImg.elemSize(); // 宽*高*通道数
-
-    /* [普通路径]: 直接使用 OpenCV 的内存指针 */
-    // 注意：origImg 必须在 inference 结束前保持存活
-    ibImage.virt_addr = origImg.data;
-    ibImage.fd = dmaFd_; // 有 dma fd
 
     /* 推理与后处理 */
     object_detect_result_list odResults;
     ret = inference_yolov8_model(&rknnAppCtx_, &ibImage, &odResults);
     if (ret != 0) {
         printf("inference fail! ret=%d\n", ret);
-        return false; // 跳过本帧后续处理，开始处理下一帧
+        /* 推理失败也应该归还内存 */
+        uhv_->yoloPool.release_buffer(yoloBuffer);
+        return false; 
     }
-
-    
 
     #if TIME_CONM_CALC
     auto end_time = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
-    std::cout << "推理时间: " << duration.count() << "ms." << std::endl;
+    std::cout << "[time]: 推理时间: " << duration.count() << "ms." << std::endl;
     #endif
 
-    /* 处理检测结果 */
+    /* 处理检测结果并画图 (直接画在 DMA 内存中) */
     for (int i = 0; i < odResults.count; i++) {
         object_detect_result *detResult = &(odResults.results[i]);
         
@@ -189,15 +283,11 @@ bool AntennaVisioner::detect_once(cv::Mat& outputFrame, std::vector<DetectionRes
         resultItem.prop = detResult->prop;
         outResults.push_back(resultItem);
 
-        /* 简单的终端打印 */
-        printf("%s @ (%.2f) \n", coco_cls_to_name(detResult->cls_id), detResult->prop);
-
         int x1 = detResult->box.left;
         int y1 = detResult->box.top;
         int x2 = detResult->box.right;
         int y2 = detResult->box.bottom;
 
-        /* 调用你原本的画图函数 (依然保留画图功能) */
         draw_rectangle(&ibImage, x1, y1, x2 - x1, y2 - y1, COLOR_BLUE, 3);
         
         char text[256];
@@ -205,10 +295,29 @@ bool AntennaVisioner::detect_once(cv::Mat& outputFrame, std::vector<DetectionRes
         draw_text(&ibImage, text, x1, y1 - 20, COLOR_RED, 10);
     }
 
+    /* 收尾工作也要区分模式 */
+    if (useHikvision_ && yoloBuffer != nullptr) {
+        /* 深拷贝给 outputFrame (因为 yoloBuffer 马上面临回收) */
+        auto current_time = std::chrono::high_resolution_clock::now();
+        cv::Mat drawnImg(ibImage.height, ibImage.width, CV_8UC3, ibImage.virt_addr);
+        cv::cvtColor(drawnImg, outputFrame, cv::COLOR_RGB2BGR); 
+        #if TIME_CONM_CALC
+        auto end_time = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - current_time);
+        std::cout << "[time]: 推理后颜色转换的时间: " << duration.count() << "ms." << std::endl;
+        #endif
+        
+        /* 归还底层内存 */
+        uhv_->yoloPool.release_buffer(yoloBuffer); 
+    } else {
+        /* 普通模式下，outputFrame 本来就是我们处理的本体，只需把颜色转回 BGR 给界面显示即可 */
+        cv::cvtColor(outputFrame, outputFrame, cv::COLOR_RGB2BGR);
+    }
+
     #if TIME_CONM_CALC
     end_time = std::chrono::high_resolution_clock::now();
     duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
-    std::cout << "推理+画图时间: " << duration.count() << "ms." << std::endl;
+    std::cout << "[time]: 推理+画图+拷贝时间: " << duration.count() << "ms." << std::endl;
     #endif
     
     return true;
