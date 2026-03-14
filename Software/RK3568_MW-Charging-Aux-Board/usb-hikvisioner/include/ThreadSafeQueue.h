@@ -7,7 +7,8 @@ template<typename T>
 class ThreadSafeQueue {
 public:
     // 阻塞式弹出，直到队列非空
-    T pop() {
+    T pop() 
+    {
         std::unique_lock<std::mutex> lock(mutex_);
         cond_.wait(lock, [this]{ return !queue_.empty(); });
         T val = queue_.front();
@@ -16,7 +17,8 @@ public:
     }
 
     // 非阻塞尝试弹出（可选）
-    bool try_pop(T& val) {
+    bool try_pop(T& val) 
+    {
         std::lock_guard<std::mutex> lock(mutex_);
         if (queue_.empty()) return false;
         val = queue_.front();
@@ -25,7 +27,8 @@ public:
     }
 
     // 压入元素
-    void push(T val) {
+    void push(T val) 
+    {
         {
             std::lock_guard<std::mutex> lock(mutex_);
             queue_.push(std::move(val));
@@ -33,7 +36,8 @@ public:
         cond_.notify_one(); // 通知等待的消费者
     }
 
-    bool empty() const {
+    bool empty() const 
+    {
         std::lock_guard<std::mutex> lock(mutex_);
         return queue_.empty();
     }

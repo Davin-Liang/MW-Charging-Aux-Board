@@ -8,7 +8,7 @@ export CC=${GCC_COMPILER}-gcc
 export CXX=${GCC_COMPILER}-g++
 
 # build
-# mkdir -p build/
+mkdir -p build/
 cd build/
 cmake ..
 make -j4

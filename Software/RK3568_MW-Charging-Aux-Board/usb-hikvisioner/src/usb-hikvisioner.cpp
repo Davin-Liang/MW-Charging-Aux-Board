@@ -200,8 +200,9 @@ bool USBHikvisioner::camera_open()
 
     /* 注册抓图回调 */
     if (openGrabCallback_) {
-        if (!sourcePool.alloc_pool(3, realWidth, realHeight, BufferFormat::YUV422)) return false;
-        if (!yoloPool.alloc_pool(3, 640, 640, BufferFormat::RGB888)) return false;
+        if (!sourcePool.alloc_pool(4, realWidth, realHeight, BufferFormat::YUV422)) return false;
+        if (!yoloPool.alloc_pool(4, 640, 640, BufferFormat::RGB888)) return false;
+        if (!pushFlowPool.alloc_pool(4, 1280, 720, BufferFormat::NV12)) return false;
 
         start_rga_thread();
 
@@ -212,6 +213,7 @@ bool USBHikvisioner::camera_open()
             stop_rga_thread();
             sourcePool.destroy_pool();
             yoloPool.destroy_pool();
+            pushFlowPool.destroy_pool();
             MV_CC_CloseDevice(deviceHandle_);
             return false; 
         }
@@ -229,6 +231,7 @@ bool USBHikvisioner::camera_open()
             stop_rga_thread();
             sourcePool.destroy_pool();
             yoloPool.destroy_pool();
+            pushFlowPool.destroy_pool();
             MV_CC_CloseDevice(deviceHandle_);
         }
         return false;
@@ -279,6 +282,7 @@ bool USBHikvisioner::camera_close()
         /* 线程彻底死透了，现在可以安全地拆除物理内存池了 */
         sourcePool.destroy_pool();
         yoloPool.destroy_pool();
+        pushFlowPool.destroy_pool();
     }
 
     cameraStatus_ = CameraStatus::CLOSED;
@@ -404,6 +408,25 @@ void USBHikvisioner::rga_dispatch_thread_func()
                 printf("[Warning] YOLO Buffer Pool is empty! Drop 1 frame.\n");
             }
 
+            DmaBuffer_t* pushFlowBuffer = pushFlowPool.get_buffer();
+
+            if (pushFlowBuffer != nullptr) {
+                /* 只有获取到 yolo 内存，且 RGA 转换成功时，才入队 */
+                auto start_time = std::chrono::high_resolution_clock::now();
+                if (rga_process_to_nv12(sourceBuffer, pushFlowBuffer)) {
+                    std::lock_guard<std::mutex> lock(queueMutex_);
+                    pushFlowTaskQueue.push(pushFlowBuffer);
+                } else {
+                    /* 如果 RGA 转换失败，要把 yoloBuffer 还回去，防止内存流失 */
+                    pushFlowPool.release_buffer(pushFlowBuffer);
+                }
+                auto end_time = std::chrono::high_resolution_clock::now();
+                auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+                std::cout << "[time]: YUV422转到NV12 1280*720 所需要的时间为: " << duration.count() << "ms." << std::endl;
+            } else {
+                printf("[Warning] Push-Flow Buffer Pool is empty! Drop 1 frame.\n");
+            }
+
             /* 无论如何，源头 Buffer 用完了必须还回去 */
             sourcePool.release_buffer(sourceBuffer);
         }
@@ -496,6 +519,97 @@ bool USBHikvisioner::rga_process_to_rgb(DmaBuffer_t* srcBuf, DmaBuffer_t* dstBuf
         ret_rga = imfill(rga_buf_dst, dst_whole_rect, 0xFF727272); 
         if (ret_rga <= 0 && dstBuf->virtAddr != nullptr)
             memset(dstBuf->virtAddr, 114, dstBuf->bufferSize);
+    }
+
+    /* 5. RGA 终极处理：瞬间完成 格式转换 + 等比例缩放 + 偏移写入 */
+    rga_buffer_t pat; memset(&pat, 0, sizeof(rga_buffer_t));
+    im_rect prect; memset(&prect, 0, sizeof(im_rect));
+    
+    ret_rga = improcess(rga_buf_src, rga_buf_dst, pat, srect, drect, prect, 0);
+    if (ret_rga <= 0) {
+        std::cerr << "[RGA Error] improcess failed: " << imStrError((IM_STATUS)ret_rga) << std::endl;
+        ret = false;
+    }
+
+    /* 6. 释放 RGA 句柄 (必须执行，否则内核内存泄漏！) */
+    releasebuffer_handle(rga_handle_src);
+    releasebuffer_handle(rga_handle_dst);
+
+    return ret;
+}
+
+bool USBHikvisioner::rga_process_to_nv12(DmaBuffer_t* srcBuf, DmaBuffer_t* dstBuf) 
+{
+    if (!srcBuf || srcBuf->dmaFd <= 0 || !dstBuf || dstBuf->dmaFd <= 0) {
+        std::cerr << "[RGA Error] Invalid DMA fd!" << std::endl;
+        return false;
+    }
+
+    bool ret = true;
+    IM_STATUS ret_rga = IM_STATUS_NOERROR;
+    
+    /* RGA 句柄 */
+    rga_buffer_handle_t rga_handle_src = 0;
+    rga_buffer_handle_t rga_handle_dst = 0;
+
+    /* 格式定义：源头是海康的 YUYV，目标是 NV12 (YUV420SP) */
+    int srcFmt = RK_FORMAT_YUYV_422; 
+    int dstFmt = RK_FORMAT_YCbCr_420_SP; // RGA 中的 NV12 格式宏
+
+    /* 1. 导入 DMA Fd 生成 RGA Handle */
+    im_handle_param_t in_param = { srcBuf->width, srcBuf->height, srcFmt };
+    rga_handle_src = importbuffer_fd(srcBuf->dmaFd, &in_param);
+    if (rga_handle_src <= 0) {
+        std::cerr << "[RGA Error] Failed to import src fd!" << std::endl;
+        return false;
+    }
+
+    im_handle_param_t dst_param = { dstBuf->width, dstBuf->height, dstFmt };
+    rga_handle_dst = importbuffer_fd(dstBuf->dmaFd, &dst_param);
+    if (rga_handle_dst <= 0) {
+        std::cerr << "[RGA Error] Failed to import dst fd!" << std::endl;
+        releasebuffer_handle(rga_handle_src); // 错误处理：释放已申请的源句柄
+        return false;
+    }
+
+    /* 2. 包装 RGA Buffer */
+    rga_buffer_t rga_buf_src = wrapbuffer_handle(rga_handle_src, srcBuf->width, srcBuf->height, 
+                                                srcFmt, srcBuf->width, srcBuf->height);
+    rga_buffer_t rga_buf_dst = wrapbuffer_handle(rga_handle_dst, dstBuf->width, dstBuf->height,
+                                                dstFmt, dstBuf->width, dstBuf->height);
+
+    /* 3. 计算 Letterbox (等比例缩放) 参数 */
+    float scale = std::min((float)dstBuf->width / srcBuf->width, 
+                            (float)dstBuf->height / srcBuf->height);
+    
+    // 【修改点1】：NV12格式要求宽、高以及X、Y的偏移量必须是偶数 (2的倍数)，使用 & (~1) 强制清零最低位
+    int scaled_w = ((int)(srcBuf->width * scale)) & (~1);
+    int scaled_h = ((int)(srcBuf->height * scale)) & (~1);
+    int offset_x = ((dstBuf->width - scaled_w) / 2) & (~1);
+    int offset_y = ((dstBuf->height - scaled_h) / 2) & (~1);
+
+    im_rect srect = {0, 0, srcBuf->width, srcBuf->height};
+    im_rect drect = {offset_x, offset_y, scaled_w, scaled_h};
+
+    /* 4. 背景填充 (Padding) */
+    if (scaled_w != dstBuf->width || scaled_h != dstBuf->height) {
+        im_rect dst_whole_rect = {0, 0, dstBuf->width, dstBuf->height};
+        
+        // 【修改点2】：NV12 填充灰色。YUV 的灰色大约是 Y=114(0x72), U=128(0x80), V=128(0x80)
+        ret_rga = imfill(rga_buf_dst, dst_whole_rect, 0x00808072); 
+        
+        // CPU 回退策略 (如果 RGA 硬件填充失败)
+        if (ret_rga <= 0 && dstBuf->virtAddr != nullptr) {
+            int y_size = dstBuf->width * dstBuf->height;
+            int uv_size = y_size / 2;
+            
+            // NV12 是半平面格式，Y 占据前 width*height，紧接着是交错的 UV 分量
+            uint8_t* y_ptr = static_cast<uint8_t*>(dstBuf->virtAddr);
+            uint8_t* uv_ptr = y_ptr + y_size;
+            
+            memset(y_ptr, 114, y_size);   // Y 亮度通道：114 (中灰色)
+            memset(uv_ptr, 128, uv_size); // UV 色度通道：128 (无色差)
+        }
     }
 
     /* 5. RGA 终极处理：瞬间完成 格式转换 + 等比例缩放 + 偏移写入 */

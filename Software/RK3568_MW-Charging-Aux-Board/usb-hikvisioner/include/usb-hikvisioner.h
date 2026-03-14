@@ -105,9 +105,11 @@ public:
 
     /* --- 公开的队列与内存池资源 --- */
     // 允许外部业务层（如 AntennaVisioner）直接交互的基础设施
-    ThreadSafeQueue<DmaBuffer_t*> yoloTaskQueue; ///< 对外输出的 YOLO 推理任务队列 (装载 RGB 数据)
-    DmaBufferPool sourcePool;                    ///< 源图内存池 (存放相机 YUYV 原始数据)
-    DmaBufferPool yoloPool;                      ///< YOLO 内存池 (存放 RGA 转换后的 RGB 数据)
+    ThreadSafeQueue<DmaBuffer_t*> yoloTaskQueue;        ///< 对外输出的 YOLO 推理任务队列 (装载 RGB 数据)
+    ThreadSafeQueue<DmaBuffer_t*> pushFlowTaskQueue;    ///< 对外输出的推流队列 (装载 NV12 数据)
+    DmaBufferPool sourcePool;                           ///< 源图内存池 (存放相机 YUYV 原始数据)
+    DmaBufferPool yoloPool;                             ///< YOLO 内存池 (存放 RGA 转换后的 RGB 数据)
+    DmaBufferPool pushFlowPool;                         ///< YOLO 内存池 (存放 RGA 转换后的 RGB 数据)
 
 private:
     /**
@@ -130,6 +132,7 @@ private:
      * @return true 转换成功 | false 转换失败
      */
     bool rga_process_to_rgb(DmaBuffer_t* srcBuf, DmaBuffer_t* dstBuf);
+    bool rga_process_to_nv12(DmaBuffer_t* srcBuf, DmaBuffer_t* dstBuf);
 
     /* --- 私有成员变量 --- */
     int cameraDeviceIndex_;                   ///< 相机设备索引
