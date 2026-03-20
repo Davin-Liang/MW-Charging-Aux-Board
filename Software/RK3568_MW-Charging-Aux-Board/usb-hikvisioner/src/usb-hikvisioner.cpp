@@ -203,6 +203,7 @@ bool USBHikvisioner::camera_open()
         if (!sourcePool.alloc_pool(4, realWidth, realHeight, BufferFormat::YUV422)) return false;
         if (!yoloPool.alloc_pool(4, 640, 640, BufferFormat::RGB888)) return false;
         if (!pushFlowPool.alloc_pool(4, 1280, 720, BufferFormat::NV12)) return false;
+        if (!v1080pPool.alloc_pool(4, 1920, 1088, BufferFormat::NV12)) return false;
 
         start_rga_thread();
 
@@ -214,6 +215,7 @@ bool USBHikvisioner::camera_open()
             sourcePool.destroy_pool();
             yoloPool.destroy_pool();
             pushFlowPool.destroy_pool();
+            v1080pPool.destroy_pool();
             MV_CC_CloseDevice(deviceHandle_);
             return false; 
         }
@@ -232,6 +234,7 @@ bool USBHikvisioner::camera_open()
             sourcePool.destroy_pool();
             yoloPool.destroy_pool();
             pushFlowPool.destroy_pool();
+            v1080pPool.destroy_pool();
             MV_CC_CloseDevice(deviceHandle_);
         }
         return false;
@@ -283,6 +286,7 @@ bool USBHikvisioner::camera_close()
         sourcePool.destroy_pool();
         yoloPool.destroy_pool();
         pushFlowPool.destroy_pool();
+        v1080pPool.destroy_pool();
     }
 
     cameraStatus_ = CameraStatus::CLOSED;
@@ -425,6 +429,25 @@ void USBHikvisioner::rga_dispatch_thread_func()
                 std::cout << "[time]: YUV422转到NV12 1280*720 所需要的时间为: " << duration.count() << "ms." << std::endl;
             } else {
                 printf("[Warning] Push-Flow Buffer Pool is empty! Drop 1 frame.\n");
+            }
+
+            DmaBuffer_t* v1080pBuffer = v1080pPool.get_buffer();
+
+            if (v1080pBuffer != nullptr) {
+                /* 只有获取到1080p内存，且 RGA 转换成功时，才入队 */
+                auto start_time = std::chrono::high_resolution_clock::now();
+                if (rga_process_to_nv12(sourceBuffer, v1080pBuffer)) {
+                    std::lock_guard<std::mutex> lock(queueMutex_); // hereTODO:
+                    v1080pTaskQueue.push(v1080pBuffer);
+                } else {
+                    /* 如果 RGA 转换失败，要把 yoloBuffer 还回去，防止内存流失 */
+                    v1080pPool.release_buffer(v1080pBuffer);
+                }
+                auto end_time = std::chrono::high_resolution_clock::now();
+                auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+                std::cout << "[time]: YUV422转到NV12 1920*1080 所需要的时间为: " << duration.count() << "ms." << std::endl;
+            } else {
+                printf("[Warning] 1080p Buffer Pool is empty! Drop 1 frame.\n");
             }
 
             /* 无论如何，源头 Buffer 用完了必须还回去 */

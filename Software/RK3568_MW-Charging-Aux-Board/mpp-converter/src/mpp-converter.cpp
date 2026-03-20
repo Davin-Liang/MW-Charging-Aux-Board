@@ -6,25 +6,62 @@ uhv_(camera)
     bool ret = true;
 
         // 1. 初始化 ZLM 的推流频道 (适配 ZLM 最新版 API)
-        mediakit::MediaTuple tuple;
-        tuple.vhost = "__defaultVhost__"; 
-        tuple.app = "live";               
-        tuple.stream = "test_720p";       
+        // mediakit::MediaTuple tuple;
+        // tuple.vhost = "__defaultVhost__"; 
+        // tuple.app = "live";               
+        // tuple.stream = "test_720p";       
 
 
-        zlmChannel720p_ = std::make_shared<mediakit::DevChannel>(tuple, 0.0f);
-        auto track = std::make_shared<mediakit::H265Track>();
+        // zlmChannel720p_ = std::make_shared<mediakit::DevChannel>(tuple, 0.0f);
+        // auto track = std::make_shared<mediakit::H265Track>();
         
-        // 把轨道注册进频道
-        zlmChannel720p_->addTrack(track);
-        // 【关键】：通知频道轨道添加完毕，频道才会开始对外注册流！！！
-        zlmChannel720p_->addTrackCompleted();
+        // // 把轨道注册进频道
+        // zlmChannel720p_->addTrack(track);
+        // // 【关键】：通知频道轨道添加完毕，频道才会开始对外注册流！！！
+        // zlmChannel720p_->addTrackCompleted();
+
+        // ==========================================================
+        // 1. 初始化 720p 推流频道 (强行派发到 ZLM 后台线程，保证绝对安全)
+        // ==========================================================
+        poller720p_ = toolkit::EventPollerPool::Instance().getPoller();
+        poller720p_->sync([this]() {
+            mediakit::MediaTuple tuple;
+            tuple.vhost = "__defaultVhost__"; 
+            tuple.app = "live";               
+            tuple.stream = "test_720p";       
+
+            this->zlmChannel720p_ = std::make_shared<mediakit::DevChannel>(tuple, 0.0f);
+            this->zlmChannel720p_->addTrack(std::make_shared<mediakit::H265Track>());
+            this->zlmChannel720p_->addTrackCompleted();
+        });
+
+        // ==========================================================
+        // 2. 初始化 1080p 录制频道 (同样派发到后台线程)
+        // 注意：这里【不再】直接调用 setupRecord，而是等用户手动调用 start_record()
+        // ==========================================================
+        poller1080p_ = toolkit::EventPollerPool::Instance().getPoller();
+        poller1080p_->sync([this]() {
+            mediakit::MediaTuple tuple1080;
+            tuple1080.vhost = "__defaultVhost__"; 
+            tuple1080.app = "record";             
+            tuple1080.stream = "test_1080p";       
+
+            this->zlmChannel1080p_ = std::make_shared<mediakit::DevChannel>(tuple1080, 0.0f);
+            this->zlmChannel1080p_->addTrack(std::make_shared<mediakit::H265Track>());
+            this->zlmChannel1080p_->addTrackCompleted();
+        });
 
         auto on_h265_encoded = [this](int streamId, const uint8_t* h265Data, size_t dataSize) {
             uint32_t currentStamp = toolkit::getCurrentMillisecond();
 
             if (streamId == 0) {
-                // ...
+                // 【1080p MP4 录制打帧】和 720p 是一模一样的零拷贝方式！
+                if (this->zlmChannel1080p_) {
+                    auto frame = std::make_shared<mediakit::H265FrameNoCacheAble>(
+                        (char*)h265Data, dataSize, currentStamp, currentStamp, 4 
+                    );
+                    this->zlmChannel1080p_->inputFrame(frame);
+                }
             } 
             else if (streamId == 1) {
                 // std::cout << "[720p] Got H.265 frame, size: " << dataSize << " bytes\n";
@@ -60,12 +97,26 @@ uhv_(camera)
         return;
     }
 
-    start_stream(1);
+    ret = add_stream_task(
+        0,                  // streamId: 0
+        1920,               // imageWidth
+        1088,                // imageHeight
+        30,                 // frameRate: 30fps
+        2000000,            // targetBps: 2Mbps
+        &uhv_->v1080pTaskQueue,         // pushFlowTaskQueue: 绑定的输入队列
+        &uhv_->v1080pPool,
+        on_h265_encoded     // encodedCallback: 绑定的输出回调
+    );
+    if (!ret) {
+        std::cerr << "Failed to start MPP streams!" << std::endl;
+        return;
+    }
 }
 
 MppConverter::~MppConverter() 
 {
     stop_all_streams();
+    stop_media_servers();
 }
 
 bool MppConverter::add_stream_task(int streamId, 
@@ -157,7 +208,6 @@ void MppConverter::encoding_thread_loop(std::shared_ptr<StreamWorkerContext> wor
         {
             std::unique_lock<std::mutex> lock(workerContext->pauseMutex_);
             // 如果 enableStream_ 为 false，线程会在这里彻底挂起，不占任何 CPU！
-            // 只有 startPushStream() 调用 notify_all 才会唤醒它。
             workerContext->pauseCv_.wait(lock, [this, workerContext] { 
                 return workerContext->enableStream_ || !workerContext->isRunning_; 
             });
@@ -187,7 +237,6 @@ void MppConverter::encoding_thread_loop(std::shared_ptr<StreamWorkerContext> wor
         ret = mpp_buffer_import(&frmBuffer, &mppBufInfo);
         if (ret != MPP_OK) {
             std::cerr << "[MppConverter] Failed to import DMA fd!" << std::endl;
-            // uhv_->pushFlowPool.release_buffer(srcBuffer);
             workerContext->bufferPool_->release_buffer(srcBuffer);
             continue; // 这里视您的业务逻辑，可能需要回收 srcBuffer
         }
@@ -222,7 +271,6 @@ void MppConverter::encoding_thread_loop(std::shared_ptr<StreamWorkerContext> wor
         mpp_frame_deinit(&mppFrame);
         mpp_buffer_put(frmBuffer);
         
-        // uhv_->pushFlowPool.release_buffer(srcBuffer);
         workerContext->bufferPool_->release_buffer(srcBuffer);
     }
 }
@@ -233,7 +281,10 @@ void MppConverter::stop_all_streams()
         if (workerContext->isRunning_) {
             /* 唤醒因条件变量而睡眠的线程 */
             if (!workerContext->enableStream_)
-                start_stream(workerContext->streamId_);
+                ctrl_stream(workerContext->streamId_, true);
+
+            if (workerContext->enableRecord_)
+                ctrl_record(workerContext->streamId_, false);
 
             workerContext->isRunning_ = false;
             
@@ -254,32 +305,119 @@ void MppConverter::stop_all_streams()
         }
     }
     streamWorkers_.clear();
+
+    if (zlmChannel1080p_) {
+        zlmChannel1080p_.reset(); // 释放频道对象
+        std::cout << "[MppConverter] 1080p 录制通道已关闭，正在封装 MP4..." << std::endl;
+    }
+    
+    if (zlmChannel720p_) {
+        zlmChannel720p_.reset();
+    }
+
     std::cout << "[MppConverter] All streams stopped and resources released." << std::endl;
 }
 
-void MppConverter::start_stream(int streamId) 
+void MppConverter::ctrl_stream(int streamId, bool status) 
 {
     for (auto& workerContext : streamWorkers_) {
         if (streamId != workerContext->streamId_) continue;
 
-        {
-            std::lock_guard<std::mutex> lock(workerContext->pauseMutex_);
-            workerContext->enableStream_ = true;
+        if (workerContext->enableStream_ == status) return;
+
+        if (status) {
+            {
+                std::lock_guard<std::mutex> lock(workerContext->pauseMutex_);
+                workerContext->enableStream_ = true;
+            }
+            workerContext->pauseCv_.notify_all(); // 【关键】：唤醒正在深度睡眠的编码线程！
+            std::cout << "[MppConverter] 阀门打开，已唤醒编码线程！" << std::endl;
+        } else {
+            {
+                std::lock_guard<std::mutex> lock(workerContext->pauseMutex_);
+                workerContext->enableStream_ = false;
+            }
+            std::cout << "[MppConverter] 阀门关闭，编码线程即将休眠！" << std::endl;
         }
-        workerContext->pauseCv_.notify_all(); // 【关键】：唤醒正在深度睡眠的编码线程！
-        std::cout << "[MppConverter] 阀门打开，已唤醒编码线程！" << std::endl;
     }
 }
 
-void MppConverter::pause_stream(int streamId) 
+void MppConverter::ctrl_record(int streamId, bool status)
 {
     for (auto& workerContext : streamWorkers_) {
         if (streamId != workerContext->streamId_) continue;
 
-        {
-            std::lock_guard<std::mutex> lock(workerContext->pauseMutex_);
-            workerContext->enableStream_ = false;
+        if (workerContext->enableRecord_ == status) return;
+
+        if (status) {
+            if (streamId == 0) {
+                if (zlmChannel1080p_ && poller1080p_) {
+                    workerContext->enableRecord_ = true;
+                    poller1080p_->async([this]() {
+                        this->zlmChannel1080p_->setupRecord(mediakit::Recorder::type_mp4, true, "./video_records", 0);
+                    });
+                    ctrl_stream(streamId, true);
+                    std::cout << "[MppConverter] 已开始 1080p MP4 录像!" << std::endl;
+                }
+            } else if (streamId == 1) {
+
+            }
+        } else {
+            if (streamId == 0) {
+                if (zlmChannel1080p_ && poller1080p_) {
+                    workerContext->enableRecord_ = false;
+                    auto channel_copy = zlmChannel1080p_; 
+                    poller1080p_->async([channel_copy]() {
+                        if (channel_copy) {
+                            channel_copy->setupRecord(mediakit::Recorder::type_mp4, false, "", 0);
+                        }
+                    });
+                    ctrl_stream(streamId, false);
+                    std::cout << "[MppConverter] 已暂停 1080p MP4 录像!" << std::endl;
+                }
+            } else if (streamId == 1) {
+
+            }
         }
-        std::cout << "[MppConverter] 阀门关闭，编码线程即将休眠！" << std::endl;
     }
+}
+
+void MppConverter::init_zlm_env() 
+{
+    toolkit::Logger::Instance().add(std::make_shared<toolkit::ConsoleChannel>());
+    toolkit::Logger::Instance().setWriter(std::make_shared<toolkit::AsyncLogWriter>());
+    toolkit::WorkThreadPool::setPoolSize(4); // 启动四核线程池
+    std::cout << "[MppConverter] ZLM 全局环境初始化完成." << std::endl;
+}
+
+bool MppConverter::start_media_servers() 
+{
+    // 实例化服务器对象
+    rtspSrv_ = std::make_shared<toolkit::TcpServer>();
+    rtmpSrv_ = std::make_shared<toolkit::TcpServer>();
+
+    try {
+        rtspSrv_->start<mediakit::RtspSession>(8554); 
+        rtmpSrv_->start<mediakit::RtmpSession>(1935); 
+        
+        std::cout << "[系统提示] ZLM 流媒体服务器已启动 (RTSP: 8554, RTMP: 1935)!" << std::endl;
+        return true;
+    } catch (std::exception &ex) {
+        std::cerr << "[严重错误] 流媒体服务器启动失败: " << ex.what() << std::endl;
+        // 启动失败的话，清理掉刚才 new 出来的对象
+        rtspSrv_.reset();
+        rtmpSrv_.reset();
+        return false;
+    }
+}
+
+void MppConverter::stop_media_servers() 
+{
+    if (rtspSrv_) {
+        rtspSrv_.reset(); // 释放端口，踢掉客户端
+    }
+    if (rtmpSrv_) {
+        rtmpSrv_.reset();
+    }
+    std::cout << "[MppConverter] ZLM 网络服务器已安全关闭." << std::endl;
 }

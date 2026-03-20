@@ -26,28 +26,8 @@ void signal_handler(int signal) {
 }
 
 int main() {
-    // ==========================================================
-    // 第一步：先开门营业 (启动 ZLM 基础网络服务)
-    // ==========================================================
-    toolkit::Logger::Instance().add(std::make_shared<toolkit::ConsoleChannel>());
-    toolkit::Logger::Instance().setWriter(std::make_shared<toolkit::AsyncLogWriter>());
-    toolkit::WorkThreadPool::setPoolSize(4); // 启动四核线程池
+    MppConverter::init_zlm_env();
 
-// 【修复】：加上 static，保证这俩服务器对象的生命周期直到程序结束才销毁
-    static toolkit::TcpServer::Ptr rtspSrv(new toolkit::TcpServer());
-    static toolkit::TcpServer::Ptr rtmpSrv(new toolkit::TcpServer());
-
-    try {
-        rtspSrv->start<mediakit::RtspSession>(8554); 
-        rtmpSrv->start<mediakit::RtmpSession>(1935); 
-        
-        std::cout << "[系统提示] ZLM 流媒体服务器已启动 (RTSP: 8554, RTMP: 1935)!" << std::endl;
-    } catch (std::exception &ex) {
-        std::cerr << "[严重错误] 启动失败: " << ex.what() << std::endl;
-        return -1;
-    }
-
-    // 【新增】注册 SIGINT (Ctrl+C) 信号给操作系统
     std::signal(SIGINT, signal_handler);
 
     // 1. 初始化底层的海康相机与 DMA 流水线
@@ -57,6 +37,13 @@ int main() {
     
     // 实例化编码管理器，传入相机指针 (用于内存回收)
     MppConverter encoderManager(&camera);
+    if (!encoderManager.start_media_servers()) {
+        return -1; // 端口被占用等情况直接退出
+    }
+
+    encoderManager.ctrl_stream(1, true);
+    encoderManager.ctrl_stream(0, true);
+    encoderManager.ctrl_record(0, true);
 
     if (!camera.camera_open()) {
         std::cerr << "相机打开失败，程序退出！" << std::endl;
@@ -124,10 +111,8 @@ int main() {
     std::cout << "---------------------------------" << std::endl;
     std::cout << "开始执行安全清理流程..." << std::endl;
 
-    if (camera.camera_close())
-        std::cout << "成功关闭相机." << std::endl;
-    else
-        std::cerr << "无法关闭相机." << std::endl;
+    if (camera.camera_close()) std::cout << "成功关闭相机." << std::endl;
+    else std::cerr << "无法关闭相机." << std::endl;
 
     std::cout << "[系统提示] 正在安全清理资源，给 MP4 封装留出时间，请勿强拔电源..." << std::endl;
     

@@ -31,6 +31,14 @@
 #include "../ext-codec/H265.h"
 #include "Util/TimeTicker.h"
 
+#include "Poller/EventPoller.h"
+#include "Network/TcpServer.h"
+
+#include "Thread/WorkThreadPool.h"
+#include "Util/logger.h"
+#include "Rtsp/RtspSession.h"
+#include "Rtmp/RtmpSession.h"
+
 // 内存 16 字节对齐宏 (VPU 硬件要求)
 #define MPP_ALIGN(x, a) (((x) + (a) - 1) & ~((a) - 1))
 
@@ -85,17 +93,39 @@ public:
      */
     void stop_all_streams();
 
-    /**
-     * @brief 使能特定编码转换流的工作
-     * @param streamId 该路流的唯一标识 ID（例如：1 表示 720p，0 表示 1080p）
-     */
-    void start_stream(int streamId);
+    // class enum StreamStatus {
+    //     DISABLE = 0,
+    //     ENABLE,
+    // };
 
     /**
-     * @brief 失能特定编码转换流的工作
+     * @brief 使能/失能特定编码转换流的工作
      * @param streamId 该路流的唯一标识 ID（例如：1 表示 720p，0 表示 1080p）
+     * @param status true 使能/ DISABLE 失能
      */
-    void pause_stream(int streamId);
+    void ctrl_stream(int streamId, bool status);
+
+    /**
+     * @brief 使能/失能特定编码流的录像工作
+     * @param streamId 该路流的唯一标识 ID（例如：1 表示 720p，0 表示 1080p）
+     * @param status true 使能/ DISABLE 失能
+     */
+    void ctrl_record(int streamId, bool status);
+
+    /**
+     * @brief 初始化日志和线程池 (全局调一次即可)
+     */
+    static void init_zlm_env();
+
+    /**
+     * @brief 启动 RTSP / RTMP 监听
+     */
+    bool start_media_servers();
+
+    /**
+     * @brief 停止流媒体服务器 (完美解决生命周期析构问题)
+     */
+    void stop_media_servers();
 
 private:
     /**
@@ -123,6 +153,7 @@ private:
         std::mutex pauseMutex_;                             ///< 
 
         bool enableStream_ = false;                         ///< 是否使能编码转换流，初始化为失能
+        bool enableRecord_ = false;
     };
 
     /**
@@ -137,7 +168,14 @@ private:
 
     /* ZLMediaKit 推流相关对象 (720p 专用) */
     std::shared_ptr<mediakit::DevChannel> zlmChannel720p_;
-    std::shared_ptr<mediakit::H265Track> zlmTrack720p_;
+    toolkit::EventPoller::Ptr poller720p_;
+
+    /* ZLMediaKit 录像相关对象 (1080p 专用) */
+    std::shared_ptr<mediakit::DevChannel> zlmChannel1080p_;
+    toolkit::EventPoller::Ptr poller1080p_;
+
+    toolkit::TcpServer::Ptr rtspSrv_;
+    toolkit::TcpServer::Ptr rtmpSrv_;
 };
 
 #endif // MPP_CONVERTER_H

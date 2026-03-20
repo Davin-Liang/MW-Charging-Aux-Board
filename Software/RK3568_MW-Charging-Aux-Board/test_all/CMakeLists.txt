@@ -17,6 +17,7 @@ add_executable(test_all_demo src/test_demo.cpp)
 add_executable(test_all_demo1 src/test_demo1.cpp)
 add_executable(test_all_demo2 src/test_demo2.cpp)
 add_executable(test_all_demo3 src/test_demo3.cpp)
+add_executable(test_all_demo4 src/test_demo4.cpp)
 
 target_link_libraries(test_all_demo PRIVATE 
     # usb_hikvisioner_lib
@@ -39,6 +40,14 @@ target_link_libraries(test_all_demo3 PRIVATE
     # ZLToolKit
 )
 
+target_link_libraries(test_all_demo4 PRIVATE 
+    # usb_hikvisioner_lib
+    aerial_visioner_lib
+    mpp_converter_lib
+    # zlmediakit
+    # ZLToolKit
+)
+
 # target_include_directories(test_all_demo3 PUBLIC
 #     ../3rdparty/ZLMediaKit/src
 #     ../3rdparty/ZLMediaKit/3rdpart/ZLToolKit/src
@@ -48,3 +57,4 @@ install(TARGETS test_all_demo DESTINATION ./)
 install(TARGETS test_all_demo1 DESTINATION ./)
 install(TARGETS test_all_demo2 DESTINATION ./)
 install(TARGETS test_all_demo3 DESTINATION ./)
+install(TARGETS test_all_demo4 DESTINATION ./)

@@ -107,9 +107,11 @@ public:
     // 允许外部业务层（如 AntennaVisioner）直接交互的基础设施
     ThreadSafeQueue<DmaBuffer_t*> yoloTaskQueue;        ///< 对外输出的 YOLO 推理任务队列 (装载 RGB 数据)
     ThreadSafeQueue<DmaBuffer_t*> pushFlowTaskQueue;    ///< 对外输出的推流队列 (装载 NV12 数据)
+    ThreadSafeQueue<DmaBuffer_t*> v1080pTaskQueue;      ///< 对外输出的录像队列 (装载 NV12 数据)
     DmaBufferPool sourcePool;                           ///< 源图内存池 (存放相机 YUYV 原始数据)
     DmaBufferPool yoloPool;                             ///< YOLO 内存池 (存放 RGA 转换后的 RGB 数据)
-    DmaBufferPool pushFlowPool;                         ///< YOLO 内存池 (存放 RGA 转换后的 RGB 数据)
+    DmaBufferPool pushFlowPool;                         ///< 推流内存池 (存放 RGA 转换后的 NV12 数据)
+    DmaBufferPool v1080pPool;                           ///< 1080P录像内存池 (存放 RGA 转换后的 NV12 数据)
 
 private:
     /**
