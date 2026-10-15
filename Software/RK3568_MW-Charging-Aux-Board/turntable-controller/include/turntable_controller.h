@@ -5,7 +5,6 @@
  */
 
 #pragma once
-
 #include <modbus.h>
 #include <cstdint>
 

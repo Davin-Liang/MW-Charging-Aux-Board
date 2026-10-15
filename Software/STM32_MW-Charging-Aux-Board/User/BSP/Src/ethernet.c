@@ -27,7 +27,6 @@
 #include "stm32f429_eth_conf.h"
 #include "stm32f429_eth.h"
 #include "delay.h"
-#include "malloc.h"
 
 ETH_InitTypeDef ETH_InitStructure;
 

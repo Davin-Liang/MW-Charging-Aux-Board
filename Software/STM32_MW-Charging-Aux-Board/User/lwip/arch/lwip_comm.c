@@ -31,7 +31,6 @@
 #include "ethernetif.h"
 #include "lwip/timeouts.h"
 #include "lwip/tcpip.h"
-#include "./MALLOC/malloc.h"
 #include "delay.h"
 //#include "./SYSTEM/usart/usart.h"
 #include <stdio.h>
