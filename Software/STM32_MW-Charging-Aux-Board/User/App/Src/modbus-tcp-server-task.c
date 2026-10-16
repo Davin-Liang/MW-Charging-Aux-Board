@@ -6,6 +6,8 @@
 #include "modbus.h"
 #include <stdio.h>
 
+#include "network_stats.h"
+
 #define SERVER_IP       "192.168.1.30"
 #define SERVER_PORT     8080
 #define COIL_COUNT      16
@@ -54,18 +56,36 @@ static void modbus_tcp_server_task(void *param) {
         uint8_t query[MODBUS_TCP_MAX_ADU_LENGTH];
         int client_socket = modbus_tcp_accept(ctx, &server_socket);
 
-        if (client_socket < 0) continue;
+        if (client_socket < 0) {
+            g_networkStats.tcp_accept_error++;  // 接受客户端连接失败
+
+            continue;
+        }
+
+        g_networkStats.tcp_connect_count++;     // 客户端接入成功
 
         printf("Modbus client connected\r\n");
         for (;;) {
             int rc = modbus_receive(ctx, query);
 
-            if (rc <= 0) break;
+            if (rc <= 0) {
+                g_networkStats.modbus_recv_end_count++; // 接收结束或失败
 
-            modbus_reply(ctx, query, rc, mapping);
+                break;
+            }
+
+            g_networkStats.modbus_req_count++;  // 收到一条完整 Modbus 请求
+
+            int ret = modbus_reply(ctx, query, rc, mapping);
+
+            if (ret < 0)
+                g_networkStats.modbus_reply_error++; // Modbus 响应失败
         }
 
         lwip_close(client_socket);
+
+        g_networkStats.tcp_disconnect_count++;  // 当前客户端连接处理结束
+
         printf("Modbus client disconnected\r\n");
     }
 }

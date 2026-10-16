@@ -63,6 +63,7 @@
 #include "ethernet.h"
 #include "stm32f429_eth.h"
 
+#include "network_stats.h"
 
 /* 定义一个信号量 */
 xSemaphoreHandle g_rx_semaphore = NULL;
@@ -182,8 +183,11 @@ static err_t low_level_output(struct netif *netif, struct pbuf *p)
         l = l+q -> len;
     } 
     res = ETH_Tx_Packet(l); 
-    if (res == ETH_ERROR)
+    if (res == ETH_ERROR) {
+        g_networkStats.tx_output_error++;  // lwIP 底层发送失败
+
         return ERR_MEM;//返回错误状态
+    }
 		
     return ERR_OK;
 
@@ -298,8 +302,14 @@ static struct pbuf * low_level_input(struct netif *netif)
         {
             memcpy((u8_t*)q->payload, (u8_t*)&buffer[l], q->len);
             l = l + q->len;
+
+            g_networkStats.rx_packet_count++;  // 确认这行存在且能够执行
         }    
+    } else {
+        g_networkStats.rx_pbuf_fail++;     // pbuf 内存分配失败
     }
+
+
     frame.descriptor->Status = ETH_DMARxDesc_OWN; // 设置Rx描述符OWN位,buffer重归ETH DMA 
     if ((ETH->DMASR & ETH_DMASR_RBUS) != (u32)RESET) // 当Rx Buffer不可用位(RBUS)被设置的时候,重置它.恢复传输
     { 
@@ -424,12 +434,16 @@ REGAIN_PBUF:
                 /* 调用netif结构体中的input字段(一个函数)来处理数据包 */
                 if (netif->input(p, netif) != ERR_OK)
                 {
+                    g_networkStats.rx_input_error++;  // lwIP 输入接口提交失败
+                    
                     LWIP_DEBUGF(NETIF_DEBUG, ("ethernetif_input: IP input error\n"));
                     pbuf_free(p);
                     p = NULL;
                 }
                 else
                 {
+                    g_networkStats.rx_input_ok++;     // lwIP 输入接口接受该 pbuf
+
                     xSemaphoreTake( g_rx_semaphore, 0);
                     goto REGAIN_PBUF;
                 }

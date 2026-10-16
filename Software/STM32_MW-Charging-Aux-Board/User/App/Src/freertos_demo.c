@@ -4,12 +4,15 @@
 #include "task.h"
 #include "lwip_comm.h"
 #include "modbus-tcp-server-task.h"
+#include "network_stats.h"
 #include <stdio.h>
 
 #define NETWORK_INIT_TASK_PRIORITY  5
 #define NETWORK_INIT_TASK_STACK     512
 #define MODBUS_TASK_PRIORITY        6
 #define MODBUS_TASK_STACK           512
+#define NETWORK_STATS_TASK_PRIORITY 1
+#define NETWORK_STATS_TASK_STACK    256
 
 static void network_init_task(void *param)
 {
@@ -24,6 +27,12 @@ static void network_init_task(void *param)
     if (create_task_for_modbus_TCP(MODBUS_TASK_STACK, MODBUS_TASK_PRIORITY) != pdPASS)
     {
         printf("Modbus task creation failed\r\n");
+    }
+
+    if (create_task_for_network_stats(NETWORK_STATS_TASK_STACK,
+                                      NETWORK_STATS_TASK_PRIORITY) != pdPASS)
+    {
+        printf("Network statistics task creation failed\r\n");
     }
 
     vTaskDelete(NULL);

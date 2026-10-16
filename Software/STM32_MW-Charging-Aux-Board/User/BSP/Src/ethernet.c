@@ -27,8 +27,13 @@
 #include "stm32f429_eth_conf.h"
 #include "stm32f429_eth.h"
 #include "delay.h"
+#include <stdio.h>
+
+#include "network_stats.h"
 
 ETH_InitTypeDef ETH_InitStructure;
+
+#define ETH_SOFTWARE_RESET_TIMEOUT    1000000U
 
 /**
  * @brief       以太网芯片初始化
@@ -38,13 +43,24 @@ ETH_InitTypeDef ETH_InitStructure;
  */
 uint8_t ethernet_init(void)
 {
+    uint32_t timeout;
+
     ETH_MspInit();
 	
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_ETH_MAC | RCC_AHB1Periph_ETH_MAC_Tx |RCC_AHB1Periph_ETH_MAC_Rx, ENABLE);
 	
     ETH_DeInit();                                  
     ETH_SoftwareReset();                          
-    while (ETH_GetSoftwareResetStatus() == SET){;}
+    timeout = ETH_SOFTWARE_RESET_TIMEOUT;
+    while ((ETH_GetSoftwareResetStatus() == SET) && (timeout-- != 0U))
+    {
+    }
+    if (ETH_GetSoftwareResetStatus() == SET)
+    {
+        printf("ETH software reset timeout, DMABMR=0x%08lX\r\n",
+               (unsigned long)ETH->DMABMR);
+        return 1;
+    }
 	
     ETH_StructInit(&ETH_InitStructure);
 
@@ -299,6 +315,8 @@ void ETH_IRQHandler(void)
         /* 检查接收中断 */
         if (ETH_GetDMAITStatus(ETH_DMA_IT_R) != RESET)
         {
+            g_networkStats.rx_irq_count++;
+
             if (ethernet_get_eth_rx_size(DMARxDescToGet))
             {
                 lwip_pkt_handle();      /* 处理以太网数据，即将数据提交给LWIP */
@@ -351,6 +369,8 @@ FrameTypeDef ETH_Rx_Packet(void)
         /* 检查接收缓冲区不可用状态 */
         if ((ETH->DMASR & ETH_DMASR_RBUS) != (uint32_t)RESET)  
         { 
+            g_networkStats.rx_rbus_count++;  // 检测到 RX Buffer Unavailable
+            
             ETH->DMASR = ETH_DMASR_RBUS;//清除ETH DMA的RBUS位 
             ETH->DMARPDR = 0;//恢复DMA接收
         }
@@ -364,8 +384,12 @@ FrameTypeDef ETH_Rx_Packet(void)
         framelength = ((DMARxDescToGet->Status & ETH_DMARxDesc_FL) >> ETH_DMARxDesc_FrameLengthShift) - 4; // 得到接收包帧长度(不包含4字节CRC)
         frame.buffer = DMARxDescToGet->Buffer1Addr; // 得到包数据所在的位置
     }
-	else 
-        framelength = ETH_ERROR; // 错误  
+	else {
+        g_networkStats.rx_desc_error++;  // RX 帧状态异常
+
+        framelength = ETH_ERROR; // 错误
+    }
+          
 
     frame.length = framelength; 
     frame.descriptor = DMARxDescToGet; 
@@ -385,8 +409,11 @@ FrameTypeDef ETH_Rx_Packet(void)
 uint8_t ETH_Tx_Packet(uint16_t FrameLength)
 {   
     // 检查当前描述符是否属于CPU（OWN位为0表示属于CPU）
-    if ((DMATxDescToSet->Status & ETH_DMATxDesc_OWN) != (uint32_t)RESET)
+    if ((DMATxDescToSet->Status & ETH_DMATxDesc_OWN) != (uint32_t)RESET) {
+        g_networkStats.tx_desc_busy++;
+
         return ETH_ERROR;  // 错误，OWN位被设置了（属于DMA）
+    }
     
     // 设置帧长度到控制缓冲区大小字段的TBS1位域
     DMATxDescToSet->ControlBufferSize = FrameLength & ETH_DMATxDesc_TBS1;
@@ -409,6 +436,8 @@ uint8_t ETH_Tx_Packet(uint16_t FrameLength)
     {
         DMATxDescToSet = (ETH_DMADESCTypeDef*)(DMATxDescToSet->Buffer2NextDescAddr);
     }
+
+    g_networkStats.tx_packet_count++;  // 成功提交一帧给 DMA
     
     return ETH_SUCCESS;   
 }

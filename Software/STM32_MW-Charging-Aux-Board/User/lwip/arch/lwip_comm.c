@@ -38,6 +38,7 @@
 #include "semphr.h"
 #include "task.h"
 
+#include "network_stats.h"
 
 __lwip_dev g_lwipdev;                   /* lwip控制结构体 */
 struct netif g_lwip_netif;              /* 定义一个全局的网络接口 */
@@ -224,9 +225,13 @@ extern xSemaphoreHandle g_rx_semaphore; /* 定义一个信号量 */
  */
 void lwip_pkt_handle(void)
 {
-    BaseType_t xHigherPriorityTaskWoken;
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
     /* 获取信号量 */
-    xSemaphoreGiveFromISR(g_rx_semaphore,&xHigherPriorityTaskWoken);/* 释放二值信号量 */
+    BaseType_t ret = xSemaphoreGiveFromISR(g_rx_semaphore,&xHigherPriorityTaskWoken);/* 释放二值信号量 */
+
+    if (ret == pdTRUE)
+        g_networkStats.rx_wakeup_count++;  // 成功投递 RX 信号量
+
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);                   /* 如果需要的话进行一次任务切换  */
 }
 
