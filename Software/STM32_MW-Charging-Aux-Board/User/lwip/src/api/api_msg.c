@@ -56,6 +56,8 @@
 
 #include <string.h>
 
+#include "network_stats.h"
+
 /* netconns are polled once per second (e.g. continue write on memory error) */
 #define NETCONN_TCP_POLL_INTERVAL 2
 
@@ -329,9 +331,18 @@ recv_tcp(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t err)
   }
 
   if (sys_mbox_trypost(&conn->recvmbox, msg) != ERR_OK) {
+      if (p != NULL) {
+        g_networkStats.tcp_recvmbox_fail++;
+        g_networkStats.tcp_recvmbox_fail_port = pcb->remote_port;
+      }
+
     /* don't deallocate p: it is presented to us later again from tcp_fasttmr! */
     return ERR_MEM;
   } else {
+    if (p != NULL) {
+      g_networkStats.tcp_recvmbox_in++;
+      g_networkStats.tcp_recvmbox_in_port = pcb->remote_port;
+    }
 #if LWIP_SO_RCVBUF
     SYS_ARCH_INC(conn->recv_avail, len);
 #endif /* LWIP_SO_RCVBUF */

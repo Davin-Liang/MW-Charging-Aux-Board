@@ -87,7 +87,9 @@ SYS_LIGHTWEIGHT_PROT==1:如果您确实需要任务间保护
 
 
 /* ---------- Statistics 选项 ---------- */
-#define LWIP_STATS                      0
+#define LWIP_STATS 1
+#define MEM_STATS  1
+#define MEMP_STATS 1
 #define LWIP_PROVIDE_ERRNO              1
 
 /* ---------- 链接回调选项 ---------- */

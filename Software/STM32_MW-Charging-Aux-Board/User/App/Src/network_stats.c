@@ -3,6 +3,22 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include <stdio.h>
+#include "lwipopts.h"
+#include "lwip/stats.h"
+
+void print_lwip_pool_stats(void)
+{
+#if LWIP_STATS && MEMP_STATS
+    printf("[lwIP PBUF_POOL]\r\n");
+    printf(" Used : %u\r\n",
+           (unsigned int)lwip_stats.memp[MEMP_PBUF_POOL]->used);
+    printf(" Max  : %u\r\n",
+           (unsigned int)lwip_stats.memp[MEMP_PBUF_POOL]->max);
+    printf(" Err  : %u\r\n",
+           (unsigned int)lwip_stats.memp[MEMP_PBUF_POOL]->err);
+#endif
+}
+
 
 NetworkStats_t g_networkStats = {0};
 
@@ -57,6 +73,22 @@ static void network_stats_task(void *param)
         PRINT_STAT("Request", current_stats.modbus_req_count, g_networkStatsSnapshot.modbus_req_count);
         PRINT_STAT("Recv End", current_stats.modbus_recv_end_count, g_networkStatsSnapshot.modbus_recv_end_count);
         PRINT_STAT("Reply Error", current_stats.modbus_reply_error, g_networkStatsSnapshot.modbus_reply_error);
+        PRINT_STAT("TCPIP Msg", current_stats.tcpip_msg_count, g_networkStatsSnapshot.tcpip_msg_count);
+
+       printf("In Port   : %lu\r\n",
+       (unsigned long)g_networkStats.tcp_recvmbox_in_port);
+
+       printf("Fail Port : %lu\r\n",
+              (unsigned long)g_networkStats.tcp_recvmbox_fail_port);
+        print_lwip_pool_stats();
+
+       printf("[TCP Recv Mailbox]\r\n");
+       printf(" In   : %lu\r\n",
+              (unsigned long)g_networkStats.tcp_recvmbox_in);
+       printf(" Out  : %lu\r\n",
+              (unsigned long)g_networkStats.tcp_recvmbox_out);
+       printf(" Fail : %lu\r\n",
+              (unsigned long)g_networkStats.tcp_recvmbox_fail);
         printf("==================================================\r\n");
 
         g_networkStatsSnapshot = current_stats;

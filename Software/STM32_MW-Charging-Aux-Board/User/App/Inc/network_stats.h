@@ -35,6 +35,15 @@ typedef struct
     volatile uint32_t modbus_recv_end_count;  // Modbus 接收结束/失败次数：modbus_receive() 返回非正值
     volatile uint32_t modbus_reply_error;     // Modbus 响应失败次数：modbus_reply() 返回负值
 
+    volatile uint32_t tcpip_msg_count; // TCP/IP 线程成功消费的邮箱消息数
+
+    /* TCP 接收邮箱统计 */
+    volatile uint32_t tcp_recvmbox_in;     // 数据成功入队
+    volatile uint32_t tcp_recvmbox_out;    // 数据被应用层取出
+    volatile uint32_t tcp_recvmbox_fail;   // 数据入队失败
+    volatile uint32_t tcp_recvmbox_fail_port;
+    volatile uint32_t tcp_recvmbox_in_port;
+
 } NetworkStats_t;
 
 extern NetworkStats_t g_networkStats;

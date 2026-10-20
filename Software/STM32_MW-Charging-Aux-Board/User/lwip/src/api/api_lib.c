@@ -69,6 +69,8 @@
 #include "lwip/priv/tcp_priv.h"
 #include "lwip/priv/tcpip_priv.h"
 
+#include "network_stats.h"
+
 #ifdef LWIP_HOOK_FILENAME
 #include LWIP_HOOK_FILENAME
 #endif
@@ -666,6 +668,10 @@ netconn_recv_data(struct netconn *conn, void **new_buf, u8_t apiflags)
   API_EVENT(conn, NETCONN_EVT_RCVMINUS, len);
 
   LWIP_DEBUGF(API_LIB_DEBUG, ("netconn_recv_data: received %p, len=%"U16_F"\n", buf, len));
+
+  if (NETCONNTYPE_GROUP(conn->type) == NETCONN_TCP && buf != NULL) {
+    g_networkStats.tcp_recvmbox_out++;
+  }
 
   *new_buf = buf;
   /* don't set conn->last_err: it's only ERR_OK, anyway */
